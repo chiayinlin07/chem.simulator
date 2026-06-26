@@ -187,15 +187,23 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 
     <!-- SLIDE 2: Concentration chart -->
     <div class="slide" id="slide2">
-      <div class="mini-flask-wrap">
-        <svg viewBox="0 0 64 64">
-          <defs><clipPath id="mclip1"><ellipse cx="32" cy="40" rx="22" ry="18"/></clipPath></defs>
-          <ellipse cx="32" cy="40" rx="22" ry="18" id="mini-sol1" fill="rgba(152,26,10,0.5)" stroke="#555" stroke-width="1.2"/>
-          <rect x="22" y="6" width="20" height="14" rx="3" fill="#2a2520" stroke="#444" stroke-width="1"/>
-          <rect x="24" y="20" width="16" height="6" fill="#2a2520"/>
-          <line x1="30" y1="6" x2="30" y2="26" stroke="#555" stroke-width="1"/>
-          <line x1="34" y1="6" x2="34" y2="26" stroke="#555" stroke-width="1"/>
-        </svg>
+      <div style="display:flex;align-items:center;gap:10px;width:100%;margin-bottom:4px;">
+        <!-- Mini Erlenmeyer flask -->
+        <div class="mini-flask-wrap" style="flex-shrink:0;">
+          <svg viewBox="0 0 64 72" width="54" height="62">
+            <defs><clipPath id="mclip1">
+              <path d="M24,8 L24,28 L8,52 Q4,62 14,64 L50,64 Q60,62 56,52 L40,28 L40,8 Z"/>
+            </clipPath></defs>
+            <path d="M24,8 L24,28 L8,52 Q4,62 14,64 L50,64 Q60,62 56,52 L40,28 L40,8 Z"
+              id="mini-sol1" fill="rgba(152,26,10,0.82)" stroke="#555" stroke-width="1.2"/>
+            <rect x="20" y="2" width="24" height="8" rx="2.5" fill="#2a2520" stroke="#444" stroke-width="1"/>
+          </svg>
+        </div>
+        <!-- Colour label -->
+        <div id="color-label" style="font-size:13px;line-height:1.6;">
+          <span style="color:#e05030;font-weight:800;">血紅色</span><br>
+          <span style="color:var(--text3);font-size:10px;">平衡狀態</span>
+        </div>
       </div>
       <div class="chart-title">📈 濃度 — 時間</div>
       <div class="chart-wrap">
@@ -210,14 +218,18 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 
     <!-- SLIDE 3: Rate chart -->
     <div class="slide" id="slide3">
-      <div class="mini-flask-wrap">
-        <svg viewBox="0 0 64 64">
-          <ellipse cx="32" cy="40" rx="22" ry="18" id="mini-sol2" fill="rgba(152,26,10,0.5)" stroke="#555" stroke-width="1.2"/>
-          <rect x="22" y="6" width="20" height="14" rx="3" fill="#2a2520" stroke="#444" stroke-width="1"/>
-          <rect x="24" y="20" width="16" height="6" fill="#2a2520"/>
-          <line x1="30" y1="6" x2="30" y2="26" stroke="#555" stroke-width="1"/>
-          <line x1="34" y1="6" x2="34" y2="26" stroke="#555" stroke-width="1"/>
-        </svg>
+      <div style="display:flex;align-items:center;gap:10px;width:100%;margin-bottom:4px;">
+        <div class="mini-flask-wrap" style="flex-shrink:0;">
+          <svg viewBox="0 0 64 72" width="54" height="62">
+            <path d="M24,8 L24,28 L8,52 Q4,62 14,64 L50,64 Q60,62 56,52 L40,28 L40,8 Z"
+              id="mini-sol2" fill="rgba(152,26,10,0.82)" stroke="#555" stroke-width="1.2"/>
+            <rect x="20" y="2" width="24" height="8" rx="2.5" fill="#2a2520" stroke="#444" stroke-width="1"/>
+          </svg>
+        </div>
+        <div id="color-label2" style="font-size:13px;line-height:1.6;">
+          <span style="color:#e05030;font-weight:800;">血紅色</span><br>
+          <span style="color:var(--text3);font-size:10px;">平衡狀態</span>
+        </div>
       </div>
       <div class="chart-title">⚡ 速率 — 時間</div>
       <div class="chart-wrap">
@@ -524,16 +536,35 @@ function setMols(fe,scn,fscn){
   document.getElementById('cnt-fscn').textContent=Math.round(fscn);
 }
 
+function getSolColor(fscnC,feC,alpha){
+  // Exaggerated: fscn drives deep blood red, low = pale straw yellow
+  const rf=Math.pow(Math.min(fscnC/8,1),0.6); // gamma <1 → faster darkening
+  const ff=Math.min(feC/5,1);
+  const r=Math.round(lerp(lerp(230,215,ff),168,rf));
+  const g2=Math.round(lerp(lerp(200,155,ff),18,rf));
+  const b=Math.round(lerp(lerp(120,30,ff),8,rf));
+  const a=alpha!==undefined?alpha:lerp(0.18,0.92,rf);
+  return`rgba(${r},${g2},${b},${a.toFixed(2)})`;
+}
+function getColorLabel(fscnC,feC){
+  const rf=Math.pow(Math.min(fscnC/8,1),0.6);
+  if(rf>0.82)return{txt:'深血紅色',sub:'FeSCN²⁺ 濃度高',col:'#ff6040'};
+  if(rf>0.60)return{txt:'血紅色',sub:'平衡狀態',col:'#e05030'};
+  if(rf>0.38)return{txt:'橙紅色',sub:'FeSCN²⁺ 減少中',col:'#e08040'};
+  if(rf>0.18)return{txt:'淡橙黃色',sub:'FeSCN²⁺ 大幅減少',col:'#d0a040'};
+  return{txt:'淡黃色',sub:'FeSCN²⁺ 極少',col:'#c8b860'};
+}
 function setSolution(fscnC,feC,alpha){
-  const rf=Math.min(fscnC/9,1),ff=Math.min(feC/6,1);
-  const r=Math.round(lerp(lerp(20,210,ff),152,rf));
-  const g2=Math.round(lerp(lerp(30,160,ff),26,rf));
-  const b=Math.round(lerp(lerp(60,20,ff),10,rf));
-  const a=alpha!==undefined?alpha:(0.22+0.48*rf);
-  const col=`rgba(${r},${g2},${b},${a.toFixed(2)})`;
+  const col=getSolColor(fscnC,feC,alpha);
   document.getElementById('sol-fill').setAttribute('fill',col);
   document.getElementById('mini-sol1').setAttribute('fill',col);
   document.getElementById('mini-sol2').setAttribute('fill',col);
+  // Update colour label
+  const lb=getColorLabel(fscnC,feC);
+  ['color-label','color-label2'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el)el.innerHTML=`<span style="color:${lb.col};font-weight:800;">${lb.txt}</span><br><span style="color:var(--text3);font-size:10px;">${lb.sub}</span>`;
+  });
 }
 
 function setRates(fwd,rev){
