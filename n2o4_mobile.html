@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>N₂O₄ ⇌ 2NO₂ 化學平衡</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#1a1a1a;--bg2:#242424;--bg3:#2e2e2e;--bg4:#383838;
+  --border:rgba(255,255,255,0.13);--border2:rgba(255,255,255,0.08);
+  --text:#f0f0ec;--text2:#c0c0bc;--text3:#808080;
+  --red:#ff4a30;--blue:#4a9eff;--gold:#ffd440;--green:#3ddc6a;
+  --info-bg:rgba(74,158,255,0.15);--info-border:rgba(74,158,255,0.5);--info-text:#7dc4ff;
+  --warn-bg:rgba(255,180,30,0.18);--warn-border:rgba(255,180,30,0.55);--warn-text:#ffd440;
+  --ok-bg:rgba(61,220,106,0.15);--ok-border:rgba(61,220,106,0.5);--ok-text:#3ddc6a;
+  --font:-apple-system,BlinkMacSystemFont,'Segoe UI','Helvetica Neue',sans-serif;
+  --r:12px;
+}
+html{background:var(--bg);color:var(--text);font-family:var(--font);-webkit-text-size-adjust:100%;}
+body{min-height:100dvh;padding-bottom:env(safe-area-inset-bottom);}
+
+/* ── Tab bar ── */
+#tab-bar{
+  position:sticky;top:0;z-index:50;
+  display:flex;background:var(--bg2);border-bottom:2px solid var(--border);
+  height:52px;
+}
+.tab-btn{
+  flex:1;border:none;background:transparent;cursor:pointer;
+  font-family:var(--font);font-size:13.5px;font-weight:700;color:var(--text3);
+  display:flex;align-items:center;justify-content:center;gap:6px;
+  border-right:1px solid var(--border);
+  -webkit-tap-highlight-color:transparent;transition:background .15s,color .15s;
+}
+.tab-btn:last-child{border-right:none;}
+.tab-btn.active{background:var(--info-bg);color:var(--info-text);}
+.tab-num{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:22px;height:22px;border-radius:50%;
+  background:var(--info-border);color:#fff;font-size:12px;font-weight:800;flex-shrink:0;
+}
+
+/* ── Panels ── */
+.panel{display:none;}
+.panel.active{display:block;}
+
+/* Section */
+.section{padding:12px 14px;border-bottom:1px solid var(--border2);}
+.sec-title{font-size:12px;font-weight:700;color:var(--text3);margin-bottom:8px;letter-spacing:.5px;}
+
+/* Page title */
+.page-title{font-size:17px;font-weight:800;letter-spacing:-.3px;line-height:1.2;margin-bottom:2px;}
+.page-sub{font-size:11px;color:var(--text3);}
+
+/* Flask */
+#flask-wrap-A,#flask-wrap-B{width:100%;aspect-ratio:4/3;display:flex;align-items:center;justify-content:center;}
+#flask-wrap-A svg,#flask-wrap-B svg{width:100%;height:100%;}
+
+/* Buttons */
+.btn-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;}
+.btn-row.three{grid-template-columns:1fr 1fr 1fr;}
+.act-btn{
+  background:var(--info-bg);border:1.5px solid var(--info-border);color:var(--info-text);
+  border-radius:10px;padding:14px 8px;font-size:13.5px;font-weight:700;
+  font-family:var(--font);cursor:pointer;min-height:52px;
+  display:flex;align-items:center;justify-content:center;gap:4px;text-align:center;
+  transition:opacity .18s;-webkit-tap-highlight-color:transparent;line-height:1.3;
+}
+.act-btn:active{opacity:.6;}
+.act-btn:disabled{opacity:.25;pointer-events:none;}
+.sel-btn{
+  background:var(--bg3);border:1.5px solid var(--border);color:var(--text2);
+  border-radius:10px;padding:13px 8px;font-size:13.5px;font-weight:600;
+  font-family:var(--font);cursor:pointer;min-height:52px;
+  display:flex;align-items:center;justify-content:center;text-align:center;
+  transition:background .15s,border-color .15s,color .15s;-webkit-tap-highlight-color:transparent;line-height:1.3;
+}
+.sel-btn.active-sel{background:var(--info-bg);border-color:var(--info-border);color:var(--info-text);}
+.sel-btn:disabled{opacity:.25;pointer-events:none;}
+.go-btn{
+  background:var(--ok-bg);border:1.5px solid var(--ok-border);color:var(--ok-text);
+  border-radius:10px;padding:14px;font-size:14px;font-weight:800;
+  font-family:var(--font);cursor:pointer;width:100%;min-height:52px;
+  -webkit-tap-highlight-color:transparent;transition:opacity .18s;
+}
+.go-btn:active{opacity:.6;}
+.go-btn:disabled{opacity:.25;pointer-events:none;}
+.reset-btn{
+  background:var(--bg3);border:1.5px solid var(--border);color:var(--text2);
+  border-radius:10px;padding:12px;font-size:14px;font-weight:600;
+  font-family:var(--font);cursor:pointer;
+  -webkit-tap-highlight-color:transparent;transition:opacity .18s;
+}
+.reset-btn:active{opacity:.6;}
+
+/* Pill */
+.pill{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:6px 14px;border-radius:20px;font-size:13px;font-weight:700;
+  border:1.5px solid var(--border);color:var(--text2);background:var(--bg3);
+  transition:all .35s;
+}
+.pill.changing{background:var(--warn-bg);color:var(--warn-text);border-color:var(--warn-border);}
+.pill.eq{background:var(--ok-bg);color:var(--ok-text);border-color:var(--ok-border);}
+.pill.not-started{background:var(--bg3);color:var(--text3);border-color:var(--border);}
+
+/* Info box */
+.info-box{
+  background:var(--bg3);border:1.5px solid var(--border);border-radius:var(--r);
+  padding:12px 14px;font-size:13.5px;color:var(--text2);line-height:1.75;
+}
+/* Obs box */
+.obs-box{
+  border-left:3px solid var(--ok-border);padding:10px 14px;font-size:13px;
+  color:var(--text2);line-height:1.65;background:rgba(61,220,106,0.07);border-radius:0 8px 8px 0;
+  margin-top:8px;
+}
+
+/* Rate bars */
+.rate-wrap{display:flex;flex-direction:column;gap:8px;}
+.rate-row{display:flex;align-items:center;gap:9px;}
+.rate-label{font-size:13px;font-weight:800;width:18px;text-align:right;}
+.rtrack{height:16px;border-radius:8px;background:var(--bg4);flex:1;overflow:hidden;border:1px solid var(--border2);}
+.rfill{height:100%;border-radius:8px;transition:width .12s linear;}
+.rate-pct{font-size:13px;font-weight:700;width:34px;}
+
+/* Counts */
+.count-row{display:flex;gap:8px;}
+.count-chip{
+  flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:8px;
+  padding:8px 10px;display:flex;align-items:center;gap:7px;
+}
+.count-label{font-size:11px;color:var(--text3);line-height:1.2;}
+.count-val{font-size:18px;font-weight:800;color:var(--text);line-height:1;}
+
+/* Colour bar */
+.col-bar-outer{position:relative;height:18px;border-radius:9px;overflow:hidden;border:1.5px solid var(--border);}
+.col-bar-marker{position:absolute;top:0;bottom:0;width:3px;background:#fff;opacity:.7;border-radius:2px;transition:left .12s linear;}
+
+/* Chart */
+.chart-outer{width:100%;aspect-ratio:16/7;position:relative;}
+.chart-canvas{width:100%;height:100%;display:block;border-radius:8px;border:1px solid var(--border);}
+
+/* Legend */
+.legend{display:flex;gap:8px;flex-wrap:wrap;margin-top:5px;}
+.leg-item{display:flex;align-items:center;gap:5px;font-size:11.5px;color:var(--text2);}
+.leg-line{display:inline-block;width:18px;height:3px;border-radius:2px;}
+.leg-dash{display:inline-block;width:18px;border-top:2px dashed;}
+
+/* Hint */
+.hint-box{
+  background:rgba(74,158,255,0.10);border:1.5px solid var(--info-border);
+  border-radius:var(--r);padding:10px 13px;font-size:12px;color:var(--info-text);line-height:1.6;
+}
+
+/* Temp display */
+.temp-row{font-size:12px;color:var(--text3);margin-top:4px;}
+
+@keyframes fa{0%,100%{transform:translate(0,0)}50%{transform:translate(3px,-4px)}}
+@keyframes fb{0%,100%{transform:translate(0,0)}50%{transform:translate(-4px,3px)}}
+@keyframes fc{0%,100%{transform:translate(0,0)}50%{transform:translate(2px,4px)}}
+@keyframes fd{0%,100%{transform:translate(0,0)}50%{transform:translate(-3px,-2px)}}
+@keyframes fe2{0%,100%{transform:translate(0,0)}50%{transform:translate(4px,2px)}}
+</style>
+</head>
+<body>
+
+<!-- Tab Bar -->
+<div id="tab-bar">
+  <button class="tab-btn active" id="tab1" onclick="switchTab(1)">
+    <span class="tab-num">1</span><span>趨向平衡</span>
+  </button>
+  <button class="tab-btn" id="tab2" onclick="switchTab(2)">
+    <span class="tab-num">2</span><span>勒沙特列</span>
+  </button>
+</div>
+
+<!-- ═══════ PANEL 1 ═══════ -->
+<div class="panel active" id="panel1">
+
+  <div class="section">
+    <div class="page-title">N₂O₄ ⇌ 2NO₂　趨向平衡</div>
+    <div class="page-sub">選擇起始條件，觀察系統如何從非平衡狀態走向動態平衡</div>
+  </div>
+
+  <!-- Flask A -->
+  <div class="section" style="padding-bottom:4px;">
+    <div id="flask-wrap-A">
+      <svg viewBox="0 0 360 300" preserveAspectRatio="xMidYMid meet" role="img">
+        <defs>
+          <clipPath id="Afclip">
+            <path d="M120,16 L120,108 L32,226 Q18,252 44,264 L296,264 Q322,252 308,226 L240,108 L240,16 Z"/>
+          </clipPath>
+        </defs>
+        <path id="A-fbg"
+          d="M120,16 L120,108 L32,226 Q18,252 44,264 L296,264 Q322,252 308,226 L240,108 L240,16 Z"
+          fill="rgba(215,215,210,0.15)" stroke="#666" stroke-width="1.8"/>
+        <rect x="105" y="3" width="150" height="18" rx="5" fill="#3a3a3a" stroke="#555" stroke-width="1"/>
+        <text x="180" y="15" text-anchor="middle" font-size="9" fill="#888" font-family="sans-serif">密閉系統</text>
+        <g clip-path="url(#Afclip)" id="A-mol-layer"></g>
+        <!-- equation -->
+        <text x="336" y="118" text-anchor="middle" font-size="12" font-weight="800" fill="#f0f0ec" font-family="sans-serif">N₂O₄</text>
+        <text x="336" y="132" text-anchor="middle" font-size="9" fill="#888" font-family="sans-serif">（無色）</text>
+        <line x1="314" y1="144" x2="358" y2="144" stroke="#ff4a30" stroke-width="1.5" marker-end="url(#arrA)"/>
+        <line x1="358" y1="156" x2="314" y2="156" stroke="#4a9eff" stroke-width="1.5" marker-end="url(#arrA)"/>
+        <text x="336" y="174" text-anchor="middle" font-size="12" font-weight="800" fill="#f0f0ec" font-family="sans-serif">2NO₂</text>
+        <text x="336" y="188" text-anchor="middle" font-size="9" fill="#888" font-family="sans-serif">（紅棕色）</text>
+        <defs>
+          <marker id="arrA" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+            <path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </marker>
+        </defs>
+      </svg>
+    </div>
+  </div>
+
+  <!-- Condition selector -->
+  <div class="section">
+    <div class="sec-title">起始條件</div>
+    <div class="btn-row">
+      <button class="sel-btn active-sel" id="A-cond-a" onclick="Apick('a')">全部是 N₂O₄<br><span style="font-size:11px;font-weight:400;opacity:.7;">（無色）</span></button>
+      <button class="sel-btn" id="A-cond-b" onclick="Apick('b')">全部是 NO₂<br><span style="font-size:11px;font-weight:400;opacity:.7;">（紅棕色）</span></button>
+    </div>
+    <button class="go-btn" id="A-btn-start" onclick="AstartSim()">▶ 開始觀察</button>
+    <div style="display:flex;gap:10px;align-items:center;margin-top:10px;">
+      <button class="reset-btn" style="flex:0 0 auto;padding:12px 18px;" id="A-btn-reset" onclick="AresetSim()">↺ 重置</button>
+      <span class="pill not-started" id="A-pill">尚未開始</span>
+    </div>
+  </div>
+
+  <!-- Rates -->
+  <div class="section">
+    <div class="sec-title">反應速率</div>
+    <div class="rate-wrap">
+      <div class="rate-row">
+        <span class="rate-label" style="color:#ff4a30;">正</span>
+        <div class="rtrack"><div class="rfill" id="A-rfwd" style="width:0%;background:#ff4a30;"></div></div>
+        <span id="A-lfwd" class="rate-pct" style="color:#ff4a30;">0%</span>
+      </div>
+      <div class="rate-row">
+        <span class="rate-label" style="color:#4a9eff;">逆</span>
+        <div class="rtrack"><div class="rfill" id="A-rrev" style="width:0%;background:#4a9eff;"></div></div>
+        <span id="A-lrev" class="rate-pct" style="color:#4a9eff;">0%</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Counts + colour -->
+  <div class="section">
+    <div class="sec-title">分子數量</div>
+    <div class="count-row">
+      <div class="count-chip">
+        <svg width="28" height="17">
+          <ellipse cx="8" cy="8.5" rx="7" ry="4" fill="rgba(130,130,120,.5)" stroke="rgba(200,200,190,.4)" stroke-width="1"/>
+          <ellipse cx="20" cy="8.5" rx="7" ry="4" fill="rgba(130,130,120,.5)" stroke="rgba(200,200,190,.4)" stroke-width="1"/>
+        </svg>
+        <div><div class="count-label">N₂O₄</div><div class="count-val" id="A-cnt-n">—</div></div>
+      </div>
+      <div class="count-chip">
+        <svg width="17" height="17"><circle cx="8.5" cy="8.5" r="7.5" fill="rgba(185,75,35,.65)" stroke="rgba(255,120,60,.3)" stroke-width="1"/></svg>
+        <div><div class="count-label">NO₂</div><div class="count-val" id="A-cnt-r">—</div></div>
+      </div>
+    </div>
+    <div style="margin-top:10px;">
+      <div class="sec-title">氣體顏色</div>
+      <div class="col-bar-outer">
+        <div style="position:absolute;inset:0;background:linear-gradient(to right,rgba(215,215,210,.25),rgba(185,75,35,.8));"></div>
+        <div class="col-bar-marker" id="A-cmark" style="left:0%;"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text3);margin-top:3px;"><span>無色</span><span>紅棕色 →</span></div>
+    </div>
+  </div>
+
+  <!-- Info -->
+  <div class="section">
+    <div class="info-box" id="A-info-box">請選擇起始條件，再按「開始觀察」。</div>
+    <div class="obs-box" id="A-obs-box" style="display:none;">
+      🔍 <strong>觀察看看：</strong>顏色不再改變了嗎？兩條速率棒有什麼特徵？平衡時 N₂O₄ 和 NO₂ 的粒子數不一定符合 1:2，因為平衡位置由 Kc 決定，而非反應係數。
+    </div>
+  </div>
+
+  <div class="section" style="border-bottom:none;padding-bottom:20px;">
+    <div class="hint-box">📌 平衡時的粒子數比例由 <strong>Kc</strong> 決定，不一定等於係數比（1:2）。</div>
+  </div>
+
+</div><!-- end panel1 -->
+
+<!-- ═══════ PANEL 2 ═══════ -->
+<div class="panel" id="panel2">
+
+  <div class="section">
+    <div class="page-title">勒沙特列原理　N₂O₄ ⇌ 2NO₂</div>
+    <div class="page-sub">系統處於動態平衡，選擇擾動條件觀察平衡移動</div>
+  </div>
+
+  <!-- Flask B -->
+  <div class="section" style="padding-bottom:4px;">
+    <div id="flask-wrap-B">
+      <svg viewBox="0 0 360 290" preserveAspectRatio="xMidYMid meet" role="img">
+        <defs>
+          <clipPath id="Bfclip">
+            <path d="M120,14 L120,102 L34,218 Q20,244 46,256 L294,256 Q320,244 306,218 L240,102 L240,14 Z"/>
+          </clipPath>
+          <marker id="arrB" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+            <path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </marker>
+        </defs>
+        <path id="B-fbg"
+          d="M120,14 L120,102 L34,218 Q20,244 46,256 L294,256 Q320,244 306,218 L240,102 L240,14 Z"
+          fill="rgba(215,155,90,0.18)" stroke="#666" stroke-width="1.8"/>
+        <rect x="106" y="2" width="148" height="17" rx="5" fill="#3a3a3a" stroke="#555" stroke-width="1"/>
+        <text x="180" y="13" text-anchor="middle" font-size="9" fill="#888" font-family="sans-serif">密閉系統</text>
+        <g clip-path="url(#Bfclip)" id="B-mol-layer"></g>
+        <text x="334" y="108" text-anchor="middle" font-size="12" font-weight="800" fill="#f0f0ec" font-family="sans-serif">N₂O₄</text>
+        <text x="334" y="122" text-anchor="middle" font-size="9" fill="#888" font-family="sans-serif">（無色）</text>
+        <line x1="312" y1="134" x2="356" y2="134" stroke="#ff4a30" stroke-width="1.5" marker-end="url(#arrB)"/>
+        <line x1="356" y1="146" x2="312" y2="146" stroke="#4a9eff" stroke-width="1.5" marker-end="url(#arrB)"/>
+        <text x="334" y="164" text-anchor="middle" font-size="12" font-weight="800" fill="#f0f0ec" font-family="sans-serif">2NO₂</text>
+        <text x="334" y="178" text-anchor="middle" font-size="9" fill="#888" font-family="sans-serif">（紅棕色）</text>
+        <text x="334" y="193" text-anchor="middle" font-size="8" fill="#666" font-family="sans-serif">△H &gt; 0（吸熱）</text>
+      </svg>
+    </div>
+  </div>
+
+  <!-- Perturb buttons -->
+  <div class="section">
+    <div class="sec-title" style="margin-bottom:10px;">擾動條件</div>
+    <div class="btn-row" style="margin-bottom:0;">
+      <button class="act-btn" id="B-btn-heat" onclick="Bperturb('heat')">🔴 加熱</button>
+      <button class="act-btn" id="B-btn-cool" onclick="Bperturb('cool')">🔵 降溫</button>
+    </div>
+    <div class="btn-row" style="margin-top:10px;">
+      <button class="act-btn" id="B-btn-conc" onclick="Bperturb('conc')">🧪 增加 N₂O₄</button>
+      <button class="act-btn" id="B-btn-press" onclick="Bperturb('press')">⬆ 加壓</button>
+    </div>
+    <div style="display:flex;gap:10px;align-items:center;margin-top:10px;">
+      <button class="reset-btn" style="flex:0 0 auto;padding:12px 18px;" onclick="BfullReset()">↺ 重置</button>
+      <span class="pill eq" id="B-pill">✓ 動態平衡</span>
+    </div>
+  </div>
+
+  <!-- Rates -->
+  <div class="section">
+    <div class="sec-title">反應速率</div>
+    <div class="rate-wrap">
+      <div class="rate-row">
+        <span class="rate-label" style="color:#ff4a30;">正</span>
+        <div class="rtrack"><div class="rfill" id="B-rfwd" style="width:47%;background:#ff4a30;"></div></div>
+        <span id="B-lfwd" class="rate-pct" style="color:#ff4a30;">47%</span>
+      </div>
+      <div class="rate-row">
+        <span class="rate-label" style="color:#4a9eff;">逆</span>
+        <div class="rtrack"><div class="rfill" id="B-rrev" style="width:47%;background:#4a9eff;"></div></div>
+        <span id="B-lrev" class="rate-pct" style="color:#4a9eff;">47%</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Counts + colour + temp -->
+  <div class="section">
+    <div class="sec-title">分子數量</div>
+    <div class="count-row">
+      <div class="count-chip">
+        <svg width="28" height="17">
+          <ellipse cx="8" cy="8.5" rx="7" ry="4" fill="rgba(130,130,120,.5)" stroke="rgba(200,200,190,.4)" stroke-width="1"/>
+          <ellipse cx="20" cy="8.5" rx="7" ry="4" fill="rgba(130,130,120,.5)" stroke="rgba(200,200,190,.4)" stroke-width="1"/>
+        </svg>
+        <div><div class="count-label">N₂O₄</div><div class="count-val" id="B-cnt-n">3</div></div>
+      </div>
+      <div class="count-chip">
+        <svg width="17" height="17"><circle cx="8.5" cy="8.5" r="7.5" fill="rgba(185,75,35,.65)" stroke="rgba(255,120,60,.3)" stroke-width="1"/></svg>
+        <div><div class="count-label">NO₂</div><div class="count-val" id="B-cnt-r">6</div></div>
+      </div>
+    </div>
+    <div style="margin-top:10px;">
+      <div class="sec-title">氣體顏色</div>
+      <div class="col-bar-outer">
+        <div style="position:absolute;inset:0;background:linear-gradient(to right,rgba(215,215,210,.25),rgba(185,75,35,.8));"></div>
+        <div class="col-bar-marker" id="B-cmark" style="left:35%;"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text3);margin-top:3px;"><span>無色</span><span>紅棕色 →</span></div>
+      <div class="temp-row" id="B-temp-display">🌡 溫度：常溫</div>
+    </div>
+  </div>
+
+  <!-- Chart -->
+  <div class="section">
+    <div class="sec-title">濃度 — 時間曲線（相對單位）</div>
+    <div class="chart-outer">
+      <canvas class="chart-canvas" id="B-conc-chart"></canvas>
+    </div>
+    <div class="legend">
+      <span class="leg-item"><span class="leg-line" style="background:rgba(100,100,90,.9);"></span>N₂O₄</span>
+      <span class="leg-item"><span class="leg-line" style="background:rgba(185,75,35,.95);"></span>NO₂</span>
+      <span class="leg-item" style="color:var(--text3);font-size:11px;">-- 原始平衡</span>
+    </div>
+  </div>
+
+  <!-- Info -->
+  <div class="section">
+    <div class="info-box" id="B-info-box">系統目前處於動態平衡。選擇擾動條件，觀察平衡如何移動。</div>
+  </div>
+
+  <div class="section" style="border-bottom:none;padding-bottom:20px;">
+    <div class="hint-box">📌 新平衡粒子比例由 <strong>Kc</strong> 決定，非係數比（1:2）。</div>
+  </div>
+
+</div><!-- end panel2 -->
+
+<script>
+/* ════════ TAB ════════ */
+function switchTab(n){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('panel'+n).classList.add('active');
+  document.getElementById('tab'+n).classList.add('active');
+  if(n===2)setTimeout(()=>{BinitCanvas();BdrawGraph();},80);
+}
+
+/* ════════ SHARED ════════ */
+const ANIMS=['fa','fb','fc','fd','fe2'];
+const DURS=['3.1s','3.8s','4.4s','2.9s','3.5s','4.1s','2.6s','3.3s','4.7s','3.0s'];
+function lerp(a,b,t){return a+(b-a)*t;}
+function ease(t){return t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;}
+function easeExp(t,k=3.5){return(1-Math.exp(-k*t))/(1-Math.exp(-k));}
+
+/* ════════ PANEL A ════════ */
+const A_N2O4_SLOTS=[
+  {x:136,y:160},{x:180,y:200},{x:224,y:164},{x:208,y:238},
+  {x:120,y:218},{x:252,y:230},{x:156,y:246},{x:268,y:196},{x:172,y:146}
+];
+const A_NO2_SLOTS=[
+  {x:116,y:208},{x:158,y:148},{x:208,y:218},{x:258,y:156},
+  {x:132,y:250},{x:232,y:152},{x:280,y:222},{x:178,y:238},
+  {x:252,y:252},{x:294,y:252}
+];
+const A_MAX_N=9,A_MAX_R=10,A_EQ_N=4,A_EQ_R=6;
+const A_TOTAL_MS=9000;
+let Acond='a',Araf=null,AlastTs=null,Aelapsed=0,Arunning=false;
+
+function AbuildMolLayer(){
+  const g=document.getElementById('A-mol-layer');g.innerHTML='';
+  A_N2O4_SLOTS.forEach((s,i)=>{
+    const el=document.createElementNS('http://www.w3.org/2000/svg','g');
+    el.id='Anm'+i;
+    el.setAttribute('style',`animation:${ANIMS[i%5]} ${DURS[i]} ease-in-out infinite;opacity:0;transition:opacity .4s ease;`);
+    el.innerHTML=`<g transform="translate(${s.x},${s.y})">
+      <ellipse cx="0" cy="0" rx="20" ry="12" fill="rgba(130,130,120,.48)" stroke="rgba(200,200,190,.5)" stroke-width="1"/>
+      <ellipse cx="24" cy="0" rx="20" ry="12" fill="rgba(130,130,120,.48)" stroke="rgba(200,200,190,.5)" stroke-width="1"/>
+      <line x1="17" y1="0" x2="7" y2="0" stroke="rgba(200,200,190,.7)" stroke-width="1.5"/>
+      <text x="12" y="4" text-anchor="middle" font-size="8.5" fill="rgba(220,220,215,.9)" font-family="sans-serif" font-weight="700">N₂O₄</text>
+    </g>`;
+    g.appendChild(el);
+  });
+  A_NO2_SLOTS.forEach((s,i)=>{
+    const el=document.createElementNS('http://www.w3.org/2000/svg','g');
+    el.id='Arm'+i;
+    el.setAttribute('style',`animation:${ANIMS[(i+2)%5]} ${DURS[(i+3)%10]} ease-in-out infinite;opacity:0;transition:opacity .4s ease;`);
+    el.innerHTML=`<g transform="translate(${s.x},${s.y})">
+      <circle cx="0" cy="0" r="16" fill="rgba(185,75,35,.65)" stroke="rgba(255,120,60,.35)" stroke-width="1"/>
+      <text x="0" y="4.5" text-anchor="middle" font-size="9" fill="rgba(255,228,208,.95)" font-family="sans-serif" font-weight="700">NO₂</text>
+    </g>`;
+    g.appendChild(el);
+  });
+}
+
+function AapplyValues(n,r,fwd,rev){
+  for(let i=0;i<A_MAX_N;i++) document.getElementById('Anm'+i).style.opacity=Math.max(0,Math.min(1,n-i));
+  for(let i=0;i<A_MAX_R;i++) document.getElementById('Arm'+i).style.opacity=Math.max(0,Math.min(1,r-i));
+  const rf=r/A_MAX_R;
+  const ri=Math.round(lerp(215,190,rf)),gi=Math.round(lerp(215,118,rf)),bi=Math.round(lerp(210,68,rf));
+  document.getElementById('A-fbg').setAttribute('fill',`rgba(${ri},${gi},${bi},${(0.10+0.30*rf).toFixed(2)})`);
+  document.getElementById('A-cmark').style.left=(rf*90).toFixed(1)+'%';
+  document.getElementById('A-rfwd').style.width=fwd.toFixed(0)+'%';
+  document.getElementById('A-rrev').style.width=rev.toFixed(0)+'%';
+  document.getElementById('A-lfwd').textContent=fwd.toFixed(0)+'%';
+  document.getElementById('A-lrev').textContent=rev.toFixed(0)+'%';
+  document.getElementById('A-cnt-n').textContent=Math.round(n);
+  document.getElementById('A-cnt-r').textContent=Math.round(r);
+}
+
+function AgetInfo(t){
+  if(t<.22) return Acond==='a'
+    ?'N₂O₄ 開始分解為 NO₂，正反應速率遠大於逆反應速率，顏色逐漸加深。'
+    :'NO₂ 開始結合為 N₂O₄，逆反應速率遠大於正反應速率，顏色逐漸變淺。';
+  if(t<.58) return '兩種分子都存在，正逆反應速率差距縮小，顏色變化趨緩。';
+  if(t<.90) return '正逆反應速率越來越接近，顏色幾乎穩定，即將達到平衡。';
+  return '✅ 達到動態平衡！正反應速率 = 逆反應速率，顏色不再改變，但兩個反應仍持續進行中。';
+}
+
+function Atick(ts){
+  if(!AlastTs)AlastTs=ts;
+  Aelapsed+=ts-AlastTs;AlastTs=ts;
+  const t=Math.min(Aelapsed/A_TOTAL_MS,1),e=ease(t);
+  const sN=Acond==='a'?A_MAX_N:0,sR=Acond==='a'?0:A_MAX_R;
+  AapplyValues(lerp(sN,A_EQ_N,e),lerp(sR,A_EQ_R,e),
+    Acond==='a'?lerp(95,47,e):lerp(0,47,e),
+    Acond==='a'?lerp(0,47,e):lerp(95,47,e));
+  const p1=document.getElementById('A-pill');
+  if(t<.98){
+    document.getElementById('A-info-box').textContent=AgetInfo(t);
+    p1.textContent='反應進行中…';p1.className='pill changing';
+  } else {
+    document.getElementById('A-info-box').textContent=AgetInfo(1);
+    p1.textContent='✓ 動態平衡';p1.className='pill eq';
+    document.getElementById('A-obs-box').style.display='block';
+  }
+  if(t<1)Araf=requestAnimationFrame(Atick);
+  else{Arunning=false;document.getElementById('A-btn-reset').disabled=false;}
+}
+
+function AstartSim(){
+  if(Arunning)return;Arunning=true;Aelapsed=0;AlastTs=null;
+  ['A-btn-start','A-cond-a','A-cond-b','A-btn-reset'].forEach(id=>document.getElementById(id).disabled=true);
+  Araf=requestAnimationFrame(Atick);
+}
+function AresetSim(){
+  if(Araf)cancelAnimationFrame(Araf);
+  Arunning=false;Aelapsed=0;AlastTs=null;
+  ['A-btn-start','A-cond-a','A-cond-b','A-btn-reset'].forEach(id=>document.getElementById(id).disabled=false);
+  document.getElementById('A-obs-box').style.display='none';
+  const p1=document.getElementById('A-pill');p1.textContent='尚未開始';p1.className='pill not-started';
+  const isA=Acond==='a';
+  AapplyValues(isA?A_MAX_N:0,isA?0:A_MAX_R,0,0);
+  document.getElementById('A-info-box').textContent=isA
+    ?'起始條件：密閉容器中只含 N₂O₄（無色）。按「開始觀察」，看看會發生什麼。'
+    :'起始條件：密閉容器中只含 NO₂（紅棕色）。按「開始觀察」，看看會發生什麼。';
+}
+function Apick(c){
+  if(Arunning)return;Acond=c;
+  document.getElementById('A-cond-a').classList.toggle('active-sel',c==='a');
+  document.getElementById('A-cond-b').classList.toggle('active-sel',c==='b');
+  AresetSim();
+}
+
+/* ════════ PANEL B ════════ */
+const B_N2O4_SLOTS=[
+  {x:74,y:138},{x:116,y:168},{x:162,y:140},{x:202,y:168},
+  {x:224,y:128},{x:82,y:190},{x:144,y:202},{x:198,y:208},{x:178,y:116}
+];
+const B_NO2_SLOTS=[
+  {x:70,y:172},{x:108,y:124},{x:148,y:188},{x:188,y:116},
+  {x:220,y:154},{x:248,y:188},{x:88,y:220},{x:156,y:226},
+  {x:210,y:228},{x:258,y:222},{x:126,y:148},{x:248,y:122}
+];
+const B_MAX_N=9,B_MAX_R=12;
+const B_BASE={cN:2.5,cR:7.0,n:3,r:6,rate:47};
+const B_JUMP={
+  heat:null,cool:null,
+  conc:{n:7,r:6,cN:5.5,cR:7.0,fwd:82,rev:47},
+  press:{n:5,r:9,cN:5.0,cR:10.5,fwd:75,rev:60},
+};
+const B_NEW_EQ={
+  heat:{cN:1.0,cR:9.5,n:1,r:10,rate:72,tempLabel:'🌡 溫度：🔴 高溫'},
+  cool:{cN:5.5,cR:2.5,n:6,r:3, rate:28,tempLabel:'🌡 溫度：🔵 低溫'},
+  conc:{cN:4.0,cR:9.5,n:4,r:9, rate:47,tempLabel:'🌡 溫度：常溫'},
+  press:{cN:6.5,cR:7.5,n:5,r:5,rate:55,tempLabel:'🌡 溫度：常溫'},
+};
+const B_INFO={
+  heat:['🔴 <strong>加熱</strong>：溫度升高，正反應（吸熱）速率上升，平衡向右移動——N₂O₄ 分解為 NO₂，顏色加深。','N₂O₄ 濃度持續下降，NO₂ 濃度持續上升。依係數 1:2，NO₂ 上升量是 N₂O₄ 下降量的兩倍。','✅ 新平衡建立。高溫下 NO₂ 較多，顏色較深，新正逆速率都比原來快但彼此相等。'],
+  cool:['🔵 <strong>降溫</strong>：溫度降低，逆反應（放熱）速率相對較快，平衡向左移動——NO₂ 結合為 N₂O₄，顏色變淺。','NO₂ 濃度持續下降，N₂O₄ 濃度持續上升。依係數 1:2，N₂O₄ 上升量是 NO₂ 下降量的一半。','✅ 新平衡建立。低溫下 N₂O₄ 較多，顏色較淺，新正逆速率都比原來慢但彼此相等。'],
+  conc:['🧪 <strong>增加 N₂O₄</strong>：N₂O₄ 濃度瞬間升高，正反應速率隨之跳升，平衡向右移動。','N₂O₄ 濃度從高點緩慢下降，NO₂ 濃度上升。依係數 1:2，NO₂ 增加量是 N₂O₄ 消耗量的兩倍。','✅ 新平衡建立。新 N₂O₄ 和 NO₂ 濃度都高於原始平衡，速率回到相等。'],
+  press:['⬆ <strong>加壓</strong>：體積縮小，所有氣體濃度同比例升高，顏色加深。系統傾向減少總莫耳數，平衡向左移動（偏向 N₂O₄）。','N₂O₄ 濃度繼續上升，NO₂ 濃度下降。依係數 2:1，NO₂ 減少量是 N₂O₄ 增加量的兩倍。','✅ 新平衡建立。兩者濃度都高於原始平衡（因體積縮小），但 N₂O₄ 比例升高、NO₂ 比例降低。'],
+};
+
+let BcurN=B_BASE.n,BcurR=B_BASE.r,BcurFwd=B_BASE.rate,BcurRev=B_BASE.rate;
+let BcurCN=B_BASE.cN,BcurCR=B_BASE.cR;
+let Bphase='eq',BpType=null,BphaseT=0;
+let BpeakN=B_BASE.n,BpeakR=B_BASE.r,BpeakCN=B_BASE.cN,BpeakCR=B_BASE.cR;
+let BpeakFwd=B_BASE.rate,BpeakRev=B_BASE.rate;
+let Braf=null,BlastTs=null,BsimTime=0,BgraphData=[],BperturbT=null;
+const B_T_PRE=2.8,B_T_PAUSE=0.9,B_T_REB=5.5,B_T_POST=2.2;
+
+let Bcanvas,Bctx,BCW,BCH;
+const B_YMAX=13,B_PAD={l:28,r:42,t:12,b:22};
+const BnCol='rgba(100,100,90,.9)',BrCol='rgba(185,75,35,.95)';
+
+function BinitCanvas(){
+  Bcanvas=document.getElementById('B-conc-chart');
+  if(!Bcanvas)return;
+  const dpr=window.devicePixelRatio||1;
+  const rect=Bcanvas.getBoundingClientRect();
+  BCW=rect.width||320;BCH=Math.max(rect.height,100);
+  Bcanvas.width=BCW*dpr;Bcanvas.height=BCH*dpr;
+  Bcanvas.style.width=BCW+'px';Bcanvas.style.height=BCH+'px';
+  Bctx=Bcanvas.getContext('2d');Bctx.scale(dpr,dpr);
+}
+
+function BdrawGraph(){
+  if(!Bctx)return;
+  const W=BCW-B_PAD.l-B_PAD.r,H=BCH-B_PAD.t-B_PAD.b;
+  Bctx.clearRect(0,0,BCW,BCH);
+  Bctx.fillStyle='#1e1e1e';Bctx.beginPath();Bctx.roundRect(0,0,BCW,BCH,6);Bctx.fill();
+  Bctx.strokeStyle='rgba(255,255,255,0.07)';Bctx.lineWidth=0.5;
+  [0,3,6,9,12].forEach(v=>{
+    const y=B_PAD.t+H*(1-v/B_YMAX);
+    Bctx.beginPath();Bctx.moveTo(B_PAD.l,y);Bctx.lineTo(B_PAD.l+W,y);Bctx.stroke();
+    Bctx.fillStyle='rgba(255,255,255,0.38)';Bctx.font='9px sans-serif';Bctx.textAlign='right';
+    Bctx.fillText(v,B_PAD.l-3,y+3.5);
+  });
+  Bctx.fillStyle='rgba(255,255,255,0.2)';Bctx.font='9px sans-serif';Bctx.textAlign='left';
+  Bctx.fillText('濃度',3,B_PAD.t+H/2);
+  const tMax=BgraphData.length>1?BgraphData[BgraphData.length-1].t:B_T_PRE+B_T_PAUSE+B_T_REB+B_T_POST;
+  const tx=t=>B_PAD.l+t/(tMax+0.3)*W;
+  const ty=v=>B_PAD.t+H*(1-Math.min(Math.max(v,0),B_YMAX)/B_YMAX);
+  // base dashes
+  [[B_BASE.cN,BnCol],[B_BASE.cR,BrCol]].forEach(([v,col])=>{
+    Bctx.setLineDash([5,4]);Bctx.lineWidth=0.8;
+    Bctx.strokeStyle=col.replace(/[\d.]+\)$/,'0.18)');
+    Bctx.beginPath();Bctx.moveTo(B_PAD.l,ty(v));Bctx.lineTo(B_PAD.l+W,ty(v));Bctx.stroke();
+  });
+  Bctx.setLineDash([]);
+  if(BperturbT!==null){
+    Bctx.strokeStyle='rgba(255,255,255,0.22)';Bctx.lineWidth=1.2;Bctx.setLineDash([4,3]);
+    Bctx.beginPath();Bctx.moveTo(tx(BperturbT),B_PAD.t);Bctx.lineTo(tx(BperturbT),B_PAD.t+H);Bctx.stroke();
+    Bctx.setLineDash([]);
+  }
+  if(BgraphData.length<2){
+    Bctx.strokeStyle='rgba(255,255,255,0.2)';Bctx.lineWidth=0.8;
+    Bctx.beginPath();Bctx.moveTo(B_PAD.l,B_PAD.t);Bctx.lineTo(B_PAD.l,B_PAD.t+H);Bctx.lineTo(B_PAD.l+W,B_PAD.t+H);Bctx.stroke();
+    Bctx.fillStyle='rgba(255,255,255,0.2)';Bctx.font='9px sans-serif';Bctx.textAlign='center';
+    Bctx.fillText('時間 →',B_PAD.l+W/2,BCH-4);
+    Bctx.font='bold 9px sans-serif';Bctx.textAlign='left';
+    Bctx.fillStyle=BnCol;Bctx.fillText('N₂O₄',B_PAD.l+W+2,ty(B_BASE.cN)+4);
+    Bctx.fillStyle=BrCol;Bctx.fillText('NO₂',B_PAD.l+W+2,ty(B_BASE.cR)+4);
+    return;
+  }
+  [[d=>d.cN,BnCol,'N₂O₄'],[d=>d.cR,BrCol,'NO₂']].forEach(([fn,col,lbl])=>{
+    Bctx.strokeStyle=col;Bctx.lineWidth=2.5;Bctx.lineJoin='round';Bctx.lineCap='round';
+    Bctx.beginPath();BgraphData.forEach((d,i)=>i===0?Bctx.moveTo(tx(d.t),ty(fn(d))):Bctx.lineTo(tx(d.t),ty(fn(d))));Bctx.stroke();
+  });
+  const last=BgraphData[BgraphData.length-1];
+  Bctx.font='bold 9px sans-serif';Bctx.textAlign='left';
+  Bctx.fillStyle=BnCol;Bctx.fillText('N₂O₄',tx(last.t)+3,ty(last.cN)+4);
+  Bctx.fillStyle=BrCol;Bctx.fillText('NO₂',tx(last.t)+3,ty(last.cR)+4);
+  Bctx.strokeStyle='rgba(255,255,255,0.2)';Bctx.lineWidth=0.8;
+  Bctx.beginPath();Bctx.moveTo(B_PAD.l,B_PAD.t);Bctx.lineTo(B_PAD.l,B_PAD.t+H);Bctx.lineTo(B_PAD.l+W,B_PAD.t+H);Bctx.stroke();
+  Bctx.fillStyle='rgba(255,255,255,0.2)';Bctx.font='9px sans-serif';Bctx.textAlign='center';
+  Bctx.fillText('時間 →',B_PAD.l+W/2,BCH-4);
+}
+
+function BbuildMolLayer(){
+  const g=document.getElementById('B-mol-layer');g.innerHTML='';
+  B_N2O4_SLOTS.forEach((s,i)=>{
+    const el=document.createElementNS('http://www.w3.org/2000/svg','g');
+    el.id='Bnm'+i;
+    el.setAttribute('style',`animation:${ANIMS[i%5]} ${DURS[i]} ease-in-out infinite;opacity:0;transition:opacity .35s ease;`);
+    el.innerHTML=`<g transform="translate(${s.x},${s.y})">
+      <ellipse cx="0" cy="0" rx="18" ry="11" fill="rgba(130,130,120,.48)" stroke="rgba(200,200,190,.5)" stroke-width="1"/>
+      <ellipse cx="22" cy="0" rx="18" ry="11" fill="rgba(130,130,120,.48)" stroke="rgba(200,200,190,.5)" stroke-width="1"/>
+      <line x1="15" y1="0" x2="7" y2="0" stroke="rgba(200,200,190,.7)" stroke-width="1.5"/>
+      <text x="11" y="4" text-anchor="middle" font-size="7.5" fill="rgba(220,220,215,.9)" font-family="sans-serif" font-weight="700">N₂O₄</text>
+    </g>`;
+    g.appendChild(el);
+  });
+  B_NO2_SLOTS.forEach((s,i)=>{
+    const el=document.createElementNS('http://www.w3.org/2000/svg','g');
+    el.id='Brm'+i;
+    el.setAttribute('style',`animation:${ANIMS[(i+2)%5]} ${DURS[(i+3)%10]} ease-in-out infinite;opacity:0;transition:opacity .35s ease;`);
+    el.innerHTML=`<g transform="translate(${s.x},${s.y})">
+      <circle cx="0" cy="0" r="13" fill="rgba(185,75,35,.65)" stroke="rgba(255,120,60,.35)" stroke-width="1"/>
+      <text x="0" y="4" text-anchor="middle" font-size="8" fill="rgba(255,228,208,.95)" font-family="sans-serif" font-weight="700">NO₂</text>
+    </g>`;
+    g.appendChild(el);
+  });
+}
+
+function BsetMolsAndColor(n,r,cN,cR){
+  for(let i=0;i<B_MAX_N;i++) document.getElementById('Bnm'+i).style.opacity=Math.max(0,Math.min(1,n-i));
+  for(let i=0;i<B_MAX_R;i++) document.getElementById('Brm'+i).style.opacity=Math.max(0,Math.min(1,r-i));
+  const rf=Math.min(r,B_MAX_R)/B_MAX_R;
+  const ri=Math.round(lerp(215,190,rf)),gi=Math.round(lerp(215,118,rf)),bi=Math.round(lerp(210,68,rf));
+  document.getElementById('B-fbg').setAttribute('fill',`rgba(${ri},${gi},${bi},${(0.10+0.30*rf).toFixed(2)})`);
+  document.getElementById('B-cmark').style.left=(rf*90).toFixed(1)+'%';
+  document.getElementById('B-cnt-n').textContent=Math.round(n);
+  document.getElementById('B-cnt-r').textContent=Math.round(r);
+  BcurN=n;BcurR=r;BcurCN=cN;BcurCR=cR;
+}
+function BsetRates(fwd,rev){
+  document.getElementById('B-rfwd').style.width=fwd.toFixed(0)+'%';
+  document.getElementById('B-rrev').style.width=rev.toFixed(0)+'%';
+  document.getElementById('B-lfwd').textContent=fwd.toFixed(0)+'%';
+  document.getElementById('B-lrev').textContent=rev.toFixed(0)+'%';
+  BcurFwd=fwd;BcurRev=rev;
+}
+function BsetBtns(on){['B-btn-heat','B-btn-cool','B-btn-conc','B-btn-press'].forEach(id=>document.getElementById(id).disabled=!on);}
+
+function BanimFrame(ts){
+  if(!BlastTs)BlastTs=ts;
+  const dt=(ts-BlastTs)/1000;BlastTs=ts;BsimTime+=dt;
+
+  if(Bphase==='eq_pre'){
+    BgraphData.push({t:BsimTime,cN:B_BASE.cN,cR:B_BASE.cR});BdrawGraph();
+    if(BsimTime>=B_T_PRE){
+      BperturbT=BsimTime;BphaseT=0;
+      const j=B_JUMP[BpType];
+      if(j){
+        BpeakN=j.n;BpeakR=j.r;BpeakCN=j.cN;BpeakCR=j.cR;
+        BpeakFwd=j.fwd;BpeakRev=j.rev;
+        BsetMolsAndColor(j.n,j.r,j.cN,j.cR);BsetRates(j.fwd,j.rev);
+        BgraphData.push({t:BsimTime+0.001,cN:j.cN,cR:j.cR});
+        if(BpType==='conc'){
+          Bphase='pause';
+          document.getElementById('B-info-box').innerHTML='🧪 N₂O₄ 粒子加入中⋯正反應速率上升，即將開始平衡移動。';
+        } else {
+          Bphase='rebalance';
+          document.getElementById('B-info-box').innerHTML=B_INFO[BpType][1];
+        }
+      } else {
+        BpeakN=BcurN;BpeakR=BcurR;BpeakCN=B_BASE.cN;BpeakCR=B_BASE.cR;
+        BpeakFwd=BpType==='heat'?88:16;BpeakRev=BpType==='heat'?22:80;
+        BsetRates(BpeakFwd,BpeakRev);
+        BgraphData.push({t:BsimTime+0.001,cN:BpeakCN,cR:BpeakCR});
+        Bphase='rebalance';
+        document.getElementById('B-info-box').innerHTML=B_INFO[BpType][1];
+      }
+      const bp=document.getElementById('B-pill');bp.textContent='反應進行中…';bp.className='pill changing';
+    }
+    Braf=requestAnimationFrame(BanimFrame);return;
+  }
+
+  if(Bphase==='pause'){
+    const elapsed=BsimTime-BperturbT;
+    const pseudoT=Math.min(elapsed/B_T_REB,1),e=easeExp(pseudoT);
+    const tgt=B_NEW_EQ[BpType];
+    const cN=lerp(BpeakCN,tgt.cN,e),cR=lerp(BpeakCR,tgt.cR,e);
+    BgraphData.push({t:BsimTime,cN,cR});BdrawGraph();
+    if(elapsed>=B_T_PAUSE){
+      Bphase='rebalance';BphaseT=pseudoT;
+      document.getElementById('B-info-box').innerHTML=B_INFO[BpType][1];
+      const n=lerp(BpeakN,tgt.n,e),r=lerp(BpeakR,tgt.r,e);
+      const fwd=lerp(BpeakFwd,tgt.rate,e),rev=lerp(BpeakRev,tgt.rate,e);
+      BsetMolsAndColor(n,r,cN,cR);BsetRates(fwd,rev);
+    }
+    Braf=requestAnimationFrame(BanimFrame);return;
+  }
+
+  if(Bphase==='rebalance'){
+    BphaseT=Math.min(BphaseT+dt/B_T_REB,1);
+    const e=easeExp(BphaseT),tgt=B_NEW_EQ[BpType];
+    const cN=lerp(BpeakCN,tgt.cN,e),cR=lerp(BpeakCR,tgt.cR,e);
+    const n=lerp(BpeakN,tgt.n,e),r=lerp(BpeakR,tgt.r,e);
+    let fwd,rev;
+    if(BpType==='heat'){fwd=lerp(88,tgt.rate,e);rev=lerp(22,tgt.rate,e);}
+    else if(BpType==='cool'){fwd=lerp(16,tgt.rate,e);rev=lerp(80,tgt.rate,e);}
+    else{fwd=lerp(BpeakFwd,tgt.rate,e);rev=lerp(BpeakRev,tgt.rate,e);}
+    BsetMolsAndColor(n,r,cN,cR);BsetRates(fwd,rev);
+    BgraphData.push({t:BsimTime,cN,cR});BdrawGraph();
+    if(BphaseT>=1){
+      Bphase='eq_post';
+      const bp=document.getElementById('B-pill');bp.textContent='✓ 動態平衡';bp.className='pill eq';
+      document.getElementById('B-info-box').innerHTML=B_INFO[BpType][2];
+      document.getElementById('B-temp-display').textContent=tgt.tempLabel;
+      BsetBtns(true);
+    }
+    Braf=requestAnimationFrame(BanimFrame);return;
+  }
+
+  if(Bphase==='eq_post'){
+    const tgt=B_NEW_EQ[BpType];
+    BgraphData.push({t:BsimTime,cN:tgt.cN,cR:tgt.cR});BdrawGraph();
+    if(BsimTime-BperturbT-B_T_PAUSE-B_T_REB>B_T_POST){Braf=null;return;}
+    Braf=requestAnimationFrame(BanimFrame);return;
+  }
+  Braf=null;
+}
+
+function Bperturb(type){
+  if(Bphase!=='eq'&&Bphase!=='eq_post')return;
+  if(Braf){cancelAnimationFrame(Braf);Braf=null;}
+  BpType=type;Bphase='eq_pre';BphaseT=0;BsimTime=0;
+  BgraphData=[];BperturbT=null;BlastTs=null;
+  BpeakN=B_BASE.n;BpeakR=B_BASE.r;BpeakCN=B_BASE.cN;BpeakCR=B_BASE.cR;
+  BpeakFwd=B_BASE.rate;BpeakRev=B_BASE.rate;
+  BsetBtns(false);
+  document.getElementById('B-info-box').innerHTML=B_INFO[type][0];
+  const bp=document.getElementById('B-pill');bp.textContent='反應進行中…';bp.className='pill changing';
+  document.getElementById('B-temp-display').textContent='🌡 溫度：常溫';
+  BsetMolsAndColor(B_BASE.n,B_BASE.r,B_BASE.cN,B_BASE.cR);
+  BsetRates(B_BASE.rate,B_BASE.rate);
+  Braf=requestAnimationFrame(BanimFrame);
+}
+function BfullReset(){
+  if(Braf){cancelAnimationFrame(Braf);Braf=null;}
+  Bphase='eq';BpType=null;BsimTime=0;BgraphData=[];BperturbT=null;BphaseT=0;
+  BsetMolsAndColor(B_BASE.n,B_BASE.r,B_BASE.cN,B_BASE.cR);
+  BsetRates(B_BASE.rate,B_BASE.rate);
+  const bp=document.getElementById('B-pill');bp.textContent='✓ 動態平衡';bp.className='pill eq';
+  document.getElementById('B-info-box').textContent='系統目前處於動態平衡。選擇擾動條件，觀察平衡如何移動。';
+  document.getElementById('B-temp-display').textContent='🌡 溫度：常溫';
+  BsetBtns(true);BdrawGraph();
+}
+
+/* ════════ INIT ════════ */
+AbuildMolLayer();Apick('a');
+BbuildMolLayer();
+BsetMolsAndColor(B_BASE.n,B_BASE.r,B_BASE.cN,B_BASE.cR);
+BsetRates(B_BASE.rate,B_BASE.rate);
+window.addEventListener('resize',()=>{
+  if(document.getElementById('panel2').classList.contains('active')){BinitCanvas();BdrawGraph();}
+});
+setTimeout(()=>{BinitCanvas();BdrawGraph();},150);
+</script>
+</body>
+</html>
