@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>互動化學教室</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#12100e;
+  --bg2:#1a1712;
+  --card:#1e1b16;
+  --card2:#242018;
+  --border:rgba(255,210,120,0.09);
+  --border2:rgba(255,210,120,0.18);
+  --text:#f2ead8;
+  --text2:#9a9080;
+  --text3:#6a6058;
+  --amber:#f5c542;
+  --amber2:#e8a020;
+  --amber3:#ffd880;
+  --teal:#5ecfb0;
+  --rose:#e07060;
+  --font:-apple-system,BlinkMacSystemFont,'Segoe UI','Helvetica Neue',sans-serif;
+}
+html,body{min-height:100dvh;background:var(--bg);color:var(--text);font-family:var(--font);-webkit-text-size-adjust:100%;}
+body{padding-bottom:calc(30px + env(safe-area-inset-bottom));overflow-x:hidden;}
+
+/* ── Background canvas ── */
+#bg-canvas{position:fixed;inset:0;z-index:0;}
+
+/* ── Content ── */
+.content{position:relative;z-index:1;}
+
+/* ── Hero ── */
+.hero{padding:60px 24px 28px;text-align:center;}
+.hero-emblem{
+  width:76px;height:76px;margin:0 auto 20px;position:relative;
+  display:flex;align-items:center;justify-content:center;
+}
+.hero-emblem svg{width:76px;height:76px;position:absolute;inset:0;}
+.hero-emblem span{font-size:32px;position:relative;z-index:1;}
+
+.hero h1{
+  font-size:27px;font-weight:800;letter-spacing:-.4px;line-height:1.2;
+  color:var(--text);margin-bottom:10px;
+}
+.hero h1 em{
+  font-style:normal;
+  background:linear-gradient(120deg,var(--amber3),var(--amber2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.hero-sub{
+  font-size:14px;color:var(--text2);line-height:1.8;max-width:280px;margin:0 auto;
+}
+.hero-sub strong{color:var(--amber);font-weight:600;}
+
+/* ── Divider ── */
+.divider{
+  display:flex;align-items:center;gap:10px;padding:0 20px;margin:8px 0 14px;
+}
+.divider-line{flex:1;height:1px;background:linear-gradient(to right,transparent,var(--border2),transparent);}
+.divider-label{font-size:10.5px;font-weight:700;letter-spacing:1.8px;color:var(--text3);text-transform:uppercase;}
+
+/* ── Cards ── */
+.cards{padding:0 16px;display:flex;flex-direction:column;gap:13px;margin-bottom:28px;}
+
+.card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:20px;
+  padding:18px 18px 18px 16px;
+  text-decoration:none;color:var(--text);
+  display:flex;align-items:center;gap:15px;
+  position:relative;overflow:hidden;
+  -webkit-tap-highlight-color:transparent;
+  transition:transform .16s,border-color .2s;
+}
+.card:active{transform:scale(.975);}
+
+/* Warm left accent bar */
+.card::after{
+  content:'';position:absolute;left:0;top:16px;bottom:16px;
+  width:3px;border-radius:0 3px 3px 0;
+  transition:opacity .2s;
+}
+.c1::after{background:linear-gradient(to bottom,var(--amber3),var(--amber2));}
+.c2::after{background:linear-gradient(to bottom,var(--teal),#3ab090);}
+.c3::after{background:linear-gradient(to bottom,var(--rose),#c05040);}
+
+.card:active{border-color:var(--border2);}
+
+/* Subtle inner glow on active */
+.card::before{
+  content:'';position:absolute;inset:0;border-radius:20px;opacity:0;
+  transition:opacity .2s;pointer-events:none;
+}
+.c1::before{background:radial-gradient(ellipse at 20% 50%,rgba(245,197,66,.06),transparent 70%);}
+.c2::before{background:radial-gradient(ellipse at 20% 50%,rgba(94,207,176,.06),transparent 70%);}
+.c3::before{background:radial-gradient(ellipse at 20% 50%,rgba(224,112,96,.06),transparent 70%);}
+.card:active::before{opacity:1;}
+
+.card-icon{
+  width:52px;height:52px;border-radius:14px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;font-size:24px;
+  position:relative;
+}
+.c1 .card-icon{background:rgba(245,197,66,.10);border:1px solid rgba(245,197,66,.2);}
+.c2 .card-icon{background:rgba(94,207,176,.10);border:1px solid rgba(94,207,176,.2);}
+.c3 .card-icon{background:rgba(224,112,96,.10);border:1px solid rgba(224,112,96,.2);}
+
+.card-body{flex:1;min-width:0;}
+.card-title{font-size:15.5px;font-weight:800;margin-bottom:3px;line-height:1.25;}
+.card-eq{
+  font-size:12px;font-weight:600;margin-bottom:6px;letter-spacing:.15px;
+  font-family:'Courier New',monospace;opacity:.85;
+}
+.c1 .card-eq{color:var(--amber);}
+.c2 .card-eq{color:var(--teal);}
+.c3 .card-eq{color:var(--rose);}
+.card-desc{font-size:12px;color:var(--text2);line-height:1.6;}
+.card-tags{display:flex;gap:5px;flex-wrap:wrap;margin-top:8px;}
+.tag{
+  font-size:10px;font-weight:600;padding:2px 7px;border-radius:20px;
+  background:rgba(255,255,255,.04);color:var(--text3);
+  border:1px solid rgba(255,255,255,.07);
+}
+.c1 .tag.hi{background:rgba(245,197,66,.12);color:var(--amber);border-color:rgba(245,197,66,.25);}
+.c2 .tag.hi{background:rgba(94,207,176,.12);color:var(--teal);border-color:rgba(94,207,176,.25);}
+.c3 .tag.hi{background:rgba(224,112,96,.12);color:var(--rose);border-color:rgba(224,112,96,.25);}
+
+.card-arrow{font-size:20px;color:var(--text3);flex-shrink:0;transition:transform .16s;}
+.card:active .card-arrow{transform:translateX(3px);}
+
+/* Coming soon */
+.card.soon{opacity:.38;pointer-events:none;}
+.soon-badge{
+  position:absolute;top:13px;right:14px;
+  font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;
+  padding:3px 8px;border-radius:20px;
+  background:rgba(255,255,255,.06);color:var(--text3);border:1px solid rgba(255,255,255,.08);
+}
+
+/* ── PWA hint ── */
+.pwa-hint{
+  margin:0 16px 20px;
+  background:rgba(245,197,66,.07);
+  border:1px solid rgba(245,197,66,.18);
+  border-radius:16px;padding:12px 14px;
+  display:flex;align-items:flex-start;gap:10px;
+}
+.pwa-hint p{font-size:12px;color:rgba(245,197,66,.75);line-height:1.7;flex:1;}
+.pwa-hint strong{color:var(--amber);}
+#pwa-close{
+  background:none;border:none;color:rgba(245,197,66,.4);font-size:17px;
+  cursor:pointer;flex-shrink:0;padding:0;margin-top:1px;
+  -webkit-tap-highlight-color:transparent;
+}
+
+/* ── Footer ── */
+.footer{padding:0 20px 4px;text-align:center;}
+.footer p{font-size:11px;color:var(--text3);line-height:1.9;}
+
+/* ── Molecule float labels ── */
+.mol-symbol{pointer-events:none;user-select:none;}
+</style>
+</head>
+<body>
+
+<canvas id="bg-canvas"></canvas>
+
+<div class="content">
+
+  <!-- Hero -->
+  <div class="hero">
+    <!-- Hexagonal emblem -->
+    <div class="hero-emblem">
+      <svg viewBox="0 0 76 76" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <polygon points="38,4 70,21 70,55 38,72 6,55 6,21"
+          fill="rgba(245,197,66,0.08)" stroke="rgba(245,197,66,0.35)" stroke-width="1.5"/>
+        <polygon points="38,12 62,25 62,51 38,64 14,51 14,25"
+          fill="none" stroke="rgba(245,197,66,0.15)" stroke-width="1"/>
+      </svg>
+      <span>⚗️</span>
+    </div>
+    <h1>互動<em>化學</em>教室</h1>
+    <p class="hero-sub">把教科書上的反應式<br>變成<strong>你眼前活起來的東西</strong>✨</p>
+  </div>
+
+  <!-- PWA hint -->
+  <div class="pwa-hint" id="pwa-hint">
+    <p>📲 點 Safari <strong>分享</strong> → <strong>加入主畫面</strong>，像 App 一樣隨時開啟！</p>
+    <button id="pwa-close" onclick="closePwa()">✕</button>
+  </div>
+
+  <!-- Section -->
+  <div class="divider">
+    <div class="divider-line"></div>
+    <div class="divider-label">教材列表</div>
+    <div class="divider-line"></div>
+  </div>
+
+  <div class="cards">
+
+    <a class="card c1" href="fescn.html">
+      <div class="card-icon">🧪</div>
+      <div class="card-body">
+        <div class="card-title">血紅色平衡</div>
+        <div class="card-eq">FeSCN²⁺ ⇌ Fe³⁺ + SCN⁻</div>
+        <div class="card-desc">加試劑、觀顏色、看曲線——勒沙特列原理一目瞭然</div>
+        <div class="card-tags">
+          <span class="tag hi">勒沙特列</span>
+          <span class="tag">ΔH &lt; 0</span>
+          <span class="tag">濃度圖</span>
+        </div>
+      </div>
+      <div class="card-arrow">›</div>
+    </a>
+
+    <a class="card c2" href="n2o4.html">
+      <div class="card-icon">🌡️</div>
+      <div class="card-body">
+        <div class="card-title">紅棕色氣體平衡</div>
+        <div class="card-eq">N₂O₄ ⇌ 2NO₂</div>
+        <div class="card-desc">從零開始趨向平衡，再用溫度與壓力打破它</div>
+        <div class="card-tags">
+          <span class="tag hi">趨向平衡</span>
+          <span class="tag hi">勒沙特列</span>
+          <span class="tag">ΔH &gt; 0</span>
+        </div>
+      </div>
+      <div class="card-arrow">›</div>
+    </a>
+
+    <div class="card c3 soon">
+      <div class="soon-badge">即將推出</div>
+      <div class="card-icon">⚡</div>
+      <div class="card-body">
+        <div class="card-title">氧化還原反應</div>
+        <div class="card-eq">Zn + Cu²⁺ → Zn²⁺ + Cu</div>
+        <div class="card-desc">電子轉移的瞬間，用動畫讓你看見</div>
+        <div class="card-tags">
+          <span class="tag">氧化還原</span>
+          <span class="tag">電化學</span>
+        </div>
+      </div>
+      <div class="card-arrow">›</div>
+    </div>
+
+  </div>
+
+  <div class="footer">
+    <p>用 Safari 開啟效果最佳 · 無需安裝 · 免費使用<br>
+    每一個方程式背後，都藏著一個故事 🔬</p>
+  </div>
+
+</div>
+
+<script>
+/* ── Honeycomb + floating atoms background ── */
+const canvas = document.getElementById('bg-canvas');
+const ctx = canvas.getContext('2d');
+let W, H;
+
+// Random chemistry symbols — generic, not equation-specific
+const SYMBOLS = [
+  'H','He','Li','C','N','O','F','Na','Mg','Al','Si','P','S','Cl','K','Ca',
+  'Fe','Cu','Zn','Ag','Au','Hg','Pb',
+  'H₂','O₂','N₂','Cl₂','H₂O','CO₂','NH₃','CH₄',
+  '⚛','△','⇌','→','e⁻','⁺','mol','pH',
+];
+
+let hexes = [], atoms = [];
+
+function resize() {
+  W = canvas.width = window.innerWidth;
+  H = canvas.height = window.innerHeight;
+  buildHexes();
+  buildAtoms();
+}
+
+/* Honeycomb grid */
+function buildHexes() {
+  hexes = [];
+  const s = 28, w = s * Math.sqrt(3), h = s * 2;
+  const cols = Math.ceil(W / w) + 2, rows = Math.ceil(H / (h * .75)) + 2;
+  for (let r = -1; r < rows; r++) {
+    for (let c = -1; c < cols; c++) {
+      const x = c * w + (r % 2 === 0 ? 0 : w / 2);
+      const y = r * h * 0.75;
+      hexes.push({ x, y, s, alpha: Math.random() * .045 + .012 });
+    }
+  }
+}
+
+function hexPath(x, y, s) {
+  ctx.beginPath();
+  for (let i = 0; i < 6; i++) {
+    const a = Math.PI / 180 * (60 * i - 30);
+    const px = x + s * Math.cos(a), py = y + s * Math.sin(a);
+    i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+  }
+  ctx.closePath();
+}
+
+function drawHexes() {
+  hexes.forEach(h => {
+    hexPath(h.x, h.y, h.s);
+    ctx.strokeStyle = `rgba(245,197,66,${h.alpha})`;
+    ctx.lineWidth = 0.8;
+    ctx.stroke();
+  });
+}
+
+/* Floating atom labels */
+function buildAtoms() {
+  atoms = [];
+  const n = Math.min(Math.floor(W * H / 16000), 40);
+  for (let i = 0; i < n; i++) atoms.push(mkAtom());
+}
+
+function mkAtom() {
+  return {
+    x: Math.random() * W,
+    y: Math.random() * H,
+    vx: (Math.random() - .5) * .18,
+    vy: (Math.random() - .5) * .18,
+    label: SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)],
+    size: Math.random() * 3 + 9,
+    alpha: Math.random() * .13 + .05,
+    warm: Math.random() > .4,
+  };
+}
+
+function drawAtoms() {
+  atoms.forEach(a => {
+    a.x += a.vx; a.y += a.vy;
+    if (a.x < -50) a.x = W + 50;
+    if (a.x > W + 50) a.x = -50;
+    if (a.y < -50) a.y = H + 50;
+    if (a.y > H + 50) a.y = -50;
+    ctx.font = `${a.size}px -apple-system,sans-serif`;
+    ctx.fillStyle = a.warm
+      ? `rgba(245,197,66,${a.alpha})`
+      : `rgba(200,180,140,${a.alpha * .7})`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(a.label, a.x, a.y);
+  });
+}
+
+/* Subtle connection lines between nearby atoms */
+function drawConnections() {
+  for (let i = 0; i < atoms.length; i++) {
+    for (let j = i + 1; j < atoms.length; j++) {
+      const dx = atoms[i].x - atoms[j].x, dy = atoms[i].y - atoms[j].y;
+      const d = Math.sqrt(dx * dx + dy * dy);
+      if (d < 80) {
+        ctx.strokeStyle = `rgba(245,197,66,${.025 * (1 - d / 80)})`;
+        ctx.lineWidth = 0.5;
+        ctx.beginPath();
+        ctx.moveTo(atoms[i].x, atoms[i].y);
+        ctx.lineTo(atoms[j].x, atoms[j].y);
+        ctx.stroke();
+      }
+    }
+  }
+}
+
+function frame() {
+  ctx.clearRect(0, 0, W, H);
+  drawHexes();
+  drawConnections();
+  drawAtoms();
+  requestAnimationFrame(frame);
+}
+
+resize(); frame();
+window.addEventListener('resize', resize);
+
+/* PWA hint */
+function closePwa() {
+  document.getElementById('pwa-hint').style.display = 'none';
+  try { localStorage.setItem('pwa-closed', '1'); } catch(e) {}
+}
+try {
+  if (localStorage.getItem('pwa-closed'))
+    document.getElementById('pwa-hint').style.display = 'none';
+} catch(e) {}
+</script>
+</body>
+</html>
