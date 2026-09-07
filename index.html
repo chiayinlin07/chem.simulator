@@ -3,6 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <title>互動化學教室</title>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
@@ -272,7 +275,8 @@ body{padding-bottom:calc(30px + env(safe-area-inset-bottom));overflow-x:hidden;}
 
   <div class="footer">
     <p>用 Safari 開啟效果最佳 · 無需安裝 · 免費使用<br>
-    每一個方程式背後，都藏著一個故事 🔬</p>
+    每一個方程式背後，都藏著一個故事 🔬<br>
+    <span id="ver-label" style="opacity:.6"></span></p>
   </div>
 
 </div>
@@ -398,6 +402,16 @@ function frame() {
 
 resize(); frame();
 window.addEventListener('resize', resize);
+
+/* ── 版本號：每次更新教材後，把下面這個數字改成當天日期即可 ── */
+const SITE_VER = '20260907';
+
+// 幫每張卡片的連結加上版本參數，強迫瀏覽器抓新版
+document.querySelectorAll('a.card').forEach(a => {
+  const href = a.getAttribute('href');
+  if (href && href.endsWith('.html')) a.setAttribute('href', href + '?v=' + SITE_VER);
+});
+document.getElementById('ver-label').textContent = '版本 ' + SITE_VER;
 
 /* PWA hint */
 function closePwa() {
