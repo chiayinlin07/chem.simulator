@@ -21,6 +21,7 @@
   --amber3:#ffd880;
   --teal:#5ecfb0;
   --rose:#e07060;
+  --sky:#7ab6e8;
   --font:-apple-system,BlinkMacSystemFont,'Segoe UI','Helvetica Neue',sans-serif;
 }
 html,body{min-height:100dvh;background:var(--bg);color:var(--text);font-family:var(--font);-webkit-text-size-adjust:100%;}
@@ -86,7 +87,8 @@ body{padding-bottom:calc(30px + env(safe-area-inset-bottom));overflow-x:hidden;}
 }
 .c1::after{background:linear-gradient(to bottom,var(--amber3),var(--amber2));}
 .c2::after{background:linear-gradient(to bottom,var(--teal),#3ab090);}
-.c3::after{background:linear-gradient(to bottom,var(--rose),#c05040);}
+.c3::after{background:linear-gradient(to bottom,var(--sky),#4a8cc0);}
+.c4::after{background:linear-gradient(to bottom,var(--rose),#c05040);}
 
 .card:active{border-color:var(--border2);}
 
@@ -97,7 +99,8 @@ body{padding-bottom:calc(30px + env(safe-area-inset-bottom));overflow-x:hidden;}
 }
 .c1::before{background:radial-gradient(ellipse at 20% 50%,rgba(245,197,66,.06),transparent 70%);}
 .c2::before{background:radial-gradient(ellipse at 20% 50%,rgba(94,207,176,.06),transparent 70%);}
-.c3::before{background:radial-gradient(ellipse at 20% 50%,rgba(224,112,96,.06),transparent 70%);}
+.c3::before{background:radial-gradient(ellipse at 20% 50%,rgba(122,182,232,.06),transparent 70%);}
+.c4::before{background:radial-gradient(ellipse at 20% 50%,rgba(224,112,96,.06),transparent 70%);}
 .card:active::before{opacity:1;}
 
 .card-icon{
@@ -107,7 +110,8 @@ body{padding-bottom:calc(30px + env(safe-area-inset-bottom));overflow-x:hidden;}
 }
 .c1 .card-icon{background:rgba(245,197,66,.10);border:1px solid rgba(245,197,66,.2);}
 .c2 .card-icon{background:rgba(94,207,176,.10);border:1px solid rgba(94,207,176,.2);}
-.c3 .card-icon{background:rgba(224,112,96,.10);border:1px solid rgba(224,112,96,.2);}
+.c3 .card-icon{background:rgba(122,182,232,.10);border:1px solid rgba(122,182,232,.2);}
+.c4 .card-icon{background:rgba(224,112,96,.10);border:1px solid rgba(224,112,96,.2);}
 
 .card-body{flex:1;min-width:0;}
 .card-title{font-size:15.5px;font-weight:800;margin-bottom:3px;line-height:1.25;}
@@ -117,7 +121,8 @@ body{padding-bottom:calc(30px + env(safe-area-inset-bottom));overflow-x:hidden;}
 }
 .c1 .card-eq{color:var(--amber);}
 .c2 .card-eq{color:var(--teal);}
-.c3 .card-eq{color:var(--rose);}
+.c3 .card-eq{color:var(--sky);}
+.c4 .card-eq{color:var(--rose);}
 .card-desc{font-size:12px;color:var(--text2);line-height:1.6;}
 .card-tags{display:flex;gap:5px;flex-wrap:wrap;margin-top:8px;}
 .tag{
@@ -127,7 +132,8 @@ body{padding-bottom:calc(30px + env(safe-area-inset-bottom));overflow-x:hidden;}
 }
 .c1 .tag.hi{background:rgba(245,197,66,.12);color:var(--amber);border-color:rgba(245,197,66,.25);}
 .c2 .tag.hi{background:rgba(94,207,176,.12);color:var(--teal);border-color:rgba(94,207,176,.25);}
-.c3 .tag.hi{background:rgba(224,112,96,.12);color:var(--rose);border-color:rgba(224,112,96,.25);}
+.c3 .tag.hi{background:rgba(122,182,232,.12);color:var(--sky);border-color:rgba(122,182,232,.25);}
+.c4 .tag.hi{background:rgba(224,112,96,.12);color:var(--rose);border-color:rgba(224,112,96,.25);}
 
 .card-arrow{font-size:20px;color:var(--text3);flex-shrink:0;transition:transform .16s;}
 .card:active .card-arrow{transform:translateX(3px);}
@@ -232,7 +238,22 @@ body{padding-bottom:calc(30px + env(safe-area-inset-bottom));overflow-x:hidden;}
       <div class="card-arrow">›</div>
     </a>
 
-    <div class="card c3 soon">
+    <a class="card c3" href="precipitation_rules.html">
+      <div class="card-icon">🧂</div>
+      <div class="card-body">
+        <div class="card-title">沉澱規則表</div>
+        <div class="card-eq">Ag⁺ + Cl⁻ → AgCl(s)↓</div>
+        <div class="card-desc">六關闖關＋隨機抽題，把溶解度規則真的背起來</div>
+        <div class="card-tags">
+          <span class="tag hi">溶解度規則</span>
+          <span class="tag hi">闖關測驗</span>
+          <span class="tag">共同牽引他</span>
+        </div>
+      </div>
+      <div class="card-arrow">›</div>
+    </a>
+
+    <div class="card c4 soon">
       <div class="soon-badge">即將推出</div>
       <div class="card-icon">⚡</div>
       <div class="card-body">
