@@ -64,8 +64,13 @@ header.top{position:sticky;top:0;z-index:30;background:rgba(238,243,245,.94);
   border-radius:999px;padding:2px 9px;display:inline-block;margin-top:6px}
 .lv-state{flex:none;font-size:20px;width:26px;text-align:center}
 .teaser{background:linear-gradient(180deg,#fff,#F7FAFB);border:1px dashed var(--line);
-  border-radius:var(--r);padding:15px 16px;color:var(--muted);font-size:15px;margin-top:6px}
+  border-radius:var(--r);padding:15px 16px;color:var(--muted);font-size:15px;margin-top:6px;
+  width:100%;text-align:left;display:block;line-height:1.6}
 .teaser b{color:var(--ink);display:block;font-size:16px;margin-bottom:3px}
+.teaser.open{background:linear-gradient(135deg,#134E5E,#1F7A8C);border:1px solid #1F7A8C;
+  color:rgba(255,255,255,.86);box-shadow:0 3px 0 rgba(10,60,75,.4)}
+.teaser.open b{color:#FFD98A}
+.teaser.open:active{transform:translateY(2px);box-shadow:0 1px 0 rgba(10,60,75,.4)}
 
 .pbar{height:7px;background:#DCE6EA;border-radius:99px;overflow:hidden;margin:2px 0 16px}
 .pbar i{display:block;height:100%;background:var(--accent);border-radius:99px;transition:width .35s ease}
@@ -634,8 +639,16 @@ function renderHome(){
       <div class="lv-state">${done?'✅':(open?'›':'🔒')}</div>
     </button>`;
   });
-  h += `<div class="teaser"><b>下一步：沉澱顏色圖鑑</b>逐滴加入硝酸銀，看沉澱依 K<sub>sp</sub> 順序一個一個出現。製作中。</div>`;
+  const cleared = !!state.done[6];
+  h += cleared
+    ? `<button class="teaser open" id="goColors">
+         <b>🎨 沉澱顏色圖鑑　已解鎖</b>
+         先猜顏色再揭曉，把 23 種常見沉澱一支一支收集起來。
+       </button>`
+    : `<div class="teaser"><b>🔒 沉澱顏色圖鑑</b>通過綜合大魔王之後解鎖。</div>`;
   app.innerHTML = h;
+  const gc = document.getElementById('goColors');
+  if(gc) gc.onclick = ()=> location.href = 'precipitate_colors.html';
   app.querySelectorAll('.level-card[data-i]').forEach(b=> b.onclick = ()=> openLevel(+b.dataset.i));
 }
 
@@ -965,7 +978,15 @@ function showResult(lv,right,total,wrongList){
       ${pass&&hasNext?`<button class="btn" id="next">下一關</button>`:`<button class="btn" id="home">回關卡選單</button>`}
     </div>`;
   if(pass&&hasNext) h+=`<button class="btn ghost" id="home2" style="margin-top:10px">回關卡選單</button>`;
+  if(pass&&lv.boss){
+    h+=`<button class="teaser open" id="goColors2" style="margin-top:14px">
+        <b>🎨 沉澱顏色圖鑑　已解鎖</b>
+        六關全部通過了，接著去看這些沉澱長什麼樣子。
+      </button>`;
+  }
   app.innerHTML=h;
+  const gc2=document.getElementById('goColors2');
+  if(gc2) gc2.onclick=()=> location.href='precipitate_colors.html';
   document.getElementById('retry').onclick=()=> startPractice(lv);
   const nx=document.getElementById('next');
   if(nx) nx.onclick=()=> openLevel(i+1);
