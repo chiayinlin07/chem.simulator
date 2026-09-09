@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>沉澱顏色圖鑑</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#12100e; --card:#1e1b16; --card2:#252119;
+  --line:rgba(255,210,120,.10); --line2:rgba(255,210,120,.22);
+  --text:#f2ead8; --text2:#9a9080; --text3:#6a6058;
+  --amber:#f5c542; --amber2:#e8a020; --amber3:#ffd880;
+  --ok:#5ecfb0; --no:#e07060;
+  --font:"Noto Sans TC","PingFang TC","Microsoft JhengHei",-apple-system,BlinkMacSystemFont,sans-serif;
+}
+html,body{min-height:100dvh;background:var(--bg);color:var(--text);font-family:var(--font);
+  -webkit-text-size-adjust:100%}
+body{padding-bottom:calc(40px + env(safe-area-inset-bottom));overflow-x:hidden;font-size:16px;line-height:1.7}
+sub,sup{font-size:.68em;line-height:0}
+button{font-family:inherit;font-size:inherit;color:inherit;border:none;background:none;cursor:pointer}
+.wrap{max-width:600px;margin:0 auto;padding:0 14px}
+
+/* ---------- 頂部 ---------- */
+header{position:sticky;top:0;z-index:20;background:rgba(18,16,14,.95);
+  backdrop-filter:blur(10px);border-bottom:1px solid var(--line);padding:12px 0 0}
+.hrow{display:flex;align-items:center;gap:10px;padding-bottom:10px}
+.htitle{font-size:17px;font-weight:800;flex:1}
+.htitle em{font-style:normal;background:linear-gradient(120deg,var(--amber3),var(--amber2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hcount{font-size:13px;color:var(--text2);font-weight:600;flex:none}
+.hcount b{color:var(--amber)}
+.tbtn{font-size:12px;color:var(--text3);border:1px solid var(--line);border-radius:99px;
+  padding:4px 10px;flex:none}
+.tbtn.on{background:var(--amber);color:#12100e;border-color:var(--amber);font-weight:700}
+.tbtn.back{font-size:16px;padding:3px 11px;color:var(--text2)}
+
+.tabs{display:flex;gap:7px;overflow-x:auto;padding:0 0 11px;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{white-space:nowrap;font-size:13.5px;font-weight:700;padding:7px 13px;border-radius:99px;
+  border:1px solid var(--line);color:var(--text2);flex:none;transition:.15s}
+.tab.on{background:rgba(245,197,66,.14);border-color:rgba(245,197,66,.4);color:var(--amber)}
+.tab .dot{font-size:11px;opacity:.75;margin-left:3px}
+
+/* ---------- 進度 ---------- */
+.pbar{height:5px;background:rgba(255,255,255,.06);border-radius:99px;overflow:hidden;margin:14px 0 4px}
+.pbar i{display:block;height:100%;border-radius:99px;transition:width .4s ease;
+  background:linear-gradient(90deg,var(--amber2),var(--amber3))}
+
+/* ---------- 家族說明 ---------- */
+.intro{background:var(--card);border:1px solid var(--line);border-radius:16px;
+  padding:14px 16px;margin:14px 0 16px}
+.intro h2{font-size:16px;font-weight:800;margin-bottom:5px}
+.intro p{font-size:13.5px;color:var(--text2);line-height:1.75}
+
+/* ---------- 試管牆 ---------- */
+.shelf{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.slot{background:var(--card);border:1px solid var(--line);border-radius:16px;
+  padding:14px 6px 11px;display:flex;flex-direction:column;align-items:center;gap:9px;
+  transition:transform .14s,border-color .2s;position:relative}
+.slot:active{transform:scale(.96)}
+.slot.done{border-color:var(--line2)}
+.slot .mark{position:absolute;top:7px;right:9px;font-size:11px;font-weight:700}
+.slot .mark.no{color:var(--no)}
+.slot .mark.ok{color:var(--ok)}
+
+.tube{width:46px;height:88px;border:2px solid rgba(255,255,255,.16);
+  border-top:none;border-radius:4px 4px 20px 20px;position:relative;overflow:hidden;
+  background:linear-gradient(160deg,rgba(255,255,255,.05),rgba(255,255,255,.01))}
+.tube::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:rgba(255,255,255,.22)}
+.tube .liq{position:absolute;left:0;right:0;bottom:0;height:66%;
+  background:rgba(200,225,255,.07)}
+.tube .sol{position:absolute;left:0;right:0;bottom:0;height:0;
+  transition:height .65s cubic-bezier(.4,1.4,.5,1)}
+.tube .sol.on{height:34%}
+.tube .q{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  font-size:26px;font-weight:900;color:var(--text3)}
+.tube.dark{box-shadow:inset 0 0 0 1px rgba(255,255,255,.12)}
+
+.slot .f{font-size:13.5px;font-weight:800;line-height:1.35;text-align:center}
+.slot .cname{font-size:11.5px;color:var(--text2);font-weight:600}
+.slot .cname.pending{color:var(--text3)}
+
+/* 落下的沉澱粒子 */
+.grain{position:absolute;width:4px;height:4px;border-radius:50%;opacity:0;
+  animation:fall .7s ease-in forwards}
+@keyframes fall{
+  0%{opacity:0;transform:translateY(-26px)}
+  25%{opacity:1}
+  100%{opacity:.15;transform:translateY(30px)}
+}
+
+/* ---------- 白色陷阱 ---------- */
+.trap-note{background:rgba(245,197,66,.07);border:1px solid rgba(245,197,66,.2);
+  border-radius:16px;padding:14px 16px;margin-bottom:16px}
+.trap-note h2{font-size:16px;font-weight:800;color:var(--amber);margin-bottom:6px}
+.trap-note p{font-size:13.5px;color:rgba(245,197,66,.8);line-height:1.8}
+.white-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.wcard{background:var(--card);border:1px solid var(--line);border-radius:14px;
+  padding:12px 13px;display:flex;align-items:center;gap:11px}
+.wchip{width:26px;height:26px;border-radius:8px;flex:none;border:1px solid rgba(255,255,255,.18)}
+.wcard .f{font-size:14px;font-weight:800}
+.wcard .u{font-size:11.5px;color:var(--text3)}
+.wcard.locked{opacity:.4}
+
+/* ---------- 預測彈窗 ---------- */
+.overlay{position:fixed;inset:0;z-index:50;background:rgba(8,7,6,.82);
+  backdrop-filter:blur(4px);display:flex;align-items:flex-end;justify-content:center;
+  padding:16px;animation:fade .2s ease}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+.sheet{background:var(--card2);border:1px solid var(--line2);border-radius:22px;
+  width:100%;max-width:480px;padding:22px 18px calc(18px + env(safe-area-inset-bottom));
+  animation:rise .28s cubic-bezier(.3,.9,.4,1);max-height:92vh;overflow-y:auto}
+@keyframes rise{from{transform:translateY(40px);opacity:.4}to{transform:none;opacity:1}}
+.sheet .ask{font-size:13.5px;color:var(--text2);text-align:center;margin-bottom:4px}
+.sheet .fbig{font-size:32px;font-weight:900;text-align:center;letter-spacing:-.5px;margin-bottom:18px}
+.sheet .stage{display:flex;justify-content:center;margin-bottom:18px}
+.sheet .tube{width:64px;height:120px}
+
+.colors{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.copt{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.04);
+  border:2px solid rgba(255,255,255,.09);border-radius:14px;padding:12px 13px;
+  font-size:15px;font-weight:700;transition:.15s}
+.copt:active{border-color:var(--amber)}
+.copt .sw{width:24px;height:24px;border-radius:7px;flex:none;border:1px solid rgba(255,255,255,.2)}
+.copt.right{border-color:var(--ok);background:rgba(94,207,176,.12)}
+.copt.wrongsel{border-color:var(--no);background:rgba(224,112,96,.12)}
+.copt.faded{opacity:.35}
+
+.reveal{margin-top:16px}
+.verdict{font-size:14px;font-weight:800;margin-bottom:8px;text-align:center}
+.verdict.ok{color:var(--ok)} .verdict.no{color:var(--no)}
+.answer{font-size:22px;font-weight:900;text-align:center;margin-bottom:8px}
+.desc{font-size:14px;color:var(--text2);line-height:1.8;background:rgba(255,255,255,.03);
+  border-radius:13px;padding:12px 14px}
+.btn{display:block;width:100%;background:var(--amber);color:#12100e;border-radius:14px;
+  padding:14px;font-size:16px;font-weight:800;text-align:center;margin-top:14px}
+.btn:active{transform:translateY(2px)}
+.btn.ghost{background:transparent;color:var(--text2);border:1px solid var(--line)}
+
+/* ---------- 完成 ---------- */
+.done-box{background:linear-gradient(160deg,rgba(245,197,66,.12),rgba(245,197,66,.03));
+  border:1px solid rgba(245,197,66,.28);border-radius:18px;padding:18px;margin-top:18px;text-align:center}
+.done-box h3{font-size:17px;font-weight:800;color:var(--amber);margin-bottom:6px}
+.done-box p{font-size:13.5px;color:var(--text2);line-height:1.8}
+.soon{margin-top:14px;border:1px dashed var(--line2);border-radius:16px;padding:14px 16px;
+  color:var(--text3);font-size:13px;line-height:1.75;width:100%;text-align:left;display:block}
+.soon b{display:block;color:var(--text2);font-size:14px;margin-bottom:3px}
+.soon.go{border-style:solid;border-color:rgba(245,197,66,.4);
+  background:linear-gradient(135deg,rgba(245,197,66,.14),rgba(245,197,66,.04));
+  color:rgba(242,234,216,.82);box-shadow:0 3px 0 rgba(120,90,20,.3)}
+.soon.go b{color:var(--amber);font-size:15px}
+.soon.go:active{transform:translateY(2px);box-shadow:0 1px 0 rgba(120,90,20,.3)}
+.clearbtn{display:block;width:100%;margin-top:18px;font-size:13px;color:var(--text3);
+  border:1px solid var(--line);border-radius:12px;padding:10px}
+
+.foot{text-align:center;color:var(--text3);font-size:11.5px;line-height:1.9;margin-top:26px}
+@media (max-width:340px){ .shelf{gap:9px} .slot .f{font-size:12.5px} }
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <div class="hrow">
+      <button class="tbtn back" id="backBtn">←</button>
+      <div class="htitle">沉澱<em>顏色圖鑑</em></div>
+      <div class="hcount" id="count"></div>
+      <button class="tbtn" id="tbtn">教師版</button>
+    </div>
+    <div class="tabs" id="tabs"></div>
+  </div>
+</header>
+
+<main class="wrap" id="app"></main>
+
+<script>
+/* ===================== 資料 ===================== */
+// 顏色群組：測驗時的四個選項就從這裡出
+const GROUPS = {
+  white:{name:'白色',   hex:'#EFEDE6'},
+  yellow:{name:'黃色',  hex:'#F0CB33'},
+  black:{name:'黑色',   hex:'#232120'},
+  brick:{name:'磚紅色', hex:'#C0492B'},
+  rust:{name:'紅棕色',  hex:'#A0491F'},
+  blue:{name:'藍色',    hex:'#3E86D6'}
+};
+
+const FAMILIES = [
+  {
+    id:'ag', name:'銀鹽',
+    intro:'同一個 Ag<sup>+</sup>，配上不同的陰離子，顏色就從白一路走到黑。這一族是課本最愛考的一組。',
+    items:[
+      {f:'AgCl', g:'white', label:'白色', hex:'#EFEDE6',
+       d:'加入硝酸銀檢驗氯離子時出現的白色沉澱。放置在光線下會慢慢分解，表面轉為紫黑色。'},
+      {f:'AgBr', g:'yellow', label:'淡黃色', hex:'#EFE3A6',
+       d:'顏色比 AgCl 深一點，是傳統底片感光層的主要成分。'},
+      {f:'AgI', g:'yellow', label:'黃色', hex:'#F0CB33',
+       d:'三個鹵化銀中顏色最深、溶解度最小的一個，也用於人造雨的造雲劑。'},
+      {f:'Ag<sub>2</sub>CrO<sub>4</sub>', g:'brick', label:'磚紅色', hex:'#C0492B',
+       d:'磚紅色沉澱。因為它比 AgCl 晚沉澱，可以用來當作氯離子滴定的終點指示。'},
+      {f:'Ag<sub>2</sub>S', g:'black', label:'黑色', hex:'#232120',
+       d:'銀器久放變黑就是它，來自空氣中微量的含硫氣體。銀鹽中溶解度最小的一個。'}
+    ]
+  },
+  {
+    id:'pb', name:'鉛鹽',
+    intro:'鉛離子跟鹵素離子、鉻酸根、硫離子都會沉澱，顏色從白、黃到黑，很多都曾被拿來當顏料。',
+    items:[
+      {f:'PbCl<sub>2</sub>', g:'white', label:'白色', hex:'#EFEDE6',
+       d:'白色沉澱，但在熱水中溶解度明顯上升，加熱會重新溶解，冷卻後又析出。'},
+      {f:'PbI<sub>2</sub>', g:'yellow', label:'亮黃色', hex:'#FFD426',
+       d:'課本著名的「黃金雨」。加熱溶解後緩慢冷卻，會析出閃亮的金黃色薄片結晶。'},
+      {f:'PbCrO<sub>4</sub>', g:'yellow', label:'黃色', hex:'#F2C230',
+       d:'黃色沉澱，早期被當作「鉻黃」顏料使用，後來因為鉛毒性而逐漸淘汰。'},
+      {f:'PbS', g:'black', label:'黑色', hex:'#232120',
+       d:'黑色沉澱，天然礦物形式就是方鉛礦，是煉鉛的主要礦源。'},
+      {f:'PbSO<sub>4</sub>', g:'white', label:'白色', hex:'#EFEDE6',
+       d:'白色沉澱。鉛蓄電池放電時，兩極表面生成的就是它。'}
+    ]
+  },
+  {
+    id:'s', name:'硫化物',
+    intro:'硫離子只放行鹼金屬、銨根和鹼土金屬，其他金屬幾乎都沉澱。多數是黑色，但也有例外。',
+    items:[
+      {f:'CuS', g:'black', label:'黑色', hex:'#232120',
+       d:'黑色沉澱，溶解度極小。硫化氫通入銅離子溶液會立刻變黑。'},
+      {f:'FeS', g:'black', label:'黑色', hex:'#2A2522',
+       d:'黑色沉澱。實驗室常用它與稀酸反應來製取硫化氫氣體。'},
+      {f:'ZnS', g:'white', label:'白色', hex:'#EFEDE6',
+       d:'硫化物中少見的白色沉澱，摻入微量金屬後會發螢光，用於夜光材料。'},
+      {f:'CdS', g:'yellow', label:'黃色', hex:'#E8C22A',
+       d:'黃色沉澱，就是顏料中的「鎘黃」。在陽離子分析中用來確認鎘離子。'}
+    ]
+  },
+  {
+    id:'oh', name:'氫氧化物',
+    intro:'除了鹼金屬、銨根和少數鹼土金屬，其他金屬碰到 OH<sup>−</sup> 都會沉澱。這一族的顏色差異最大。',
+    items:[
+      {f:'Mg(OH)<sub>2</sub>', g:'white', label:'白色', hex:'#EFEDE6',
+       d:'白色沉澱，就是胃乳（鎂乳）的有效成分，用來中和過多的胃酸。'},
+      {f:'Al(OH)<sub>3</sub>', g:'white', label:'白色', hex:'#EDEBE4',
+       d:'白色膠狀沉澱，體積蓬鬆。淨水時用它吸附水中懸浮的細小雜質。'},
+      {f:'Fe(OH)<sub>3</sub>', g:'rust', label:'紅棕色', hex:'#A0491F',
+       d:'紅棕色沉澱，是鐵鏽的主要來源。顏色鮮明，很容易辨認。'},
+      {f:'Cu(OH)<sub>2</sub>', g:'blue', label:'藍色', hex:'#3E86D6',
+       d:'藍色沉澱。加熱會脫水轉變成黑色的氧化銅，是常見的課堂演示。'},
+      {f:'Zn(OH)<sub>2</sub>', g:'white', label:'白色', hex:'#EFEDE6',
+       d:'白色沉澱，但加入過量強鹼會再溶解，是兩性氫氧化物的代表。'}
+    ]
+  },
+  {
+    id:'ba', name:'鋇與鈣鹽',
+    intro:'鋇和鈣碰到硫酸根、鉻酸根、碳酸根、磷酸根都會沉澱，大多是白色，只有鉻酸鋇是黃色。',
+    items:[
+      {f:'BaSO<sub>4</sub>', g:'white', label:'白色', hex:'#EFEDE6',
+       d:'白色沉澱，極難溶又不被胃酸溶解，所以能當作腸胃 X 光檢查的「鋇餐」。'},
+      {f:'BaCrO<sub>4</sub>', g:'yellow', label:'黃色', hex:'#F2C230',
+       d:'黃色沉澱。同樣是鋇鹽，換成鉻酸根顏色就完全不同。'},
+      {f:'CaCO<sub>3</sub>', g:'white', label:'白色', hex:'#EFEDE6',
+       d:'白色沉澱，石灰石、大理石、蛋殼、珊瑚的主要成分。二氧化碳通入石灰水變混濁就是它。'},
+      {f:'Ca<sub>3</sub>(PO<sub>4</sub>)<sub>2</sub>', g:'white', label:'白色', hex:'#EFEDE6',
+       d:'白色沉澱，骨骼與牙齒的主要成分，也是磷肥的原料。'}
+    ]
+  }
+];
+
+const ALL = FAMILIES.flatMap(f=>f.items.map(it=>({...it, fam:f.id})));
+
+/* ===================== 狀態 ===================== */
+const TEACHER = /teacher/i.test(location.search) || /teacher/i.test(location.hash);
+const SAVE_KEY='chem_colors_v1';
+function loadSave(){ try{ return JSON.parse(localStorage.getItem(SAVE_KEY))||{}; }catch(e){ return {}; } }
+function saveProgress(){ try{ localStorage.setItem(SAVE_KEY, JSON.stringify(state.got)); }catch(e){} }
+const state = { tab:'ag', got:loadSave(), teacher:TEACHER };   // got[f] = 'ok' | 'no'
+
+const app = document.getElementById('app');
+const tabsEl = document.getElementById('tabs');
+const countEl = document.getElementById('count');
+const tbtn = document.getElementById('tbtn');
+
+document.getElementById('backBtn').onclick = ()=>{
+  if(history.length>1) history.back();
+  else location.href='precipitation_rules.html';
+};
+
+if(!TEACHER) tbtn.style.display='none';
+else { tbtn.classList.add('on'); tbtn.textContent='教師版'; }
+tbtn.onclick = ()=>{
+  // 教師版：一鍵全部收錄，方便備課或投影對照
+  const on = Object.keys(state.got).length < ALL.length;
+  if(on) ALL.forEach(it=> state.got[it.f]='ok');
+  else state.got = {};
+  saveProgress();
+  render();
+};
+
+function key(it){ return it.f; }
+function gotCount(list){ return list.filter(it=>state.got[it.f]).length; }
+
+/* ===================== 畫面 ===================== */
+function renderTabs(){
+  let h='';
+  FAMILIES.forEach(fam=>{
+    const n=gotCount(fam.items);
+    h += `<button class="tab ${state.tab===fam.id?'on':''}" data-t="${fam.id}">${fam.name}
+      <span class="dot">${n}/${fam.items.length}</span></button>`;
+  });
+  h += `<button class="tab ${state.tab==='trap'?'on':''}" data-t="trap">白色陷阱</button>`;
+  tabsEl.innerHTML=h;
+  tabsEl.querySelectorAll('.tab').forEach(b=> b.onclick=()=>{ state.tab=b.dataset.t; render(); });
+}
+
+function tubeHTML(it, filled){
+  const dark = it.g==='black' ? ' dark' : '';
+  return `<div class="tube${dark}">
+    <div class="liq"></div>
+    <div class="sol ${filled?'on':''}" style="background:${it.hex}"></div>
+    ${filled?'':'<div class="q">？</div>'}
+  </div>`;
+}
+
+function render(){
+  renderTabs();
+  countEl.innerHTML = `已收錄 <b>${Object.keys(state.got).length}</b>/${ALL.length}`;
+  if(state.tab==='trap') return renderTrap();
+
+  const fam = FAMILIES.find(f=>f.id===state.tab);
+  const n = gotCount(fam.items), total = fam.items.length;
+  let h = `<div class="pbar"><i style="width:${Math.round(n/total*100)}%"></i></div>
+  <div class="intro"><h2>${fam.name}家族</h2><p>${fam.intro}</p></div>
+  <div class="shelf">`;
+  fam.items.forEach((it,k)=>{
+    const st = state.got[it.f];
+    h += `<button class="slot ${st?'done':''}" data-k="${k}">
+      ${st?`<span class="mark ${st}">${st==='ok'?'○':'✕'}</span>`:''}
+      ${tubeHTML(it, !!st)}
+      <div class="f">${it.f}</div>
+      <div class="cname ${st?'':'pending'}">${st?it.label:'未收錄'}</div>
+    </button>`;
+  });
+  h += `</div>`;
+
+  if(n===total){
+    h += `<div class="done-box"><h3>${fam.name}家族收錄完成</h3>
+      <p>把這一頁投影出來，就是完整的${fam.name}顏色對照。</p></div>`;
+    if(fam.id==='ag'){
+      h += `<button class="soon go" id="goOrder"><b>🧪 誰先沉澱？　可以玩了</b>同一杯溶液裡同時有 Cl<sup>−</sup>、CrO<sub>4</sub><sup>2−</sup>、I<sup>−</sup>、S<sup>2−</sup>，滴入硝酸銀時它們不會一起沉下去。先預測順序，再看滴定結果。</button>`;
+    }
+  }
+  if(Object.keys(state.got).length){
+    h += `<button class="clearbtn" id="clearBtn">清除收錄進度</button>`;
+  }
+  h += `<div class="foot">顏色為示意，實際沉澱會因濃度與顆粒大小而略有差異</div>`;
+  app.innerHTML = h;
+  const cb=document.getElementById('clearBtn');
+  if(cb) cb.onclick=()=>{ if(confirm('確定要清除這台裝置上的收錄進度嗎？')){
+    state.got={}; saveProgress(); render(); } };
+  const go=document.getElementById('goOrder');
+  if(go) go.onclick=()=> location.href='precipitation_order.html';
+  app.querySelectorAll('.slot').forEach(b=> b.onclick=()=> openQuiz(fam.items[+b.dataset.k]));
+}
+
+function renderTrap(){
+  const whites = ALL.filter(it=>it.g==='white');
+  const n = whites.filter(it=>state.got[it.f]).length;
+  let h = `<div class="pbar"><i style="width:${Math.round(n/whites.length*100)}%"></i></div>
+  <div class="trap-note">
+    <h2>白色沉澱有這麼多</h2>
+    <p>光看到「白色沉澱」四個字，其實分辨不出是哪一個。所以判斷未知溶液時，顏色只能當線索，真正要靠的還是溶解度規則，再搭配加酸、加熱這類額外的檢驗。</p>
+  </div>
+  <div class="white-grid">`;
+  whites.forEach(it=>{
+    const st = state.got[it.f];
+    h += `<div class="wcard ${st?'':'locked'}">
+      <div class="wchip" style="background:${st?it.hex:'transparent'}"></div>
+      <div><div class="f">${st?it.f:'？'}</div>
+      <div class="u">${st?'已收錄':'先去圖鑑收錄'}</div></div>
+    </div>`;
+  });
+  h += `</div><div class="foot">共 ${whites.length} 個白色沉澱，目前已收錄 ${n} 個</div>`;
+  app.innerHTML = h;
+}
+
+/* ===================== 預測彈窗 ===================== */
+function openQuiz(it){
+  const keys = Object.keys(GROUPS);
+  const others = keys.filter(k=>k!==it.g).sort(()=>Math.random()-.5).slice(0,3);
+  const opts = [it.g, ...others].sort(()=>Math.random()-.5);
+
+  const ov = document.createElement('div');
+  ov.className='overlay';
+  ov.innerHTML = `<div class="sheet">
+    <div class="ask">這個沉澱是什麼顏色？</div>
+    <div class="fbig">${it.f}</div>
+    <div class="stage" id="stage">${tubeHTML(it,false)}</div>
+    <div class="colors" id="colors">
+      ${opts.map(k=>`<button class="copt" data-g="${k}">
+        <span class="sw" style="background:${GROUPS[k].hex}"></span>${GROUPS[k].name}</button>`).join('')}
+    </div>
+    <div id="rv"></div>
+  </div>`;
+  document.body.appendChild(ov);
+  ov.addEventListener('click', e=>{ if(e.target===ov) ov.remove(); });
+
+  ov.querySelectorAll('.copt').forEach(b=> b.onclick=()=> answer(b.dataset.g));
+
+  function answer(g){
+    const ok = g===it.g;
+    state.got[it.f] = ok ? 'ok' : 'no';
+    saveProgress();
+
+    ov.querySelectorAll('.copt').forEach(b=>{
+      b.disabled = true;
+      if(b.dataset.g===it.g) b.classList.add('right');
+      else if(b.dataset.g===g) b.classList.add('wrongsel');
+      else b.classList.add('faded');
+    });
+
+    // 沉澱落下並堆積
+    const stage = document.getElementById('stage');
+    const tube = stage.querySelector('.tube');
+    tube.querySelector('.q').remove();
+    for(let i=0;i<7;i++){
+      const gr=document.createElement('div');
+      gr.className='grain';
+      gr.style.background=it.hex;
+      gr.style.left=(14+Math.random()*36)+'px';
+      gr.style.top=(24+Math.random()*20)+'px';
+      gr.style.animationDelay=(i*0.06)+'s';
+      tube.appendChild(gr);
+    }
+    setTimeout(()=> tube.querySelector('.sol').classList.add('on'), 260);
+
+    document.getElementById('rv').innerHTML = `<div class="reveal">
+      <div class="verdict ${ok?'ok':'no'}">${ok?'預測正確':'再記一次'}</div>
+      <div class="answer" style="color:${it.hex}">${it.label}</div>
+      <div class="desc">${it.d}</div>
+      <button class="btn" id="close">收錄進圖鑑</button>
+    </div>`;
+    document.getElementById('close').onclick=()=>{ ov.remove(); render(); };
+  }
+}
+
+render();
+</script>
+</body>
+</html>

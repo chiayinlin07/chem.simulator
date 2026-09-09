@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>沉澱的分離與純化</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#12100e; --card:#1e1b16; --card2:#252119;
+  --line:rgba(255,210,120,.10); --line2:rgba(255,210,120,.24);
+  --text:#f2ead8; --text2:#9a9080; --text3:#6a6058;
+  --amber:#f5c542; --amber2:#e8a020; --amber3:#ffd880;
+  --ok:#5ecfb0; --no:#e07060;
+  --font:"Noto Sans TC","PingFang TC","Microsoft JhengHei",-apple-system,BlinkMacSystemFont,sans-serif;
+}
+html,body{min-height:100dvh;background:var(--bg);color:var(--text);font-family:var(--font);-webkit-text-size-adjust:100%}
+body{padding-bottom:calc(40px + env(safe-area-inset-bottom));overflow-x:hidden;font-size:16px;line-height:1.7}
+sub,sup{font-size:.68em;line-height:0}
+button{font-family:inherit;font-size:inherit;color:inherit;border:none;background:none;cursor:pointer}
+.wrap{max-width:600px;margin:0 auto;padding:0 14px}
+
+header{position:sticky;top:0;z-index:20;background:rgba(18,16,14,.95);
+  backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.hrow{display:flex;align-items:center;gap:10px;padding:12px 0}
+.htitle{font-size:17px;font-weight:800;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.htitle em{font-style:normal;background:linear-gradient(120deg,var(--amber3),var(--amber2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.tbtn{font-size:16px;color:var(--text2);border:1px solid var(--line);border-radius:99px;padding:3px 11px;flex:none}
+.hstep{font-size:12.5px;color:var(--text2);font-weight:700;flex:none}
+.hstep b{color:var(--amber)}
+
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:17px;margin-top:16px}
+.card h2{font-size:17px;font-weight:800;margin-bottom:8px}
+.card p{font-size:14px;color:var(--text2);line-height:1.85}
+.card p+p{margin-top:9px}
+.hl{color:var(--amber);font-weight:700}
+
+.btn{display:block;width:100%;background:var(--amber);color:#12100e;border-radius:15px;padding:15px;
+  font-size:16.5px;font-weight:800;text-align:center;margin-top:14px}
+.btn:active{transform:translateY(2px)}
+.btn.ghost{background:transparent;color:var(--text2);border:1px solid var(--line);font-weight:700}
+.btn-row{display:flex;gap:10px}
+.btn-row .btn{margin-top:14px}
+
+.pickcard{display:block;width:100%;text-align:left;background:var(--card);border:1px solid var(--line);
+  border-radius:18px;padding:17px;margin-top:14px;transition:transform .14s,border-color .2s}
+.pickcard:active{transform:scale(.982);border-color:var(--line2)}
+.pickcard .tag{font-size:11px;font-weight:800;letter-spacing:1px;color:var(--text3);
+  text-transform:uppercase;margin-bottom:5px;display:block}
+.pickcard h3{font-size:18px;font-weight:800;margin-bottom:5px}
+.pickcard p{font-size:13.5px;color:var(--text2);line-height:1.8}
+.chiprow{display:flex;gap:6px;flex-wrap:wrap;margin-top:11px}
+.chiprow span{font-size:11.5px;font-weight:700;color:var(--text3);background:rgba(255,255,255,.04);
+  border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:3px 8px}
+.pickcard.done h3::after{content:' ✅';font-size:15px}
+.clearbtn{display:block;width:100%;margin-top:18px;font-size:13px;color:var(--text3);
+  border:1px solid var(--line);border-radius:12px;padding:10px}
+
+/* ---------- 燒杯 ---------- */
+.scene{display:flex;justify-content:center;padding:30px 0 4px}
+.scene>div{position:relative}
+.beaker{width:190px;height:210px;border:3px solid rgba(255,255,255,.2);border-top:none;
+  border-radius:5px 5px 18px 18px;position:relative;overflow:hidden;
+  background:linear-gradient(160deg,rgba(255,255,255,.045),rgba(255,255,255,.012))}
+.beaker::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:rgba(255,255,255,.24)}
+.water{position:absolute;left:0;right:0;bottom:0;height:0;background:rgba(140,195,255,.08);transition:height .5s ease}
+.water.on{height:82%}
+.solid{position:absolute;left:50%;top:38%;transform:translateX(-50%);
+  font-size:13px;font-weight:800;color:var(--text3);text-align:center;line-height:1.5}
+.ions{position:absolute;left:0;right:0;top:8%;bottom:26%;pointer-events:none}
+.ions span{position:absolute;font-size:11.5px;font-weight:800;padding:2px 6px;border-radius:7px;
+  animation:bob 4s ease-in-out infinite;white-space:nowrap}
+.ions .imp{background:rgba(224,112,96,.2);color:#f0a89c;border:1px solid rgba(224,112,96,.4)}
+.ions .ext{background:rgba(245,197,66,.18);color:var(--amber3);border:1px solid rgba(245,197,66,.4)}
+.ions .keep{background:rgba(94,207,176,.16);color:#9ce0cd;border:1px solid rgba(94,207,176,.35)}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+.layers{position:absolute;left:0;right:0;bottom:0;display:flex;flex-direction:column-reverse}
+.layer{height:0;transition:height .6s cubic-bezier(.3,1.2,.5,1);border-top:1px solid rgba(0,0,0,.3)}
+.layer.on{height:16px}
+.mud{position:absolute;left:0;right:0;bottom:0;height:0;background:#6b5b45;transition:height .5s}
+.mud.on{height:9px}
+
+.status{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:14px}
+.stbox{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:11px 13px}
+.stbox h4{font-size:11px;font-weight:800;color:var(--text3);letter-spacing:.8px;margin-bottom:6px}
+.stbox .list{display:flex;flex-wrap:wrap;gap:5px}
+.stbox .list span{font-size:12px;font-weight:800;border-radius:7px;padding:3px 7px}
+.stbox .list .imp{background:rgba(224,112,96,.16);color:#f0a89c}
+.stbox .list .ext{background:rgba(245,197,66,.15);color:var(--amber3)}
+.stbox .list .none{background:rgba(94,207,176,.14);color:#9ce0cd}
+.stbox .list .got{background:rgba(255,255,255,.08);color:var(--text2);display:flex;align-items:center;gap:5px}
+.stbox .list .got i{width:10px;height:10px;border-radius:3px;display:block;border:1px solid rgba(255,255,255,.25)}
+
+.palette{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:14px}
+.opcard{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px;
+  text-align:left;display:flex;flex-direction:column;gap:3px;transition:transform .13s,border-color .2s}
+.opcard:active{transform:scale(.97)}
+.opcard .nm{font-size:14.5px;font-weight:800;line-height:1.35;white-space:nowrap}
+.opcard .sub{font-size:11.5px;color:var(--text3);line-height:1.5}
+.opcard.used{opacity:.28;pointer-events:none}
+.opcard.shake{animation:shake .38s}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+
+.timeline{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px}
+.tl{font-size:11.5px;font-weight:800;background:rgba(94,207,176,.14);color:#9ce0cd;border-radius:8px;padding:4px 9px}
+.tl i{font-style:normal;opacity:.6;margin-right:4px}
+
+.msg{border-radius:14px;padding:13px 15px;margin-top:14px;font-size:14px;line-height:1.8}
+.msg.bad{background:rgba(224,112,96,.12);border:1px solid rgba(224,112,96,.35);color:#f2b6ac}
+.msg.good{background:rgba(94,207,176,.1);border:1px solid rgba(94,207,176,.3);color:#a9e3d3}
+.msg b{display:block;margin-bottom:4px;font-size:14.5px}
+.msg .eq{font-size:13.5px;color:var(--text2);margin-top:7px;background:rgba(0,0,0,.25);
+  border-radius:9px;padding:8px 11px;line-height:1.9}
+
+/* ---------- 前導測試 ---------- */
+.gridcard{padding:14px}
+.gtable{display:grid;gap:6px}
+.gh{font-size:13px;font-weight:800;color:var(--text2);text-align:center;padding:6px 2px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.grow{font-size:13.5px;font-weight:800;display:flex;flex-direction:column;justify-content:center;
+  line-height:1.35;padding-right:6px;white-space:nowrap}
+.grow span{font-size:10.5px;color:var(--text3);font-weight:700;white-space:nowrap}
+.gcell{height:52px;border:2px solid rgba(255,255,255,.12);border-radius:12px;
+  background:rgba(255,255,255,.03);font-size:22px;font-weight:900;color:var(--text3);
+  transition:.15s;display:flex;align-items:center;justify-content:center}
+.gcell.yes{border-color:rgba(94,207,176,.55);background:rgba(94,207,176,.14);color:var(--ok)}
+.gcell.no{border-color:rgba(255,255,255,.2);background:rgba(255,255,255,.06);color:var(--text2)}
+.gcell.bad{border-color:var(--no);background:rgba(224,112,96,.16);animation:shake .38s}
+
+/* ---------- 動畫 ---------- */
+.animlab{position:absolute;top:-26px;left:50%;transform:translateX(-50%);
+  font-size:12.5px;font-weight:800;color:var(--amber);white-space:nowrap;
+  background:rgba(245,197,66,.12);border:1px solid rgba(245,197,66,.3);border-radius:9px;padding:3px 11px}
+.layer.lift,.mud.lift{animation:lift .9s ease forwards}
+@keyframes lift{to{height:0;opacity:0}}
+.sweep{position:absolute;left:0;right:0;bottom:0;height:16px;
+  background:linear-gradient(180deg,rgba(255,255,255,.28),rgba(255,255,255,.05));
+  border-top:2px solid rgba(255,255,255,.5);animation:sweepup 1.2s ease-in forwards}
+@keyframes sweepup{0%{bottom:0;opacity:0}12%{opacity:1}100%{bottom:105%;opacity:.9}}
+.caught{position:absolute;left:50%;top:-9px;transform:translateX(-50%);
+  width:52px;height:11px;border-radius:6px 6px 3px 3px;box-shadow:0 -2px 5px rgba(0,0,0,.3)}
+.fdrip{position:absolute;top:40%;width:5px;height:8px;border-radius:50% 50% 60% 60%;
+  background:rgba(190,225,255,.75);opacity:0;animation:fdrip .8s ease-in forwards}
+@keyframes fdrip{0%{opacity:0;transform:translateY(0)}25%{opacity:1}100%{opacity:0;transform:translateY(60px)}}
+.beaker.heating{box-shadow:inset 0 -26px 32px -18px rgba(245,120,40,.5)}
+.steam{position:absolute;bottom:24%;width:9px;height:9px;border-radius:50%;
+  background:rgba(255,255,255,.3);opacity:0;animation:steam 1.7s ease-out infinite}
+@keyframes steam{0%{opacity:0;transform:translateY(0) scale(.6)}20%{opacity:.55}
+  100%{opacity:0;transform:translateY(-96px) scale(1.9)}}
+.xtal{position:absolute;width:7px;height:7px;background:#F2EFE6;border-radius:2px;
+  opacity:0;animation:xtal .5s ease forwards;box-shadow:0 0 4px rgba(255,255,255,.35)}
+@keyframes xtal{to{opacity:1}}
+.ions span.fadeout{opacity:0;transition:opacity .6s}
+
+/* ---------- 結果 ---------- */
+.result-head{text-align:center;padding:22px 10px 6px}
+.result-head .big{font-size:32px;font-weight:900;color:var(--amber);line-height:1.25}
+.result-head p{font-size:14px;color:var(--text2);margin-top:6px}
+.flow{border:1px solid var(--line);border-radius:14px;overflow:hidden;margin-top:12px}
+.fr{display:grid;grid-template-columns:26px 1fr;gap:10px;padding:11px 12px;
+  border-bottom:1px solid rgba(255,255,255,.05);align-items:start}
+.fr:last-child{border-bottom:none}
+.fr .n{font-size:12px;font-weight:900;color:var(--amber);text-align:center;
+  background:rgba(245,197,66,.12);border-radius:7px;padding:2px 0}
+.fr .nm{font-size:14px;font-weight:800;margin-bottom:2px;display:block}
+.fr .why{font-size:12.5px;color:var(--text3);line-height:1.65;display:block}
+.fr .eq{font-size:12.5px;color:var(--text2);margin-top:4px;display:block}
+.note{background:rgba(245,197,66,.07);border:1px solid rgba(245,197,66,.2);border-radius:15px;
+  padding:14px 16px;margin-top:16px}
+.note h3{font-size:15px;font-weight:800;color:var(--amber);margin-bottom:5px}
+.note p{font-size:13.5px;color:rgba(245,197,66,.82);line-height:1.85}
+.note p+p{margin-top:8px}
+.foot{text-align:center;color:var(--text3);font-size:11.5px;line-height:1.9;margin-top:26px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <div class="hrow">
+      <button class="tbtn" id="backBtn">←</button>
+      <div class="htitle" id="htitle">沉澱的<em>分離與純化</em></div>
+      <div class="hstep" id="hstep"></div>
+    </div>
+  </div>
+</header>
+
+<main class="wrap" id="app"></main>
+
+<script>
+/* ===================== 操作 ===================== */
+const OPS = {
+  dissolve:{ nm:'溶解', sub:'加水攪拌' },
+  bacl2:{ nm:'加 BaCl₂', sub:'提供 Ba²⁺' },
+  naoh:{ nm:'加 NaOH', sub:'提供 OH⁻' },
+  na2co3:{ nm:'加 Na₂CO₃', sub:'提供 CO₃²⁻' },
+  filter:{ nm:'過濾', sub:'把沉澱除去' },
+  hcl:{ nm:'加適量鹽酸', sub:'中和多餘試劑' },
+  evap:{ nm:'蒸發結晶', sub:'取得產物' },
+  // 第三關
+  hcl3:{ nm:'加 HCl', sub:'提供 Cl⁻' },
+  na2s3:{ nm:'加 Na₂S', sub:'提供 S²⁻' },
+  naoh3:{ nm:'加 NaOH', sub:'提供 OH⁻' },
+  filter3:{ nm:'過濾並收集', sub:'可重複使用', repeat:true }
+};
+
+const IMP_LABEL = { SO4:'SO₄²⁻', Mg:'Mg²⁺' };
+const EXT_LABEL = { ba:'Ba²⁺', oh:'OH⁻', co3:'CO₃²⁻' };
+const CAT_LABEL = { Ag:'Ag⁺', Cu:'Cu²⁺', Mg:'Mg²⁺' };
+
+/* ===================== 關卡 ===================== */
+const LEVELS = [
+{
+  id:2, mode:'purify', tag:'第二關', title:'基礎流程',
+  ops:['dissolve','bacl2','naoh','na2co3','filter','evap'],
+  excess:['ba'], mud:false,
+  chips:['過量的代價','SO₄²⁻ · Mg²⁺','6 個步驟'],
+  blurb:'換個情境：純化粗鹽。這次試劑本身會帶進新的雜質。',
+  intro:[
+    '粗鹽溶於水後，除了我們要的 <span class="hl">Na⁺ 和 Cl⁻</span>，還混著兩種可溶雜質：<span class="hl">SO₄²⁻ 和 Mg²⁺</span>。',
+    '要把它們變成沉澱除掉，需要 BaCl₂ 對付硫酸根、NaOH 對付鎂。',
+    '但是 BaCl₂ 一定要加<span class="hl">過量</span>才能把硫酸根除乾淨，於是多出來的 Ba²⁺ 自己變成新的雜質，還得再找一個試劑來收拾它。'
+  ],
+  pretest:{
+    title:'先確認：誰能除掉誰？',
+    desc:'三種試劑分別提供 Ba²⁺、OH⁻、CO₃²⁻。點格子切換：<b>○</b> 代表會生成沉澱，<b>✕</b> 代表不會，再點一次可清空。',
+    cols:[ {k:'SO4', nm:'SO₄²⁻'}, {k:'Mg', nm:'Mg²⁺'}, {k:'Ba', nm:'Ba²⁺'} ],
+    rows:[
+      { k:'ba', nm:'BaCl₂', sub:'Ba²⁺', cells:{
+        SO4:{a:1, why:'硫酸根遇到鋇離子難溶，生成白色的 BaSO₄。'},
+        Mg:{a:0, why:'兩個都是陽離子，不會互相沉澱。'},
+        Ba:{a:0, why:'加進去的正是鋇離子，不可能除掉它自己。'} }},
+      { k:'oh', nm:'NaOH', sub:'OH⁻', cells:{
+        SO4:{a:0, why:'兩個都是陰離子，不會互相沉澱。'},
+        Mg:{a:1, why:'Mg(OH)₂ 難溶，生成白色沉澱。'},
+        Ba:{a:0, why:'Ba(OH)₂ 可溶，鋇離子會留在溶液裡。'} }},
+      { k:'co3', nm:'Na₂CO₃', sub:'CO₃²⁻', cells:{
+        SO4:{a:0, why:'兩個都是陰離子，不會互相沉澱。'},
+        Mg:{a:1, why:'MgCO₃ 難溶。碳酸根只放行鹼金屬與銨根。'},
+        Ba:{a:1, why:'BaCO₃ 難溶。記住這一格，它是整個流程的關鍵。'} }}
+    ]
+  },
+  bridge:[
+    '這張表告訴你：<span class="hl">BaCl₂ 除硫酸根、NaOH 除鎂</span>，而 <span class="hl">Na₂CO₃ 是唯一能沉澱 Ba²⁺ 的試劑</span>。',
+    '碳酸根理論上也能讓鎂沉澱，但流程上仍用 NaOH 除鎂，因為 Mg(OH)₂ 的溶解度比 MgCO₃ 小得多，除得比較乾淨。',
+    '接下來的問題只剩一個：<span class="hl">該用什麼順序加？</span>'
+  ]
+},
+{
+  id:3, mode:'purify', tag:'第三關', title:'完整流程',
+  ops:['dissolve','bacl2','naoh','na2co3','filter','hcl','evap'],
+  excess:['ba','oh','co3'], mud:true,
+  chips:['沉澱會被酸溶回去','多了泥沙','要加鹽酸','7 個步驟'],
+  blurb:'實際操作不可能加得剛剛好，三種試劑都會過量，最後還得收尾。',
+  intro:[
+    '這一次更接近真實：粗鹽裡還混著不溶的<span class="hl">泥沙</span>，而且三種試劑都必須加過量，才能把雜質除乾淨。',
+    '過量的代價是：多餘的 <span class="hl">Ba²⁺、OH⁻、CO₃²⁻</span> 全部留在溶液裡，蒸發後會混進產物。',
+    '所以流程最後要加<span class="hl">適量鹽酸</span>把它們處理掉。但鹽酸什麼時候加，是這一關最大的陷阱。'
+  ],
+  pretest:{
+    title:'先確認：哪些沉澱溶於鹽酸？',
+    desc:'這一關會用到鹽酸。先判斷這三種沉澱碰到稀鹽酸會怎樣：<b>○</b> 代表會溶解，<b>✕</b> 代表不會。',
+    cols:[ {k:'BaSO4', nm:'BaSO₄'}, {k:'BaCO3', nm:'BaCO₃'}, {k:'MgOH', nm:'Mg(OH)₂'} ],
+    rows:[
+      { k:'h', nm:'加稀鹽酸', sub:'H⁺', cells:{
+        BaSO4:{a:0, why:'硫酸鋇不溶於酸，這也是它能當鋇餐、安全通過胃酸的原因。'},
+        BaCO3:{a:1, why:'碳酸鹽遇酸會分解，放出二氧化碳並溶解。'},
+        MgOH:{a:1, why:'氫氧化物遇酸被中和，生成鹽類和水而溶解。'} }}
+    ]
+  },
+  bridge:[
+    '三個裡面有兩個會被鹽酸溶回去。這件事直接決定了鹽酸該放在流程的哪一步。',
+    '想清楚：如果沉澱還泡在溶液裡就加鹽酸，會發生什麼事？',
+    '另一方面，過量的 NaOH 和 Na₂CO₃ 又非得靠鹽酸處理不可。<span class="hl">時機是這一關的全部。</span>'
+  ]
+},
+{
+  id:1, mode:'separate', tag:'第一關', title:'選擇性分離',
+  ops:['hcl3','na2s3','naoh3','filter3'],
+  chips:['先熱身三題','Ag⁺ · Cu²⁺ · Mg²⁺','試劑的專一性','6 個步驟'],
+  blurb:'把三種金屬離子一個一個分開回收。只要會查溶解度規則就能通關。',
+  intro:[
+    '這一關的目標完全不同。燒杯裡有 <span class="hl">Ag⁺、Cu²⁺、Mg²⁺</span> 三種金屬離子，要把它們<span class="hl">分別</span>沉澱、分別收集，不能混在一起。',
+    '手上有三種試劑：HCl、Na₂S、NaOH。每加一次試劑就要過濾一次，把該次的沉澱單獨收走——因為每一份都要保留，不像除雜可以最後一次濾完。',
+    '關鍵在於每個試劑的<span class="hl">專一性</span>不同——有的只抓一種離子，有的通吃。順序選錯，兩種沉澱就會混在同一張濾紙上，分不開了。'
+  ],
+  pretest:{
+    title:'先確認：每個試劑會抓走誰？',
+    desc:'把九格都判斷過，你會看出一個規律：<b>○</b> 代表會生成沉澱，<b>✕</b> 代表不會。',
+    cols:[ {k:'Ag', nm:'Ag⁺'}, {k:'Cu', nm:'Cu²⁺'}, {k:'Mg', nm:'Mg²⁺'} ],
+    rows:[
+      { k:'cl', nm:'HCl', sub:'Cl⁻', cells:{
+        Ag:{a:1, why:'AgCl 難溶，白色沉澱。銀是「共同牽引他」名單上的成員。'},
+        Cu:{a:0, why:'名單上的是亞銅 Cu⁺，Cu²⁺ 不在其中，CuCl₂ 可溶。'},
+        Mg:{a:0, why:'鎂不在鹵素離子的黑名單中，MgCl₂ 可溶。'} }},
+      { k:'s', nm:'Na₂S', sub:'S²⁻', cells:{
+        Ag:{a:1, why:'Ag₂S 難溶，黑色沉澱，溶解度極小。'},
+        Cu:{a:1, why:'CuS 難溶，黑色沉澱。'},
+        Mg:{a:0, why:'硫離子放行鹼土金屬，MgS 依課本規則可溶。'} }},
+      { k:'oh', nm:'NaOH', sub:'OH⁻', cells:{
+        Ag:{a:1, why:'銀不在氫氧根的白名單裡，會沉澱。'},
+        Cu:{a:1, why:'Cu(OH)₂ 難溶，藍色沉澱。'},
+        Mg:{a:1, why:'Mg(OH)₂ 難溶，白色沉澱。'} }}
+    ]
+  },
+  bridge:[
+    '看出規律了嗎？由上往下，○ 越來越多：<span class="hl">Cl⁻ 只抓銀、S²⁻ 抓銀和銅、OH⁻ 三個都抓</span>。',
+    '這就是「專一性」的差別。要把離子一個一個分開，必須<span class="hl">從最專一的試劑開始</span>——先用只抓一種的，把它單獨收走，再用範圍大一點的。',
+    '順序反過來的話，一次抓走兩三種，沉澱混在一起就分不開了。'
+  ],
+  warmup:[
+    { q:'溶液裡有 <b>Ag⁺</b> 和 <b>Cu²⁺</b>。只想把 Ag⁺ 單獨沉澱出來，該加哪一種？',
+      a:'cl',
+      why:{
+        cl:'Cl⁻ 只跟 Ag⁺ 沉澱，銅會留在溶液裡，剛好把兩者分開。',
+        s:'S²⁻ 會把 Ag⁺ 和 Cu²⁺ 一起沉下來，兩種黑色沉澱混在一起就分不開了。',
+        oh:'OH⁻ 兩個都會沉澱，一樣混在一起。',
+        no:'其實做得到，有一個試劑只會抓走銀。再看一次剛才的表。'
+      }},
+    { q:'溶液裡有 <b>Cu²⁺</b> 和 <b>Mg²⁺</b>。只想把 Cu²⁺ 單獨沉澱出來，該加哪一種？',
+      a:'s',
+      why:{
+        cl:'Cl⁻ 跟這兩個都不會沉澱，加下去什麼事也不會發生。',
+        s:'S²⁻ 讓 Cu²⁺ 沉澱成黑色的 CuS，而 MgS 可溶，鎂安穩留在溶液裡。',
+        oh:'OH⁻ 讓 Cu²⁺ 和 Mg²⁺ 都沉澱，藍色和白色混成一團。',
+        no:'其實做得到，有一個試劑只會抓走銅。'
+      }},
+    { q:'溶液裡有 <b>Ag⁺</b> 和 <b>Mg²⁺</b>。這次只想把 Mg²⁺ 單獨沉澱出來，該加哪一種？',
+      a:'no',
+      why:{
+        cl:'Cl⁻ 抓的是銀，不是鎂。',
+        s:'S²⁻ 抓的也是銀，MgS 可溶。',
+        oh:'OH⁻ 確實能沉澱 Mg²⁺，但 Ag⁺ 也會一起沉下來，還是混在一起。',
+        no:'沒錯，一步做不到。沒有任何一個試劑只抓鎂不抓銀，所以只能先把銀除掉，再處理鎂。分兩步走，正是接下來要練習的事。'
+      }}
+  ],
+  warmOpts:[
+    {k:'cl', nm:'HCl', sub:'Cl⁻'},
+    {k:'s',  nm:'Na₂S', sub:'S²⁻'},
+    {k:'oh', nm:'NaOH', sub:'OH⁻'},
+    {k:'no', nm:'一步做不到', sub:'需要分兩次'}
+  ]
+}
+];
+LEVELS.sort((a,b)=>a.id-b.id);
+
+/* ===================== 狀態 ===================== */
+const SAVE_KEY='chem_salt_v1';
+function loadSave(){ try{ return JSON.parse(localStorage.getItem(SAVE_KEY))||{}; }catch(e){ return {}; } }
+function saveProgress(){ try{ localStorage.setItem(SAVE_KEY, JSON.stringify(st.done)); }catch(e){} }
+const st = {
+  lv:null, done:loadSave(), seq:[], hints:0, order:[],
+  dissolved:false, filtered:false,
+  imp:{}, ext:{}, layers:[], mud:false,
+  cat:{}, pending:[], collected:[],
+  grid:{}, gridWrong:[]
+};
+const app = document.getElementById('app');
+const htitle = document.getElementById('htitle');
+const hstep = document.getElementById('hstep');
+
+document.getElementById('backBtn').onclick = ()=>{
+  if(!st.lv){ if(history.length>1) history.back(); else location.href='index.html'; return; }
+  if(st.seq.length && !confirm('離開後這一關已完成的步驟會清空，確定嗎？')) return;
+  renderMenu();
+};
+function shuffle(a){
+  const r=a.slice();
+  for(let i=r.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [r[i],r[j]]=[r[j],r[i]]; }
+  return r;
+}
+
+/* ===================== 選單 ===================== */
+function renderMenu(){
+  st.lv=null; htitle.innerHTML='沉澱的<em>分離與純化</em>'; hstep.textContent=''; window.scrollTo(0,0);
+  let h = `<div class="card">
+    <h2>把離子一個一個處理掉</h2>
+    <p>運用前面學到的<span class="hl">溶解度規則</span>，選出適當的試劑，把溶液裡的離子一步一步變成沉澱處理掉。第一關是把三種金屬離子分開回收，後兩關則是純化粗鹽。</p>
+    <p>三關由淺入深，每一關只多學一個新觀念：<span class="hl">先學排順序，再學試劑帶進來的新雜質，最後學加入的時機</span>。每一關開始前都會先做小測試。</p>
+  </div>`;
+  LEVELS.forEach((lv,i)=>{
+    h += `<button class="pickcard ${st.done[lv.id]?'done':''}" data-i="${i}">
+      <span class="tag">${lv.tag}</span><h3>${lv.title}</h3>
+      <p>${lv.blurb}</p>
+      <div class="chiprow">${lv.chips.map(c=>`<span>${c}</span>`).join('')}</div>
+    </button>`;
+  });
+  if(Object.keys(st.done).length){
+    h += `<button class="clearbtn" id="clearBtn">清除進度，從頭開始</button>`;
+  }
+  h += `<div class="foot">建議依序完成，難度逐關遞增</div>`;
+  app.innerHTML = h;
+  const cb=document.getElementById('clearBtn');
+  if(cb) cb.onclick=()=>{ if(confirm('確定要清除這台裝置上的闖關進度嗎？')){
+    st.done={}; saveProgress(); renderMenu(); } };
+  app.querySelectorAll('.pickcard').forEach(b=> b.onclick=()=> startLevel(LEVELS[+b.dataset.i]));
+}
+
+/* ===================== 開始 ===================== */
+function startLevel(lv){
+  st.lv=lv; st.seq=[]; st.hints=0;
+  st.dissolved = lv.mode==='separate';
+  st.filtered=false;
+  st.imp = lv.mode==='purify' ? {SO4:true, Mg:true} : {};
+  st.ext={}; st.layers=[]; st.mud=!!lv.mud;
+  st.cat = lv.mode==='separate' ? {Ag:true, Cu:true, Mg:true} : {};
+  st.pending=[]; st.collected=[];
+  st.grid={}; st.gridWrong=[];
+  st.order = shuffle(lv.ops);
+  htitle.innerHTML = lv.tag+'｜'+lv.title;
+  renderIntro();
+}
+function renderIntro(){
+  const lv=st.lv; window.scrollTo(0,0); hstep.textContent='';
+  app.innerHTML = `<div class="card"><h2>${lv.title}</h2>
+      ${lv.intro.map(p=>`<p>${p}</p>`).join('')}</div>
+    <button class="btn" id="go">先做小測試</button>`;
+  document.getElementById('go').onclick = ()=> renderGrid();
+}
+
+/* ===================== 前導測試 ===================== */
+function renderGrid(){
+  const pt = st.lv.pretest; window.scrollTo(0,0); hstep.textContent='';
+  let h = `<div class="card"><h2>${pt.title}</h2><p>${pt.desc}</p></div>
+    <div class="card gridcard">
+      <div class="gtable" style="grid-template-columns:96px repeat(${pt.cols.length},1fr)">
+        <div class="gh"></div>
+        ${pt.cols.map(c=>`<div class="gh">${c.nm}</div>`).join('')}
+        ${pt.rows.map(r=>`
+          <div class="grow">${r.nm}<span>${r.sub}</span></div>
+          ${pt.cols.map(c=>{
+            const id=r.k+'_'+c.k, v=st.grid[id];
+            const wrong=st.gridWrong.includes(id);
+            return `<button class="gcell ${v===1?'yes':(v===0?'no':'')} ${wrong?'bad':''}" data-c="${id}">${v===1?'○':(v===0?'✕':'')}</button>`;
+          }).join('')}`).join('')}
+      </div>
+    </div>
+    <div id="gmsg"></div>
+    <button class="btn" id="check">檢查</button>
+    <div class="foot">依課本溶解度規則判斷</div>`;
+  app.innerHTML = h;
+  app.querySelectorAll('.gcell').forEach(b=> b.onclick=()=>{
+    const id=b.dataset.c, cur=st.grid[id];
+    st.grid[id] = cur===undefined ? 1 : (cur===1 ? 0 : undefined);
+    st.gridWrong = st.gridWrong.filter(x=>x!==id);
+    renderGrid();
+  });
+  document.getElementById('check').onclick = checkGrid;
+}
+
+function checkGrid(){
+  const pt=st.lv.pretest;
+  const blanks=[], wrong=[];
+  pt.rows.forEach(r=> pt.cols.forEach(c=>{
+    const id=r.k+'_'+c.k, v=st.grid[id];
+    if(v===undefined) blanks.push(id);
+    else if(v!==r.cells[c.k].a) wrong.push(id);
+  }));
+  const box=document.getElementById('gmsg');
+  if(blanks.length){
+    box.innerHTML = `<div class="msg bad"><b>還有 ${blanks.length} 格沒填</b>每一格都要判斷過，才知道哪個試劑對付哪個離子。</div>`;
+    box.scrollIntoView({behavior:'smooth',block:'nearest'}); return;
+  }
+  if(wrong.length){
+    st.gridWrong = wrong; renderGrid();
+    document.getElementById('gmsg').innerHTML = `<div class="msg bad">
+      <b>有 ${wrong.length} 格要再想一下</b>
+      ${wrong.map(id=>{
+        const [rk,ck]=id.split('_');
+        const r=pt.rows.find(x=>x.k===rk), c=pt.cols.find(x=>x.k===ck);
+        return `<div style="margin-top:6px">${r.sub} ＋ ${c.nm}：${r.cells[ck].why}</div>`;
+      }).join('')}</div>`;
+    document.getElementById('gmsg').scrollIntoView({behavior:'smooth',block:'nearest'});
+    return;
+  }
+  if(st.lv.warmup) renderWarm(0); else renderBridge();
+}
+
+/* ===================== 熱身小任務 ===================== */
+function renderWarm(i){
+  const lv=st.lv, w=lv.warmup[i];
+  window.scrollTo(0,0);
+  hstep.innerHTML = `熱身 <b>${i+1}</b> / ${lv.warmup.length}`;
+  app.innerHTML = `<div class="card">
+      <h2>熱身 ${i+1}｜挑對試劑</h2>
+      <p>${w.q}</p>
+    </div>
+    <div class="card" style="padding:14px">
+      <div class="palette" id="wopts">
+        ${lv.warmOpts.map(o=>`<button class="opcard" data-k="${o.k}">
+          <span class="nm">${o.nm}</span><span class="sub">${o.sub}</span></button>`).join('')}
+      </div>
+    </div>
+    <div id="wmsg"></div>
+    <div id="wnext"></div>`;
+  app.querySelectorAll('#wopts .opcard').forEach(b=> b.onclick=()=>{
+    const k=b.dataset.k, ok = k===w.a;
+    const box=document.getElementById('wmsg');
+    if(!ok){
+      st.hints++;
+      b.classList.add('shake'); setTimeout(()=>b.classList.remove('shake'),400);
+      b.classList.add('used');
+      box.innerHTML=`<div class="msg bad"><b>再想一下</b>${w.why[k]}</div>`;
+      box.scrollIntoView({behavior:'smooth',block:'nearest'});
+      return;
+    }
+    app.querySelectorAll('#wopts .opcard').forEach(x=>{
+      x.style.pointerEvents='none';
+      if(x.dataset.k!==k) x.classList.add('used');
+    });
+    box.innerHTML=`<div class="msg good"><b>答對了</b>${w.why[k]}</div>`;
+    const last = i===lv.warmup.length-1;
+    document.getElementById('wnext').innerHTML =
+      `<button class="btn" id="wn">${last?'進入正式任務':'下一題'}</button>`;
+    document.getElementById('wn').onclick=()=> last ? renderBridge() : renderWarm(i+1);
+  });
+}
+
+function renderBridge(){
+  window.scrollTo(0,0);
+  app.innerHTML = `<div class="card"><h2>全部正確</h2>
+      ${st.lv.bridge.map(p=>`<p>${p}</p>`).join('')}</div>
+    <button class="btn" id="go">進入關卡</button>`;
+  document.getElementById('go').onclick = ()=> renderPlay();
+}
+
+/* ===================== 主畫面 ===================== */
+function beakerHTML(){
+  const lv=st.lv;
+  let tags='';
+  if(st.dissolved){
+    if(lv.mode==='purify'){
+      tags += `<span class="keep" style="left:34%;top:6%">Na⁺ Cl⁻</span>`;
+      const posImp=[[14,14],[52,22]], posExt=[[56,48],[16,66],[52,70]];
+      Object.keys(st.imp).filter(k=>st.imp[k]).forEach((k,i)=>{
+        const p=posImp[i%2];
+        tags += `<span class="imp" style="left:${p[0]}%;top:${p[1]}%;animation-delay:${i*.7}s">${IMP_LABEL[k]}</span>`;
+      });
+      Object.keys(st.ext).filter(k=>st.ext[k]).forEach((k,i)=>{
+        const p=posExt[i%3];
+        tags += `<span class="ext" style="left:${p[0]}%;top:${p[1]}%;animation-delay:${i*.5}s">${EXT_LABEL[k]} 過量</span>`;
+      });
+    } else {
+      const pos=[[16,16],[54,34],[24,58]];
+      Object.keys(st.cat).filter(k=>st.cat[k]).forEach((k,i)=>{
+        const p=pos[i%3];
+        tags += `<span class="imp" style="left:${p[0]}%;top:${p[1]}%;animation-delay:${i*.6}s">${CAT_LABEL[k]}</span>`;
+      });
+    }
+  }
+  const layers = (st.lv.mode==='purify' ? st.layers : st.pending)
+    .map(l=>`<div class="layer on" style="background:${l.color}"></div>`).join('');
+  return `<div class="scene"><div><div class="beaker">
+      <div class="water ${st.dissolved?'on':''}"></div>
+      ${st.dissolved?'':'<div class="solid">粗鹽固體<br><span style="font-size:11px">尚未溶解</span></div>'}
+      <div class="ions">${tags}</div>
+      <div class="layers">${layers}</div>
+      ${st.mud?'<div class="mud on"></div>':''}
+    </div></div></div>`;
+}
+
+function statusHTML(){
+  if(st.lv.mode==='separate'){
+    const left = Object.keys(st.cat).filter(k=>st.cat[k]);
+    return `<div class="status">
+      <div class="stbox"><h4>溶液中的金屬離子</h4><div class="list">
+        ${left.length ? left.map(k=>`<span class="imp">${CAT_LABEL[k]}</span>`).join('')
+          : '<span class="none">已全部分離</span>'}
+        ${st.pending.length?`<span class="ext">杯底有沉澱</span>`:''}
+      </div></div>
+      <div class="stbox"><h4>已收集的沉澱</h4><div class="list">
+        ${st.collected.length ? st.collected.map(c=>
+          `<span class="got"><i style="background:${c.color}"></i>${c.nm}</span>`).join('')
+          : '<span class="none">還沒有</span>'}
+      </div></div></div>`;
+  }
+  const impKeys=Object.keys(st.imp).filter(k=>st.imp[k]);
+  const extKeys=Object.keys(st.ext).filter(k=>st.ext[k]);
+  return `<div class="status">
+    <div class="stbox"><h4>還沒除掉的雜質</h4><div class="list">
+      ${impKeys.length ? impKeys.map(k=>`<span class="imp">${IMP_LABEL[k]}</span>`).join('')
+        : (st.mud?'':'<span class="none">已清空</span>')}
+      ${st.mud?'<span class="imp">泥沙</span>':''}
+    </div></div>
+    <div class="stbox"><h4>過量試劑殘留</h4><div class="list">
+      ${extKeys.length ? extKeys.map(k=>`<span class="ext">${EXT_LABEL[k]}</span>`).join('')
+        : '<span class="none">沒有</span>'}
+    </div></div></div>`;
+}
+
+function renderPlay(msg){
+  const lv=st.lv; window.scrollTo(0,0);
+  const total = lv.mode==='separate' ? 6 : lv.ops.length;
+  hstep.innerHTML = `第 <b>${st.seq.length+1}</b> 步 / 共 ${total} 步`;
+  const avail = st.order.filter(o=> OPS[o].repeat || !st.seq.includes(o));
+  app.innerHTML = `
+    ${beakerHTML()}
+    ${statusHTML()}
+    ${st.seq.length?`<div class="timeline">${st.seq.map((o,i)=>
+      `<span class="tl"><i>${i+1}</i>${OPS[o].nm}</span>`).join('')}</div>`:''}
+    <div id="msg">${msg||''}</div>
+    <div class="card" style="padding:14px">
+      <h2 style="font-size:15px;margin-bottom:10px">接下來要做什麼？</h2>
+      <div class="palette">
+        ${avail.map(o=>`<button class="opcard" data-o="${o}">
+          <span class="nm">${OPS[o].nm}</span><span class="sub">${OPS[o].sub}</span></button>`).join('')}
+      </div>
+    </div>
+    <button class="btn ghost" id="restart">重新開始這一關</button>`;
+  app.querySelectorAll('.opcard').forEach(b=> b.onclick=()=> choose(b.dataset.o, b));
+  document.getElementById('restart').onclick = ()=> startLevel(lv);
+}
+
+/* ===================== 判斷 ===================== */
+function validate(op){
+  const lv=st.lv, has=o=>st.seq.includes(o);
+
+  if(lv.mode==='separate'){
+    if(st.pending.length && op!=='filter3')
+      return {msg:'杯底還有剛生成的沉澱沒收走。現在再加試劑，新的沉澱會跟它混在一起，就分不開了。先過濾。'};
+    if(op==='filter3' && !st.pending.length)
+      return {msg:'杯子裡沒有沉澱可以濾。先加一種試劑讓某個離子沉下來。'};
+    if(op==='hcl3' && !st.cat.Ag)
+      return {msg:'銀離子已經收走了，鹽酸沒有對象可以沉澱。'};
+    if(op==='na2s3'){
+      if(!st.cat.Cu) return {msg:'銅離子已經收走了。'};
+      if(st.cat.Ag) return {msg:'硫離子除了銅，也會讓 Ag⁺ 沉澱成 Ag₂S。現在加下去，黑色的 CuS 和 Ag₂S 會一起沉在杯底，分不開。先用只抓銀的試劑。'};
+    }
+    if(op==='naoh3'){
+      if(!st.cat.Mg) return {msg:'鎂離子已經收走了。'};
+      const both=[];
+      if(st.cat.Ag) both.push('Ag⁺');
+      if(st.cat.Cu) both.push('Cu²⁺');
+      if(both.length) return {msg:`氫氧根是三個裡面最不專一的，${both.join('、')} 也會跟著沉澱，混成一團。把它留到最後。`};
+    }
+    return null;
+  }
+
+  const impLeft = Object.keys(st.imp).filter(k=>st.imp[k]);
+  if(op!=='dissolve' && !st.dissolved)
+    return {msg:'先把粗鹽溶解成溶液。固體狀態下離子沒有分開，試劑加下去也不會反應。'};
+  if(op==='dissolve' && st.dissolved) return {msg:'已經溶解過了。'};
+
+  if(['bacl2','naoh','na2co3'].includes(op)){
+    if(st.filtered)
+      return {msg:'已經過濾了，現在再加試劑只會生成新的沉澱，還得再濾一次。要沉澱的試劑都得在過濾之前加完。'};
+    if(op==='na2co3' && !has('bacl2'))
+      return {msg:'先別急。Na₂CO₃ 在這裡的任務是收拾 BaCl₂ 過量留下的 Ba²⁺。現在就加，等一下加了 BaCl₂，多餘的鋇就沒人處理了。'};
+  }
+  if(op==='filter'){
+    if(impLeft.length)
+      return {msg:`還有 ${impLeft.map(k=>IMP_LABEL[k]).join('、')} 沒有變成沉澱。現在過濾，它們會留在濾液裡跟著進入產物。`};
+    if(st.ext.ba)
+      return {msg:'溶液裡還有過量的 Ba²⁺，它也是雜質。先想辦法把它變成沉澱再過濾。'};
+  }
+  if(op==='hcl' && !st.filtered)
+    return {msg:'太早了。BaCO₃ 和 Mg(OH)₂ 都溶於酸，現在加鹽酸會把剛沉下去的東西溶回溶液，前面等於白做。'};
+  if(op==='evap'){
+    if(impLeft.length || st.mud)
+      return {msg:'雜質還沒除乾淨，現在蒸發只會把它們一起結晶出來。'};
+    if(!st.filtered)
+      return {msg:'沉澱還泡在溶液裡，現在蒸發會把沉澱跟食鹽混在一起。要先過濾。'};
+    const extLeft=Object.keys(st.ext).filter(k=>st.ext[k]);
+    if(extLeft.length)
+      return {msg:`溶液裡還有過量的 ${extLeft.map(k=>EXT_LABEL[k]).join('、')}，蒸發後會混進產物。先想辦法把它們轉成 NaCl 或除掉。`};
+  }
+  return null;
+}
+
+/* ===================== 執行 ===================== */
+function apply(op){
+  const lv=st.lv;
+  switch(op){
+    case 'dissolve':
+      st.dissolved=true;
+      return `<div class="msg good"><b>溶解完成</b>粗鹽溶進水裡，Na⁺、Cl⁻ 和兩種雜質離子都分散在溶液中${lv.mud?'，不溶的泥沙沉在杯底':''}。</div>`;
+    case 'bacl2':
+      st.imp.SO4=false; st.layers.push({color:'#EFEDE6'});
+      if(lv.excess.includes('ba')) st.ext.ba=true;
+      return `<div class="msg good"><b>硫酸根除掉了</b>生成白色的 BaSO₄ 沉澱。但因為加的是過量，多餘的 Ba²⁺ 留在溶液裡，變成新的雜質。
+        <div class="eq">Ba²⁺ + SO₄²⁻ → BaSO₄(s)↓</div></div>`;
+    case 'naoh':
+      st.imp.Mg=false; st.layers.push({color:'#E6E2D6'});
+      if(lv.excess.includes('oh')) st.ext.oh=true;
+      return `<div class="msg good"><b>鎂離子除掉了</b>生成白色的 Mg(OH)₂ 沉澱。${lv.excess.includes('oh')?'過量的 OH⁻ 留在溶液裡。':''}
+        <div class="eq">Mg²⁺ + 2OH⁻ → Mg(OH)₂(s)↓</div></div>`;
+    case 'na2co3': {
+      let extra='', eq='';
+      if(st.ext.ba){
+        st.ext.ba=false; st.layers.push({color:'#DCD8CC'});
+        eq='Ba²⁺ + CO₃²⁻ → BaCO₃(s)↓';
+        extra='過量的 Ba²⁺ 被碳酸根沉澱成 BaCO₃ 除掉了，這就是它必須排在 BaCl₂ 後面的原因。';
+      }
+      if(lv.excess.includes('co3')) st.ext.co3=true;
+      return `<div class="msg good"><b>過量的鋇離子處理掉了</b>${extra}
+        <div class="eq">${eq}</div></div>`;
+    }
+    case 'filter':
+      st.filtered=true; st.layers=[]; st.mud=false;
+      return `<div class="msg good"><b>過濾完成</b>所有沉澱${lv.mud?'和泥沙':''}都留在濾紙上，濾液裡只剩下 NaCl${Object.keys(st.ext).filter(k=>st.ext[k]).length?' 和過量的試劑':''}。</div>`;
+    case 'hcl':
+      st.ext.oh=false; st.ext.co3=false;
+      return `<div class="msg good"><b>多餘的試劑處理掉了</b>鹽酸中和過量的 NaOH，也把過量的 Na₂CO₃ 轉成 NaCl、水和二氧化碳。加「適量」是關鍵，多加的鹽酸蒸發時會揮發，不會殘留。
+        <div class="eq">OH⁻ + H⁺ → H₂O<br>CO₃²⁻ + 2H⁺ → H₂O + CO₂↑</div></div>`;
+    case 'evap': return 'done';
+
+    /* 第三關 */
+    case 'hcl3':
+      st.cat.Ag=false; st.pending.push({nm:'AgCl', color:'#EFEDE6'});
+      return `<div class="msg good"><b>銀離子沉澱了</b>白色的 AgCl 沉在杯底。銅和鎂完全沒受影響，還留在溶液裡。
+        <div class="eq">Ag⁺ + Cl⁻ → AgCl(s)↓</div></div>`;
+    case 'na2s3':
+      st.cat.Cu=false; st.pending.push({nm:'CuS', color:'#232120'});
+      return `<div class="msg good"><b>銅離子沉澱了</b>黑色的 CuS 沉在杯底。因為銀已經先收走，這次只抓到銅。
+        <div class="eq">Cu²⁺ + S²⁻ → CuS(s)↓</div></div>`;
+    case 'naoh3':
+      st.cat.Mg=false; st.pending.push({nm:'Mg(OH)₂', color:'#EFEDE6'});
+      return `<div class="msg good"><b>鎂離子沉澱了</b>白色的 Mg(OH)₂ 沉在杯底。氫氧根雖然通吃，但前兩個離子已經不在了，所以這次只抓到鎂。
+        <div class="eq">Mg²⁺ + 2OH⁻ → Mg(OH)₂(s)↓</div></div>`;
+    case 'filter3': {
+      const names = st.pending.map(p=>p.nm).join('、');
+      st.collected = st.collected.concat(st.pending);
+      st.pending=[];
+      return `<div class="msg good"><b>收集完成</b>${names} 單獨留在濾紙上，純度很高。濾液倒回燒杯，繼續處理剩下的離子。</div>`;
+    }
+  }
+}
+
+/* ===================== 動畫 ===================== */
+function animFilter(cb, caughtColor){
+  const beaker=document.querySelector('.beaker');
+  if(!beaker){ cb(); return; }
+  const sweep=document.createElement('div'); sweep.className='sweep';
+  const caught=document.createElement('div'); caught.className='caught';
+  caught.style.background = caughtColor || '#E8E4D8';
+  sweep.appendChild(caught); beaker.appendChild(sweep);
+  beaker.querySelectorAll('.layer,.mud').forEach(l=> l.classList.add('lift'));
+  for(let i=0;i<6;i++){
+    const d=document.createElement('div'); d.className='fdrip';
+    d.style.left=(20+Math.random()*140)+'px';
+    d.style.animationDelay=(0.5+i*0.09)+'s';
+    beaker.appendChild(d);
+  }
+  const label=document.createElement('div');
+  label.className='animlab'; label.textContent='過濾中…';
+  beaker.parentElement.appendChild(label);
+  setTimeout(cb, 1500);
+}
+function animEvap(cb){
+  const beaker=document.querySelector('.beaker');
+  if(!beaker){ cb(); return; }
+  beaker.classList.add('heating');
+  const water=beaker.querySelector('.water');
+  beaker.querySelectorAll('.ions span').forEach(s=> s.classList.add('fadeout'));
+  for(let i=0;i<7;i++){
+    const s=document.createElement('div'); s.className='steam';
+    s.style.left=(30+Math.random()*120)+'px';
+    s.style.animationDelay=(i*0.22)+'s';
+    beaker.appendChild(s);
+  }
+  const label=document.createElement('div');
+  label.className='animlab'; label.textContent='加熱蒸發中…';
+  beaker.parentElement.appendChild(label);
+  setTimeout(()=>{ if(water) water.style.height='0'; }, 300);
+  setTimeout(()=>{
+    label.textContent='結晶析出';
+    for(let i=0;i<14;i++){
+      const c=document.createElement('div'); c.className='xtal';
+      c.style.left=(14+Math.random()*160)+'px';
+      c.style.bottom=(3+Math.random()*14)+'px';
+      c.style.animationDelay=(i*0.05)+'s';
+      c.style.transform='rotate('+(Math.random()*45)+'deg)';
+      beaker.appendChild(c);
+    }
+  },1500);
+  setTimeout(cb, 2900);
+}
+
+function choose(op, el){
+  const bad=validate(op);
+  if(bad){
+    st.hints++;
+    el.classList.add('shake');
+    setTimeout(()=>el.classList.remove('shake'),400);
+    const box=document.getElementById('msg');
+    box.innerHTML=`<div class="msg bad"><b>這一步還不行</b>${bad.msg}</div>`;
+    box.scrollIntoView({behavior:'smooth',block:'nearest'});
+    return;
+  }
+  const color = st.pending.length ? st.pending[0].color : null;
+  const m=apply(op);
+  st.seq.push(op);
+  document.querySelectorAll('.opcard').forEach(b=> b.style.pointerEvents='none');
+
+  if(op==='filter'){ animFilter(()=> renderPlay(m)); return; }
+  if(op==='filter3'){
+    animFilter(()=>{
+      if(st.collected.length===3) renderResult();
+      else renderPlay(m);
+    }, color);
+    return;
+  }
+  if(op==='evap'){ animEvap(()=> renderResult()); return; }
+  renderPlay(m);
+}
+
+/* ===================== 結果 ===================== */
+const FLOW_WHY = {
+  dissolve:{ why:'讓離子分散在水中，反應才能發生', eq:'' },
+  bacl2:{ why:'除去 SO₄²⁻，但會留下過量的 Ba²⁺', eq:'Ba²⁺ + SO₄²⁻ → BaSO₄(s)↓' },
+  naoh:{ why:'除去 Mg²⁺', eq:'Mg²⁺ + 2OH⁻ → Mg(OH)₂(s)↓' },
+  na2co3:{ why:'收拾過量的 Ba²⁺，所以必須排在 BaCl₂ 之後', eq:'Ba²⁺ + CO₃²⁻ → BaCO₃(s)↓' },
+  filter:{ why:'一次把所有沉澱除去，所以要等試劑都加完', eq:'' },
+  hcl:{ why:'中和過量的鹼與碳酸根，必須在過濾之後，否則沉澱會溶回來', eq:'OH⁻ + H⁺ → H₂O　／　CO₃²⁻ + 2H⁺ → H₂O + CO₂↑' },
+  evap:{ why:'水分蒸發，留下純淨的 NaCl', eq:'' },
+  hcl3:{ why:'最專一的試劑，只抓 Ag⁺', eq:'Ag⁺ + Cl⁻ → AgCl(s)↓' },
+  na2s3:{ why:'範圍次之，銀走了以後只抓 Cu²⁺', eq:'Cu²⁺ + S²⁻ → CuS(s)↓' },
+  naoh3:{ why:'最不專一，留到最後才抓 Mg²⁺', eq:'Mg²⁺ + 2OH⁻ → Mg(OH)₂(s)↓' },
+  filter3:{ why:'每沉澱一次就收集一次，才能分開', eq:'' }
+};
+
+function renderResult(){
+  const lv=st.lv; st.done[lv.id]=true; saveProgress(); window.scrollTo(0,0); hstep.textContent='';
+  const clean=st.hints===0;
+  const headline = lv.mode==='separate' ? '三種沉澱分開收集完成' : '得到純的 NaCl';
+  let h = `<div class="result-head"><div class="big">${headline}</div>
+      <p>${clean?'整條流程一次到位，沒有用到任何提示。':'過程中被擋下 '+st.hints+' 次，那幾個地方就是最容易錯的關鍵。'}</p>
+    </div>
+    <div class="card"><h2>完整流程</h2>
+      <div class="flow">${st.seq.map((o,i)=>`<div class="fr">
+        <span class="n">${i+1}</span>
+        <span><span class="nm">${OPS[o].nm}</span>
+        <span class="why">${FLOW_WHY[o].why}</span>
+        ${FLOW_WHY[o].eq?`<span class="eq">${FLOW_WHY[o].eq}</span>`:''}</span>
+      </div>`).join('')}</div>
+    </div>`;
+
+  if(lv.mode==='separate'){
+    h += `<div class="note"><h3>專一性決定順序</h3>
+      <p>三個試劑抓的範圍不同：<b>Cl⁻ 只抓 Ag⁺，S²⁻ 抓 Ag⁺ 和 Cu²⁺，OH⁻ 三個都抓。</b>要把離子分開，就得<b>從最專一的開始，一路往最廣的做</b>。</p>
+      <p>反過來的話，第一步就把兩三種離子一起沉下來，混在同一張濾紙上，再也分不開。</p>
+      <p>這一關只用到溶解度規則。接下來兩關換成純化粗鹽，會多出兩個新麻煩：試劑本身帶進來的雜質，以及加入的時機。</p></div>`;
+  } else if(lv.id===2){
+    h += `<div class="note"><h3>這一關的新觀念：過量</h3>
+      <p><b>Na₂CO₃ 必須排在 BaCl₂ 後面。</b>因為 BaCl₂ 加的是過量，多餘的 Ba²⁺ 只能靠碳酸根收拾。順序顛倒的話，鋇離子就會一路留到產物裡。</p>
+      <p>這是第一次遇到「解決問題的手段本身製造了新問題」。BaCl₂ 和 NaOH 誰先誰後則沒有差別，因為它們處理的是不同的雜質，互不干擾。</p>
+      <p>下一關會讓三種試劑都過量，還多了泥沙，流程要再長一步。</p></div>`;
+  } else {
+    h += `<div class="note"><h3>這一關的新觀念：時機</h3>
+      <p><b>鹽酸一定要在過濾之後。</b>BaCO₃ 和 Mg(OH)₂ 都溶於酸。先加鹽酸再過濾，沉澱會重新溶回溶液，雜質原封不動回來。只有 BaSO₄ 不溶於酸，但它一個撐不住場面。</p>
+      <p><b>鹽酸也不能不加。</b>過量的 NaOH 和 Na₂CO₃ 留在濾液裡，蒸發後會混進產物。加適量鹽酸剛好把它們轉成 NaCl、水和二氧化碳，多餘的鹽酸則在蒸發時揮發，不留痕跡。</p>
+      <p>三關走完，整套邏輯可以濃縮成一句：<b>先確認誰能沉澱誰，再決定順序，最後注意時機。</b></p></div>`;
+  }
+
+  const nextLv = LEVELS.find(l=>l.id===lv.id+1);
+  h += `<div class="btn-row">
+      <button class="btn ghost" id="again">再做一次</button>
+      ${nextLv?`<button class="btn" id="next">挑戰${nextLv.tag}</button>`
+        :`<button class="btn" id="menu2">回關卡選單</button>`}
+    </div>
+    ${nextLv?`<button class="btn ghost" id="menu" style="margin-top:10px">回關卡選單</button>`:''}
+    <div class="foot">實驗室實際操作還需考慮試劑用量與洗滌步驟</div>`;
+  app.innerHTML=h;
+  document.getElementById('again').onclick=()=> startLevel(lv);
+  const nx=document.getElementById('next'); if(nx) nx.onclick=()=> startLevel(nextLv);
+  ['menu','menu2'].forEach(id=>{ const b=document.getElementById(id); if(b) b.onclick=renderMenu; });
+}
+
+renderMenu();
+</script>
+</body>
+</html>

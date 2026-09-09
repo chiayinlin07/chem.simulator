@@ -1,0 +1,1021 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>溶解度規則卡 ｜ 離子的沉澱</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#EEF3F5; --surface:#FFFFFF; --ink:#10303C; --muted:#5B7581;
+  --line:#D6E1E6; --accent:#15708C; --gold:#DFA02B;
+  --sol:#0A8A64;    --sol-bg:#D4F2E6;    --sol-line:#8DD9BF;
+  --slight:#A96A05; --slight-bg:#FCEECF; --slight-line:#EFCB83;
+  --insol:#C33A3A;  --insol-bg:#FBDFDF;  --insol-line:#EFAFAF;
+  --r:16px; --shadow:0 2px 0 rgba(16,48,60,.08), 0 8px 24px rgba(16,48,60,.07);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{
+  background:var(--bg);color:var(--ink);
+  font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;
+  font-size:17px;line-height:1.65;min-height:100vh;padding-bottom:env(safe-area-inset-bottom);
+}
+sub,sup{font-size:.68em;line-height:0}
+button{font-family:inherit;font-size:inherit;color:inherit;border:none;background:none;cursor:pointer}
+.wrap{max-width:560px;margin:0 auto;padding:0 14px 40px}
+
+header.top{position:sticky;top:0;z-index:30;background:rgba(238,243,245,.94);
+  backdrop-filter:blur(8px);padding:10px 0 8px;border-bottom:1px solid var(--line)}
+.top-row{display:flex;align-items:center;gap:10px}
+.back{width:40px;height:40px;border-radius:12px;background:var(--surface);
+  border:1px solid var(--line);display:none;align-items:center;justify-content:center;font-size:20px;flex:none}
+.back.show{display:flex}
+.top-title{font-weight:700;font-size:16px;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.stars{font-size:14px;color:var(--muted);font-weight:500;flex:none}
+.stars b{color:var(--gold);font-size:16px}
+.unlock{font-size:13px;color:var(--muted);border:1px solid var(--line);
+  background:var(--surface);border-radius:999px;padding:5px 11px;flex:none}
+
+.hero{padding:26px 4px 18px}
+.hero h1{font-size:31px;font-weight:900;letter-spacing:-.5px;margin:0 0 10px;line-height:1.3}
+.hero p{margin:0;color:var(--muted);font-size:16px}
+.hero .eq{display:inline-block;margin-top:16px;background:var(--surface);border:1px solid var(--line);
+  border-radius:12px;padding:9px 14px;font-size:17px;font-weight:700;box-shadow:var(--shadow)}
+.hero .eq .a{color:var(--accent)} .hero .eq .p{color:var(--insol)}
+.section-label{font-size:15px;color:var(--muted);margin:22px 4px 10px;font-weight:500}
+
+.level-card{display:flex;align-items:center;gap:14px;width:100%;text-align:left;background:var(--surface);
+  border:1px solid var(--line);border-radius:var(--r);padding:15px 16px;margin-bottom:11px;
+  box-shadow:var(--shadow);transition:transform .12s ease}
+.level-card:active{transform:scale(.985)}
+.level-card.locked{opacity:.5;box-shadow:none}
+.badge{width:48px;height:48px;border-radius:14px;flex:none;display:flex;align-items:center;
+  justify-content:center;font-size:21px;font-weight:900;color:#fff}
+.lv-body{flex:1;min-width:0}
+.lv-title{font-weight:700;font-size:17px;margin-bottom:2px}
+.lv-sub{font-size:14px;color:var(--muted);line-height:1.5}
+.lv-tag{font-size:12px;font-weight:500;color:var(--muted);border:1px solid var(--line);
+  border-radius:999px;padding:2px 9px;display:inline-block;margin-top:6px}
+.lv-state{flex:none;font-size:20px;width:26px;text-align:center}
+.teaser{background:linear-gradient(180deg,#fff,#F7FAFB);border:1px dashed var(--line);
+  border-radius:var(--r);padding:15px 16px;color:var(--muted);font-size:15px;margin-top:6px;
+  width:100%;text-align:left;display:block;line-height:1.6}
+.teaser b{color:var(--ink);display:block;font-size:16px;margin-bottom:3px}
+.teaser.open{background:linear-gradient(135deg,#134E5E,#1F7A8C);border:1px solid #1F7A8C;
+  color:rgba(255,255,255,.86);box-shadow:0 3px 0 rgba(10,60,75,.4)}
+.teaser.open b{color:#FFD98A}
+.teaser.open:active{transform:translateY(2px);box-shadow:0 1px 0 rgba(10,60,75,.4)}
+.clearbtn{display:block;width:100%;margin-top:18px;font-size:13px;color:var(--muted);
+  border:1px solid var(--line);border-radius:12px;padding:10px;background:var(--surface)}
+
+.pbar{height:7px;background:#DCE6EA;border-radius:99px;overflow:hidden;margin:2px 0 16px}
+.pbar i{display:block;height:100%;background:var(--accent);border-radius:99px;transition:width .35s ease}
+
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);
+  padding:18px;box-shadow:var(--shadow);margin-bottom:14px}
+.rule-head{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.rule-ion{border-radius:12px;padding:8px 13px;font-size:20px;font-weight:900;color:#fff;flex:none}
+.rule-head h2{font-size:18px;margin:0;font-weight:700;line-height:1.4}
+
+.block{border-radius:13px;padding:13px 14px;margin-bottom:10px;border:1px solid}
+.block.sol{background:var(--sol-bg);border-color:var(--sol-line)}
+.block.insol{background:var(--insol-bg);border-color:var(--insol-line)}
+.block.slight{background:var(--slight-bg);border-color:var(--slight-line)}
+.block-label{font-weight:700;font-size:15px;display:flex;align-items:center;gap:7px;margin-bottom:9px}
+.block-label .lbl{flex:1;min-width:0}
+.block.sol .block-label{color:var(--sol)}
+.block.insol .block-label{color:var(--insol)}
+.block.slight .block-label{color:var(--slight)}
+.icon{width:22px;height:22px;border-radius:7px;flex:none;color:#fff;font-size:14px;font-weight:900;
+  display:flex;align-items:center;justify-content:center}
+.block.sol .icon{background:var(--sol)}
+.block.insol .icon{background:var(--insol)}
+.block.slight .icon{background:var(--slight)}
+.chips{display:flex;flex-wrap:wrap;gap:7px}
+.chip{background:rgba(255,255,255,.85);border:1px solid rgba(0,0,0,.09);border-radius:9px;
+  padding:5px 10px;font-size:16px;font-weight:700;text-align:center}
+.chip .ann{display:block;font-size:11px;font-weight:500;color:var(--muted);margin-top:2px;letter-spacing:.5px}
+.block .note{font-size:14px;color:var(--muted);margin-top:9px;line-height:1.55}
+
+.mnemonic{background:#F4F8F9;border-left:4px solid var(--accent);border-radius:0 11px 11px 0;
+  padding:12px 14px;font-size:15px;line-height:1.65}
+.mnemonic b{color:var(--accent)}
+.keyphrase{text-align:center;margin-bottom:12px}
+.keyphrase .kp{font-size:26px;font-weight:900;letter-spacing:8px;color:var(--accent);
+  padding-left:8px;margin-bottom:10px}
+.kp-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.kp-cell{background:#fff;border:1px solid var(--line);border-radius:10px;padding:8px 2px}
+.kp-cell .k{font-size:19px;font-weight:900;color:var(--accent)}
+.kp-cell .ion{font-size:14px;font-weight:700;margin-top:3px}
+.kp-cell .nm{font-size:10px;color:var(--muted);margin-top:1px}
+
+.btn{display:block;width:100%;background:var(--accent);color:#fff;border-radius:14px;padding:15px;
+  font-size:17px;font-weight:700;text-align:center;box-shadow:0 3px 0 rgba(10,70,90,.35);margin-top:4px}
+.btn:active{transform:translateY(2px);box-shadow:0 1px 0 rgba(10,70,90,.35)}
+.btn.ghost{background:var(--surface);color:var(--ink);border:1px solid var(--line);box-shadow:var(--shadow)}
+.btn.small{padding:12px;font-size:16px}
+.btn-row{display:flex;gap:10px;margin-top:12px}
+.btn-row .btn{margin-top:0}
+
+.qcount{font-size:14px;color:var(--muted);margin-bottom:8px;font-weight:500}
+.qtext{font-size:19px;font-weight:700;line-height:1.6;margin-bottom:16px}
+.opt{display:block;width:100%;text-align:left;background:var(--surface);border:2px solid var(--line);
+  border-radius:13px;padding:14px 15px;font-size:17px;font-weight:500;margin-bottom:10px;
+  transition:border-color .15s,background .15s}
+.opt:active{border-color:var(--accent)}
+.opt.correct{border-color:var(--sol);background:var(--sol-bg);font-weight:700}
+.opt.wrong{border-color:var(--insol);background:var(--insol-bg)}
+.opt.dim{opacity:.5}
+.opt .mark{float:right;font-weight:900}
+.opt.correct .mark{color:var(--sol)} .opt.wrong .mark{color:var(--insol)}
+
+.feedback{border-radius:13px;padding:13px 15px;font-size:15px;line-height:1.65;margin-top:4px}
+.feedback.ok{background:var(--sol-bg);border:1px solid var(--sol-line)}
+.feedback.no{background:var(--slight-bg);border:1px solid var(--slight-line)}
+.feedback b{display:block;margin-bottom:3px}
+.feedback.ok b{color:var(--sol)} .feedback.no b{color:var(--slight)}
+
+.drag-hint{font-size:14px;color:var(--muted);margin-bottom:12px}
+.pool{display:flex;flex-wrap:wrap;gap:9px;min-height:64px;background:#E5EDF0;
+  border-radius:13px;padding:11px;margin-bottom:14px}
+.tile{background:var(--surface);border:2px solid var(--line);border-radius:11px;padding:9px 13px;
+  font-size:18px;font-weight:700;box-shadow:0 2px 0 rgba(16,48,60,.1);touch-action:none;user-select:none}
+.tile.picked{border-color:var(--accent);background:#E6F2F6;transform:scale(1.04)}
+.tile.dragging{position:fixed;z-index:99;pointer-events:none;opacity:.92;box-shadow:0 10px 22px rgba(0,0,0,.22)}
+.tile.settled{box-shadow:none;font-size:16px;padding:7px 11px}
+.tile.settled.right{border-color:var(--sol);background:var(--sol-bg)}
+.tile.settled.bad{border-color:var(--insol);background:var(--insol-bg)}
+.bins{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+.bin{border-radius:13px;padding:12px;border:2px dashed;min-height:130px}
+.bin.sol{background:var(--sol-bg);border-color:var(--sol-line)}
+.bin.insol{background:var(--insol-bg);border-color:var(--insol-line)}
+.bin.over{border-style:solid;transform:scale(1.02)}
+.bin h3{margin:0 0 9px;font-size:16px;font-weight:700;text-align:center}
+.bin.sol h3{color:var(--sol)} .bin.insol h3{color:var(--insol)}
+.bin .drop{display:flex;flex-wrap:wrap;gap:7px;justify-content:center}
+
+.flash-wrap{margin-bottom:14px}
+.flash{
+  width:100%;min-height:250px;border-radius:var(--r);border:1px solid var(--line);
+  background:var(--surface);box-shadow:var(--shadow);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;padding:24px 22px;gap:10px;
+  transform-origin:center center;
+  transition:transform .22s ease, background .25s ease, border-color .25s ease;
+}
+.flash.turning{transform:rotateY(88deg)}
+.flash .big{font-size:42px;font-weight:900;letter-spacing:-.5px}
+.flash .tip{font-size:14px;color:var(--muted)}
+.flash .verdict{font-size:34px;font-weight:900}
+.flash .why{font-size:16px;color:var(--muted);line-height:1.65;max-width:24em}
+.flash.sol{background:var(--sol-bg);border-color:var(--sol-line)}
+.flash.insol{background:var(--insol-bg);border-color:var(--insol-line)}
+.flash.slight{background:var(--slight-bg);border-color:var(--slight-line)}
+.flash.sol .verdict{color:var(--sol)}
+.flash.insol .verdict{color:var(--insol)}
+.flash.slight .verdict{color:var(--slight)}
+.flash .formula{font-size:20px;font-weight:700;opacity:.75}
+.ans-row{display:flex;gap:10px;margin-bottom:12px}
+.ans{flex:1;border-radius:14px;padding:16px 8px;font-size:19px;font-weight:700;
+  text-align:center;border:2px solid;transition:opacity .15s,transform .1s}
+.ans:active{transform:translateY(2px)}
+.ans.sol{background:var(--sol-bg);border-color:var(--sol-line);color:var(--sol)}
+.ans.insol{background:var(--insol-bg);border-color:var(--insol-line);color:var(--insol)}
+.ans[disabled]{opacity:.35}
+.ans.chosen{opacity:1;box-shadow:0 0 0 3px rgba(21,112,140,.35)}
+.ans .mk{font-weight:900;margin-left:6px}
+
+.result{text-align:center;padding:30px 18px}
+.result .score{font-size:56px;font-weight:900;line-height:1;margin:8px 0}
+.result .star-row{font-size:36px;letter-spacing:6px;margin:12px 0 6px}
+.result p{color:var(--muted);margin:6px 0 20px;font-size:16px}
+.review{text-align:left;margin-top:16px}
+.review h4{font-size:15px;margin:0 0 9px;color:var(--muted);font-weight:500}
+.review-item{background:var(--insol-bg);border:1px solid var(--insol-line);border-radius:11px;
+  padding:11px 13px;margin-bottom:8px;font-size:15px;line-height:1.6}
+.review-item b{display:block;font-size:17px;margin-bottom:2px}
+
+/* ---- 教師版 ---- */
+.unlock.on{background:var(--accent);color:#fff;border-color:var(--accent);font-weight:700}
+.tbanner{background:#EAF3F6;border:1px solid #B9D8E2;border-radius:12px;padding:10px 13px;
+  font-size:14px;color:#14536A;margin:14px 0 4px;line-height:1.55}
+.tcue{font-size:13px;font-weight:700;color:var(--accent);background:#E6F2F6;
+  border-radius:8px;padding:4px 10px;display:inline-block;margin-bottom:10px}
+.tile .cue{font-size:11px;font-weight:700;vertical-align:super;margin-left:3px;color:var(--muted)}
+.bank-q{border-bottom:1px solid var(--line);padding:13px 0}
+.bank-q:last-child{border-bottom:none}
+.bank-q .n{font-size:13px;color:var(--muted);font-weight:500}
+.bank-q .t{font-weight:700;margin:3px 0 6px;line-height:1.55}
+.bank-q .a{font-size:15px}
+.bank-q .a .ok{color:var(--sol);font-weight:700}
+.bank-q .a .no{color:var(--insol);font-weight:700}
+.bank-q .e{font-size:14px;color:var(--muted);line-height:1.55;margin-top:4px}
+.bank-cols{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+.bank-col h3{margin:0 0 8px;font-size:15px}
+.bank-col.sol h3{color:var(--sol)} .bank-col.insol h3{color:var(--insol)}
+.bank-col ul{margin:0;padding-left:18px;font-size:15px;line-height:1.9}
+
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+@media (max-width:360px){
+  body{font-size:16px}.hero h1{font-size:27px}.flash .big{font-size:34px}
+  .keyphrase .kp{font-size:22px;letter-spacing:5px}
+  .kp-cell .ion{font-size:12px}
+}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <div class="top-row">
+      <button class="back" id="back" aria-label="回到關卡選單">←</button>
+      <div class="top-title" id="topTitle">溶解度規則卡</div>
+      <div class="stars" id="starCount"><b>★</b> 0/6</div>
+      <button class="unlock" id="unlockBtn">教師版</button>
+    </div>
+  </div>
+</header>
+
+<main class="wrap" id="app"></main>
+
+<script>
+/* 二選一題型的簡寫：可溶 / 難溶 */
+function S(f,hint,ex){return {q:f+' 在水中是？',options:['可溶','難溶'],answer:0,hint:hint,explain:ex};}
+function I(f,hint,ex){return {q:f+' 在水中是？',options:['可溶','難溶'],answer:1,hint:hint,explain:ex};}
+
+const LEVELS = [
+/* ===================== 關卡 1 ===================== */
+{
+  id:1, color:'#0A8A64', title:'萬用可溶組', sub:'硝酸根、醋酸根、鹼金屬、銨根',
+  tag:'選擇題 · 抽 5 題', type:'mc', draw:5,
+  rule:{
+    ion:'一定可溶', ionColor:'#0A8A64', headline:'看到這四類，先判斷「可溶」',
+    blocks:[
+      {tone:'sol', label:'陽離子是這些 → 全部可溶',
+       chips:['Li<sup>+</sup>','Na<sup>+</sup>','K<sup>+</sup>','Rb<sup>+</sup>','Cs<sup>+</sup>','NH<sub>4</sub><sup>+</sup>'],
+       note:'鹼金屬離子與銨根，不管配上哪一個陰離子，都溶。'},
+      {tone:'sol', label:'陰離子是這些 → 全部可溶',
+       chips:['NO<sub>3</sub><sup>−</sup>','CH<sub>3</sub>COO<sup>−</sup>'],
+       note:'醋酸根唯一要留意的是 Ag<sup>+</sup>，醋酸銀的溶解度比較小。'}
+    ],
+    mnemonic:'先看有沒有 <b>Na<sup>+</sup>、K<sup>+</sup>、NH<sub>4</sub><sup>+</sup>、NO<sub>3</sub><sup>−</sup></b>。只要出現其中一個，答案幾乎就是可溶，不用再往下想。'
+  },
+  bank:[
+    S('Ba(NO<sub>3</sub>)<sub>2</sub>','先看陰離子是誰。','硝酸根跟任何陽離子都可溶，看到 NO<sub>3</sub><sup>−</sup> 就能直接判斷。'),
+    S('Na<sub>2</sub>S','硫化物大多難溶，但這個陽離子很特別。','Na<sup>+</sup> 是鹼金屬，鹼金屬鹽全部可溶，硫離子的規則在這裡不適用。'),
+    S('(NH<sub>4</sub>)<sub>2</sub>CO<sub>3</sub>','碳酸鹽大多難溶，例外是誰？','銨根跟鹼金屬一樣，形成的鹽全部可溶。'),
+    S('AgNO<sub>3</sub>','銀鹽大多難溶，但配上什麼陰離子？','硝酸鹽全部可溶，所以硝酸銀能配成溶液，用來做沉澱試劑。'),
+    S('KI','K<sup>+</sup> 屬於哪一族？','鹼金屬鹽全部可溶，碘離子的黑名單裡沒有鉀。'),
+    S('Pb(NO<sub>3</sub>)<sub>2</sub>','鉛鹽常沉澱，但這個陰離子例外。','硝酸根讓所有陽離子都可溶，這是實驗室能配鉛離子溶液的原因。'),
+    S('NH<sub>4</sub>Cl','兩邊都在萬用可溶組裡嗎？','銨根形成的鹽全部可溶。'),
+    S('K<sub>2</sub>CrO<sub>4</sub>','鉻酸鹽的黑名單有鉀嗎？','K<sup>+</sup> 是鹼金屬，可溶；這也是實驗常用的鉻酸鉀溶液。'),
+    S('Cs<sub>2</sub>SO<sub>4</sub>','Cs 是第幾族？','銫是鹼金屬，鹽類全部可溶。'),
+    S('CH<sub>3</sub>COONa','醋酸根的規則是什麼？','醋酸鹽可溶，加上鈉是鹼金屬，雙重保證。'),
+    S('Fe(NO<sub>3</sub>)<sub>3</sub>','鐵離子有沒有在硝酸根的例外裡？','硝酸根沒有例外，全部可溶。'),
+    S('(NH<sub>4</sub>)<sub>2</sub>S','硫化物大多沉澱，這個為何例外？','銨根形成的鹽全部可溶。'),
+    S('NaOH','氫氧化物大多難溶，鈉呢？','鹼金屬的氫氧化物可溶，就是實驗室的氫氧化鈉溶液。'),
+    S('Rb<sub>2</sub>CO<sub>3</sub>','Rb 是第幾族？','銣是鹼金屬，碳酸鹽在這裡照樣可溶。'),
+    S('Cu(NO<sub>3</sub>)<sub>2</sub>','銅離子配上硝酸根會怎樣？','硝酸鹽全部可溶，形成藍色的銅離子溶液。'),
+    S('Zn(CH<sub>3</sub>COO)<sub>2</sub>','醋酸根的規則是什麼？','醋酸鹽可溶，唯一要留意的是銀。'),
+    {q:'下列哪一個<u>不能</u>只用「萬用可溶組」判斷？',
+     options:['KNO<sub>3</sub>','AgNO<sub>3</sub>','CaCl<sub>2</sub>','NH<sub>4</sub>Cl'],answer:2,
+     hint:'哪一個既沒有鹼金屬／銨根，也沒有硝酸根、醋酸根？',
+     explain:'CaCl<sub>2</sub> 兩邊都不在萬用可溶組裡，要用鹵素離子的規則判斷（答案是可溶）。'},
+    {q:'下列何者一定可溶？',
+     options:['BaSO<sub>4</sub>','AgCl','KNO<sub>3</sub>','Mg(OH)<sub>2</sub>'],answer:2,
+     hint:'找出同時有鹼金屬和硝酸根的那一個。',
+     explain:'KNO<sub>3</sub> 兩邊都在萬用可溶組，其他三個都是常見的沉澱。'},
+    {q:'醋酸鹽幾乎都可溶，但要特別留意哪一個陽離子？',
+     options:['Na<sup>+</sup>','Ag<sup>+</sup>','K<sup>+</sup>','NH<sub>4</sub><sup>+</sup>'],answer:1,
+     hint:'課本在醋酸根那一列標了一個括號。',
+     explain:'醋酸銀的溶解度較小，是醋酸鹽唯一要注意的例外。'},
+    {q:'想讓一個容易沉澱的陽離子留在溶液中，配哪個陰離子最保險？',
+     options:['CO<sub>3</sub><sup>2−</sup>','OH<sup>−</sup>','NO<sub>3</sub><sup>−</sup>','S<sup>2−</sup>'],answer:2,
+     hint:'哪一個陰離子完全沒有例外？',
+     explain:'硝酸根跟所有陽離子都可溶，所以配製金屬離子溶液時大多用硝酸鹽。'},
+    {q:'下列哪一組陽離子，形成的鹽類全部可溶？',
+     options:['鹼土金屬離子','過渡金屬離子','鹼金屬離子與銨根','鹵素離子'],answer:2,
+     hint:'第一族和一個多原子離子。',
+     explain:'鹼金屬離子與 NH<sub>4</sub><sup>+</sup> 是唯一「怎麼配都可溶」的一組。'},
+    {q:'下列哪一個是難溶？',
+     options:['NaNO<sub>3</sub>','KCl','BaSO<sub>4</sub>','NH<sub>4</sub>NO<sub>3</sub>'],answer:2,
+     hint:'哪一個完全沒碰到萬用可溶組？',
+     explain:'BaSO<sub>4</sub> 兩邊都不在萬用可溶組，而且鋇與硫酸根正好會沉澱。'}
+  ]
+},
+
+/* ===================== 關卡 2 ===================== */
+{
+  id:2, color:'#15708C', title:'鹵素離子關卡', sub:'Cl⁻、Br⁻、I⁻ 只怕五個陽離子',
+  tag:'選擇題 · 抽 5 題', type:'mc', draw:5,
+  rule:{
+    ion:'Cl<sup>−</sup> Br<sup>−</sup> I<sup>−</sup>', ionColor:'#15708C',
+    headline:'鹵素離子只跟五個陽離子沉澱',
+    keyphrase:{
+      phrase:'共同牽引他',
+      cells:[
+        {k:'共',ion:'Hg<sub>2</sub><sup>2+</sup>',nm:'亞汞'},
+        {k:'同',ion:'Cu<sup>+</sup>',nm:'亞銅'},
+        {k:'牽',ion:'Pb<sup>2+</sup>',nm:'鉛'},
+        {k:'引',ion:'Ag<sup>+</sup>',nm:'銀'},
+        {k:'他',ion:'Tl<sup>+</sup>',nm:'亞鉈'}
+      ]
+    },
+    blocks:[
+      {tone:'insol', label:'碰到這五個 → 難溶（會沉澱）',
+       chips:['Hg<sub>2</sub><sup>2+</sup><span class="ann">亞汞</span>','Cu<sup>+</sup><span class="ann">亞銅</span>',
+              'Pb<sup>2+</sup><span class="ann">鉛</span>','Ag<sup>+</sup><span class="ann">銀</span>',
+              'Tl<sup>+</sup><span class="ann">亞鉈</span>'],
+       note:'注意氧化數：是亞汞 Hg<sub>2</sub><sup>2+</sup>、亞銅 Cu<sup>+</sup>、亞鉈 Tl<sup>+</sup>。Cu<sup>2+</sup> 不在名單裡，CuCl<sub>2</sub> 是可溶的。'},
+      {tone:'sol', label:'其他所有陽離子 → 可溶', chips:['其他全部'],
+       note:'例如 NaCl、KI、CaBr<sub>2</sub>、MgCl<sub>2</sub>、FeCl<sub>3</sub> 都可溶。'}
+    ],
+    mnemonic:'黑名單只有五個，用<b>「共同牽引他」</b>記：共（汞）、同（銅）、牽（鉛）、引（銀）、他（鉈）。名單以外一律可溶。'
+  },
+  bank:[
+    I('AgCl','銀在不在黑名單裡？','Ag<sup>+</sup> 在名單中，生成白色 AgCl 沉澱，是檢驗氯離子最常用的反應。'),
+    S('NaCl','鈉在名單裡嗎？','Na<sup>+</sup> 不在五個名單中，加上鹼金屬本來就全溶，所以食鹽溶於水。'),
+    I('PbI<sub>2</sub>','「牽」是哪一個離子？','Pb<sup>2+</sup> 在名單中，生成亮黃色沉澱，就是課本的「黃金雨」。'),
+    S('CaBr<sub>2</sub>','鈣有在五個名單裡嗎？','Ca<sup>2+</sup> 不在鹵素離子的黑名單中，可溶。'),
+    I('AgI','銀配上碘會怎樣？','AgI 是黃色沉澱，K<sub>sp</sub> 極小，在銀鹽中最先沉澱。'),
+    I('Hg<sub>2</sub>Cl<sub>2</sub>','「共」是哪一個離子？','亞汞 Hg<sub>2</sub><sup>2+</sup> 在名單中，生成白色沉澱（甘汞）。'),
+    I('CuCl','注意銅的氧化數是幾？','這是亞銅 Cu<sup>+</sup>，在名單中，難溶。'),
+    S('CuCl<sub>2</sub>','這裡的銅是 Cu<sup>+</sup> 還是 Cu<sup>2+</sup>？','名單上的是亞銅 Cu<sup>+</sup>；Cu<sup>2+</sup> 不在名單裡，所以 CuCl<sub>2</sub> 可溶。'),
+    I('TlCl','「他」是哪一個離子？','亞鉈 Tl<sup>+</sup> 在名單中，難溶。'),
+    S('MgI<sub>2</sub>','鎂在名單裡嗎？','Mg<sup>2+</sup> 不在五個名單中，可溶。'),
+    I('PbCl<sub>2</sub>','鉛在不在名單裡？','Pb<sup>2+</sup> 在名單中，依課本規則歸為難溶。'),
+    I('AgBr','銀配上溴會怎樣？','AgBr 是淡黃色沉澱，用硝酸銀檢驗氯離子時會造成干擾。'),
+    S('ZnCl<sub>2</sub>','鋅在名單裡嗎？','Zn<sup>2+</sup> 不在五個名單中，可溶。'),
+    S('FeCl<sub>3</sub>','鐵在名單裡嗎？','Fe<sup>3+</sup> 不在名單中，可溶，就是平衡實驗常用的氯化鐵溶液。'),
+    S('NH<sub>4</sub>Br','銨根的規則是什麼？','銨鹽全部可溶，不必再看鹵素離子的名單。'),
+    S('BaCl<sub>2</sub>','鋇在鹵素離子的名單裡嗎？','Ba<sup>2+</sup> 不在名單中，BaCl<sub>2</sub> 可溶；它常用來提供鋇離子做沉澱試劑。'),
+    S('AlCl<sub>3</sub>','鋁在名單裡嗎？','Al<sup>3+</sup> 不在五個名單中，可溶。'),
+    {q:'把 AgNO<sub>3</sub> 加入自來水，出現白色沉澱，代表水中含有？',
+     options:['Na<sup>+</sup>','Cl<sup>−</sup>','NO<sub>3</sub><sup>−</sup>','Ca<sup>2+</sup>'],answer:1,
+     hint:'白色沉澱是哪一個銀鹽？',
+     explain:'白色沉澱是 AgCl，代表含氯離子。若含 Br<sup>−</sup> 會是淡黃色、含 I<sup>−</sup> 則是黃色。'},
+    {q:'加入 AgNO<sub>3</sub> 後出現<u>黃色</u>沉澱，溶液中最可能含有？',
+     options:['Cl<sup>−</sup>','Br<sup>−</sup>','I<sup>−</sup>','F<sup>−</sup>'],answer:2,
+     hint:'白、淡黃、黃分別對應哪三個？',
+     explain:'AgCl 白色、AgBr 淡黃色、AgI 黃色；氟離子則不與銀離子沉澱。'},
+    {q:'口訣「共同牽引他」中的「同」指的是？',
+     options:['Cu<sup>2+</sup>','Cu<sup>+</sup>','Hg<sup>2+</sup>','Tl<sup>3+</sup>'],answer:1,
+     hint:'注意是「亞」銅。',
+     explain:'「同」是亞銅 Cu<sup>+</sup>。Cu<sup>2+</sup> 並不在黑名單裡，這是最容易混淆的地方。'},
+    {q:'下列哪一個氯化物<u>可溶</u>？',
+     options:['AgCl','PbCl<sub>2</sub>','Hg<sub>2</sub>Cl<sub>2</sub>','CuCl<sub>2</sub>'],answer:3,
+     hint:'把每個陽離子跟「共同牽引他」對一次。',
+     explain:'前三個的陽離子都在黑名單中；CuCl<sub>2</sub> 的 Cu<sup>2+</sup> 不在名單裡，可溶。'},
+    {q:'用硝酸銀溶液檢測鹵素離子時，哪一個<u>不會</u>產生沉澱？',
+     options:['F<sup>−</sup>','Cl<sup>−</sup>','Br<sup>−</sup>','I<sup>−</sup>'],answer:0,
+     hint:'課本說第二週期到第四週期的鹵素離子才會沉澱。',
+     explain:'只有氟離子不與銀離子生成沉澱，其餘三個分別是白色、淡黃色、黃色沉澱。'}
+  ]
+},
+
+/* ===================== 關卡 3 ===================== */
+{
+  id:3, color:'#A9581F', title:'硫酸根＆鉻酸根', sub:'把化合物拖進正確的桶子',
+  tag:'拖曳配對 · 抽 8 個', type:'drag', draw:8,
+  rule:{
+    ion:'SO<sub>4</sub><sup>2−</sup> CrO<sub>4</sub><sup>2−</sup>', ionColor:'#A9581F',
+    headline:'這兩個陰離子怕的是重的陽離子',
+    blocks:[
+      {tone:'insol', label:'SO<sub>4</sub><sup>2−</sup> 碰到這些 → 難溶',
+       chips:['Sr<sup>2+</sup>','Ba<sup>2+</sup>','Pb<sup>2+</sup>'],
+       note:'Ca<sup>2+</sup> 屬於微溶，介於可溶與難溶之間。'},
+      {tone:'insol', label:'CrO<sub>4</sub><sup>2−</sup> 碰到這些 → 難溶',
+       chips:['Sr<sup>2+</sup>','Ba<sup>2+</sup>','Pb<sup>2+</sup>','Ag<sup>+</sup>'],
+       note:'前三個跟硫酸根完全一樣，只是最後多一個 Ag<sup>+</sup>；磚紅色的 Ag<sub>2</sub>CrO<sub>4</sub> 很常考。'},
+      {tone:'sol', label:'其他陽離子 → 可溶', chips:['其他全部'], note:''}
+    ],
+    mnemonic:'兩個名單都有 <b>Sr<sup>2+</sup>、Ba<sup>2+</sup>、Pb<sup>2+</sup></b>。差別只在於：鉻酸根還要多記一個銀。'
+  },
+  pool:[
+    {f:'BaSO<sub>4</sub>',ans:'insol',why:'鋇與硫酸根難溶，是粗鹽純化中除去硫酸根的關鍵。'},
+    {f:'SrSO<sub>4</sub>',ans:'insol',why:'鍶在硫酸根的黑名單中。'},
+    {f:'PbSO<sub>4</sub>',ans:'insol',why:'鉛在硫酸根黑名單中，生成白色沉澱。'},
+    {f:'PbCrO<sub>4</sub>',ans:'insol',why:'鉛在鉻酸根黑名單中，生成黃色沉澱。'},
+    {f:'Ag<sub>2</sub>CrO<sub>4</sub>',ans:'insol',why:'磚紅色沉澱，是鉻酸根多記的那一個銀。'},
+    {f:'BaCrO<sub>4</sub>',ans:'insol',why:'鋇同時在兩個名單中，鉻酸鋇為黃色沉澱。'},
+    {f:'SrCrO<sub>4</sub>',ans:'insol',why:'鍶同時在兩個名單中，難溶。'},
+    {f:'K<sub>2</sub>SO<sub>4</sub>',ans:'sol',why:'鉀是鹼金屬，全部可溶。'},
+    {f:'Na<sub>2</sub>SO<sub>4</sub>',ans:'sol',why:'鈉是鹼金屬，全部可溶。'},
+    {f:'MgSO<sub>4</sub>',ans:'sol',why:'鎂不在硫酸根黑名單中，可溶。'},
+    {f:'ZnSO<sub>4</sub>',ans:'sol',why:'鋅不在硫酸根黑名單中，可溶。'},
+    {f:'CuSO<sub>4</sub>',ans:'sol',why:'銅不在名單中，就是實驗室的藍色硫酸銅溶液。'},
+    {f:'(NH<sub>4</sub>)<sub>2</sub>SO<sub>4</sub>',ans:'sol',why:'銨鹽全部可溶。'},
+    {f:'Fe<sub>2</sub>(SO<sub>4</sub>)<sub>3</sub>',ans:'sol',why:'鐵不在硫酸根黑名單中，可溶。'},
+    {f:'Al<sub>2</sub>(SO<sub>4</sub>)<sub>3</sub>',ans:'sol',why:'鋁不在名單中，可溶。'},
+    {f:'NiSO<sub>4</sub>',ans:'sol',why:'鎳不在名單中，可溶。'},
+    {f:'Na<sub>2</sub>CrO<sub>4</sub>',ans:'sol',why:'鈉是鹼金屬，全部可溶。'},
+    {f:'K<sub>2</sub>CrO<sub>4</sub>',ans:'sol',why:'鉀是鹼金屬，就是實驗常用的鉻酸鉀溶液。'},
+    {f:'(NH<sub>4</sub>)<sub>2</sub>CrO<sub>4</sub>',ans:'sol',why:'銨鹽全部可溶。'},
+    {f:'MgCrO<sub>4</sub>',ans:'sol',why:'鎂不在鉻酸根黑名單中，可溶。'},
+    {f:'ZnCrO<sub>4</sub>',ans:'sol',why:'鋅不在鉻酸根的四個名單中，可溶。'}
+  ]
+},
+
+/* ===================== 關卡 4 ===================== */
+{
+  id:4, color:'#7A4FA3', title:'氫氧根＆硫離子', sub:'翻牌複習：只有少數可溶',
+  tag:'閃卡 · 抽 6 張', type:'flash', draw:6,
+  rule:{
+    ion:'OH<sup>−</sup> S<sup>2−</sup>', ionColor:'#7A4FA3',
+    headline:'這兩個反過來記：只有少數可溶',
+    blocks:[
+      {tone:'sol', label:'OH<sup>−</sup> 可溶的只有這些',
+       chips:['鹼金屬','NH<sub>4</sub><sup>+</sup>','Sr<sup>2+</sup>','Ba<sup>2+</sup>'],
+       note:'Ca(OH)<sub>2</sub> 是微溶，就是實驗室常用的石灰水。'},
+      {tone:'sol', label:'S<sup>2−</sup> 可溶的只有這些',
+       chips:['鹼金屬','NH<sub>4</sub><sup>+</sup>','鹼土金屬'],
+       note:'鹼土金屬包含 Be<sup>2+</sup>、Mg<sup>2+</sup>、Ca<sup>2+</sup>、Sr<sup>2+</sup>、Ba<sup>2+</sup>。'},
+      {tone:'insol', label:'其他陽離子 → 難溶', chips:['其他全部'],
+       note:'例如 Cu<sup>2+</sup>、Fe<sup>3+</sup>、Ag<sup>+</sup>、Zn<sup>2+</sup> 都會沉澱。'}
+    ],
+    mnemonic:'前面幾關是記黑名單，這一關要改成 <b>記白名單</b>：只有第 1、2 族和銨根能溶，其他一律沉澱。'
+  },
+  pool:[
+    {front:'NaOH',tone:'sol',verdict:'可溶',why:'鹼金屬的氫氧化物可溶，就是實驗室的氫氧化鈉溶液。'},
+    {front:'KOH',tone:'sol',verdict:'可溶',why:'鹼金屬的氫氧化物可溶，是常見的強鹼。'},
+    {front:'Ba(OH)<sub>2</sub>',tone:'sol',verdict:'可溶',why:'鋇是氫氧根白名單中的例外之一。'},
+    {front:'Sr(OH)<sub>2</sub>',tone:'sol',verdict:'可溶',why:'鍶也在氫氧根的白名單中。'},
+    {front:'Ca(OH)<sub>2</sub>',tone:'slight',verdict:'微溶',why:'介於可溶與難溶之間，飽和溶液就是澄清石灰水。'},
+    {front:'Mg(OH)<sub>2</sub>',tone:'insol',verdict:'難溶',why:'鎂不在氫氧根白名單裡，生成白色沉澱，是胃乳的成分。'},
+    {front:'Fe(OH)<sub>3</sub>',tone:'insol',verdict:'難溶',why:'鐵不在白名單裡，生成紅棕色沉澱。'},
+    {front:'Cu(OH)<sub>2</sub>',tone:'insol',verdict:'難溶',why:'銅不在白名單裡，生成藍色沉澱。'},
+    {front:'Zn(OH)<sub>2</sub>',tone:'insol',verdict:'難溶',why:'鋅不在白名單裡，生成白色沉澱。'},
+    {front:'Al(OH)<sub>3</sub>',tone:'insol',verdict:'難溶',why:'鋁不在白名單裡，生成白色膠狀沉澱。'},
+    {front:'AgOH',tone:'insol',verdict:'難溶',why:'銀不在白名單裡，會沉澱。'},
+    {front:'Na<sub>2</sub>S',tone:'sol',verdict:'可溶',why:'鈉是鹼金屬，硫化物在這裡照樣可溶。'},
+    {front:'K<sub>2</sub>S',tone:'sol',verdict:'可溶',why:'鉀是鹼金屬，可溶。'},
+    {front:'(NH<sub>4</sub>)<sub>2</sub>S',tone:'sol',verdict:'可溶',why:'銨鹽全部可溶。'},
+    {front:'CaS',tone:'sol',verdict:'可溶',why:'鈣是鹼土金屬，在硫離子的白名單中。'},
+    {front:'BaS',tone:'sol',verdict:'可溶',why:'鋇是鹼土金屬，在硫離子的白名單中。'},
+    {front:'MgS',tone:'sol',verdict:'可溶',why:'依課本規則，鹼土金屬的硫化物可溶。'},
+    {front:'CuS',tone:'insol',verdict:'難溶',why:'銅不在硫離子白名單裡，生成黑色沉澱。'},
+    {front:'ZnS',tone:'insol',verdict:'難溶',why:'鋅不在白名單裡，生成白色沉澱。'},
+    {front:'FeS',tone:'insol',verdict:'難溶',why:'鐵不在白名單裡，生成黑色沉澱。'},
+    {front:'PbS',tone:'insol',verdict:'難溶',why:'鉛不在白名單裡，生成黑色沉澱。'},
+    {front:'Ag<sub>2</sub>S',tone:'insol',verdict:'難溶',why:'黑色沉澱，K<sub>sp</sub> 極小，就是銀器表面的黑色鏽蝕物。'}
+  ]
+},
+
+/* ===================== 關卡 5 ===================== */
+{
+  id:5, color:'#1F6F8B', title:'含氧酸根關卡', sub:'碳酸根、磷酸根、亞硫酸根',
+  tag:'閃卡 · 抽 6 張', type:'flash', draw:6,
+  rule:{
+    ion:'CO<sub>3</sub><sup>2−</sup> PO<sub>4</sub><sup>3−</sup> SO<sub>3</sub><sup>2−</sup>', ionColor:'#1F6F8B',
+    headline:'三個一起記，規則最單純',
+    blocks:[
+      {tone:'sol', label:'可溶的只有這兩類', chips:['鹼金屬','NH<sub>4</sub><sup>+</sup>'],
+       note:'比第 4 關更嚴格，連鹼土金屬都不行。'},
+      {tone:'insol', label:'其他陽離子 → 全部難溶', chips:['其他全部'],
+       note:'CaCO<sub>3</sub> 就是石灰石、蛋殼、珊瑚的主要成分。'}
+    ],
+    mnemonic:'這三個陰離子共用一條規則：<b>只有鹼金屬和銨根可溶</b>。跟第 4 關比一比，差別在鹼土金屬——第 4 關的硫離子放行，這一關不放行。'
+  },
+  pool:[
+    {front:'CaCO<sub>3</sub>',tone:'insol',verdict:'難溶',why:'鈣不是鹼金屬，會沉澱；這就是石灰石與蛋殼。'},
+    {front:'MgCO<sub>3</sub>',tone:'insol',verdict:'難溶',why:'鹼土金屬在這一關不放行，會沉澱。'},
+    {front:'BaCO<sub>3</sub>',tone:'insol',verdict:'難溶',why:'鋇雖然在氫氧根關卡可溶，碰到碳酸根還是沉澱。'},
+    {front:'SrCO<sub>3</sub>',tone:'insol',verdict:'難溶',why:'鍶不是鹼金屬，會沉澱。'},
+    {front:'Ag<sub>2</sub>CO<sub>3</sub>',tone:'insol',verdict:'難溶',why:'銀不是鹼金屬，會沉澱。'},
+    {front:'PbCO<sub>3</sub>',tone:'insol',verdict:'難溶',why:'鉛不是鹼金屬，會沉澱。'},
+    {front:'ZnCO<sub>3</sub>',tone:'insol',verdict:'難溶',why:'鋅不是鹼金屬，會沉澱。'},
+    {front:'FeCO<sub>3</sub>',tone:'insol',verdict:'難溶',why:'鐵不是鹼金屬，會沉澱。'},
+    {front:'Na<sub>2</sub>CO<sub>3</sub>',tone:'sol',verdict:'可溶',why:'鹼金屬碳酸鹽可溶，常用來除去水中的鈣、鎂離子。'},
+    {front:'K<sub>2</sub>CO<sub>3</sub>',tone:'sol',verdict:'可溶',why:'鉀是鹼金屬，可溶。'},
+    {front:'(NH<sub>4</sub>)<sub>2</sub>CO<sub>3</sub>',tone:'sol',verdict:'可溶',why:'銨鹽全部可溶。'},
+    {front:'Ag<sub>3</sub>PO<sub>4</sub>',tone:'insol',verdict:'難溶',why:'銀不是鹼金屬，磷酸銀為黃色沉澱。'},
+    {front:'Ca<sub>3</sub>(PO<sub>4</sub>)<sub>2</sub>',tone:'insol',verdict:'難溶',why:'鈣不是鹼金屬，會沉澱；這是骨骼與牙齒的主要成分。'},
+    {front:'Mg<sub>3</sub>(PO<sub>4</sub>)<sub>2</sub>',tone:'insol',verdict:'難溶',why:'鎂不是鹼金屬，會沉澱。'},
+    {front:'FePO<sub>4</sub>',tone:'insol',verdict:'難溶',why:'鐵不是鹼金屬，會沉澱。'},
+    {front:'Na<sub>3</sub>PO<sub>4</sub>',tone:'sol',verdict:'可溶',why:'鈉是鹼金屬，可溶。'},
+    {front:'K<sub>3</sub>PO<sub>4</sub>',tone:'sol',verdict:'可溶',why:'鉀是鹼金屬，可溶。'},
+    {front:'(NH<sub>4</sub>)<sub>3</sub>PO<sub>4</sub>',tone:'sol',verdict:'可溶',why:'銨鹽全部可溶。'},
+    {front:'CaSO<sub>3</sub>',tone:'insol',verdict:'難溶',why:'鈣不是鹼金屬，亞硫酸鈣會沉澱。'},
+    {front:'BaSO<sub>3</sub>',tone:'insol',verdict:'難溶',why:'鋇不是鹼金屬，會沉澱。'},
+    {front:'Na<sub>2</sub>SO<sub>3</sub>',tone:'sol',verdict:'可溶',why:'鈉是鹼金屬，可溶。'},
+    {front:'K<sub>2</sub>SO<sub>3</sub>',tone:'sol',verdict:'可溶',why:'鉀是鹼金屬，可溶。'}
+  ]
+},
+
+/* ===================== 關卡 6 ===================== */
+{
+  id:6, color:'#B03A48', title:'綜合大魔王', sub:'不分類混合出題，檢驗真的記住了嗎',
+  tag:'混合測驗 · 抽 5 題', type:'mc', draw:5, boss:true,
+  rule:{
+    ion:'總複習', ionColor:'#B03A48', headline:'判斷順序：先看有沒有「萬用可溶組」',
+    blocks:[
+      {tone:'sol', label:'第一步：出現這些就是可溶',
+       chips:['鹼金屬','NH<sub>4</sub><sup>+</sup>','NO<sub>3</sub><sup>−</sup>','CH<sub>3</sub>COO<sup>−</sup>'],note:''},
+      {tone:'insol', label:'第二步：看陰離子的黑名單',
+       chips:['鹵素離子→共同牽引他','SO<sub>4</sub><sup>2−</sup>→鍶、鋇、鉛','CrO<sub>4</sub><sup>2−</sup>→鍶、鋇、鉛、銀'],note:''},
+      {tone:'insol', label:'第三步：反過來記白名單的三組',
+       chips:['OH<sup>−</sup>','S<sup>2−</sup>','CO<sub>3</sub><sup>2−</sup> PO<sub>4</sub><sup>3−</sup> SO<sub>3</sub><sup>2−</sup>'],
+       note:'這三組只有白名單可溶，其他都沉澱。'}
+    ],
+    mnemonic:'養成固定的判斷順序：<b>先看陽離子有沒有在萬用可溶組，再看陰離子的名單</b>。順序固定，答題就不會亂。'
+  },
+  bank:[
+    I('AgBr','銀離子跟鹵素離子。','銀在「共同牽引他」名單中，AgBr 為淡黃色沉澱。'),
+    S('KOH','鉀屬於哪一族？','鹼金屬鹽全部可溶，KOH 是強鹼溶液。'),
+    I('CaCO<sub>3</sub>','碳酸根只放行誰？','碳酸根只有鹼金屬和銨根可溶，鈣會沉澱。'),
+    S('Zn(NO<sub>3</sub>)<sub>2</sub>','先看陰離子。','硝酸根跟任何陽離子都可溶，不必再考慮鋅。'),
+    I('BaSO<sub>4</sub>','鋇在硫酸根名單裡嗎？','鋇在硫酸根黑名單中，生成白色沉澱。'),
+    S('BaCl<sub>2</sub>','同樣是鋇，換成氯離子呢？','鋇不在鹵素離子的黑名單中，所以 BaCl<sub>2</sub> 可溶。'),
+    I('Ag<sub>2</sub>S','銀在硫離子的白名單裡嗎？','銀不是鹼金屬也不是鹼土金屬，生成黑色沉澱。'),
+    S('(NH<sub>4</sub>)<sub>3</sub>PO<sub>4</sub>','銨根的規則是什麼？','銨鹽全部可溶，磷酸根的規則在這裡不適用。'),
+    I('Fe(OH)<sub>3</sub>','鐵在氫氧根白名單裡嗎？','鐵不在白名單中，生成紅棕色沉澱。'),
+    S('CuSO<sub>4</sub>','銅在硫酸根名單裡嗎？','硫酸根只怕鍶、鋇、鉛，銅可溶，是藍色的硫酸銅溶液。'),
+    I('PbCrO<sub>4</sub>','鉛在鉻酸根名單裡嗎？','鉛在鉻酸根黑名單中，生成黃色沉澱。'),
+    S('CaS','鈣屬於第幾族？','鹼土金屬在硫離子的白名單中，可溶。'),
+    I('MgCO<sub>3</sub>','碳酸根連鹼土金屬都放行嗎？','碳酸根只放行鹼金屬和銨根，鎂會沉澱。'),
+    S('CuCl<sub>2</sub>','名單上的是 Cu<sup>+</sup> 還是 Cu<sup>2+</sup>？','黑名單上的是亞銅 Cu<sup>+</sup>，Cu<sup>2+</sup> 可溶。'),
+    {q:'粗鹽含有 SO<sub>4</sub><sup>2−</sup> 雜質，要先加入哪一種溶液把它沉澱除去？',
+     options:['Mg(NO<sub>3</sub>)<sub>2</sub>','BaCl<sub>2</sub>','KCl','NH<sub>4</sub>Cl'],answer:1,
+     hint:'哪一個陽離子會跟硫酸根沉澱？',
+     explain:'Ba<sup>2+</sup> ＋ SO<sub>4</sub><sup>2−</sup> → BaSO<sub>4</sub>(s)，白色沉澱過濾即可除去硫酸根。'},
+    {q:'承上題，接著要除去濾液中的 Ca<sup>2+</sup> 與 Mg<sup>2+</sup>，加入下列何者最適合？',
+     options:['Na<sub>2</sub>CO<sub>3</sub>','NaNO<sub>3</sub>','KNO<sub>3</sub>','Na<sub>2</sub>S'],answer:0,
+     hint:'哪一個陰離子會同時讓鈣、鎂沉澱，又不留下新雜質？',
+     explain:'碳酸根讓 Ca<sup>2+</sup>、Mg<sup>2+</sup> 同時沉澱；用鈉鹽是因為最後要得到純的 NaCl。硫離子則放行鹼土金屬，不會沉澱。'},
+    {q:'下列哪一組混合後<u>不會</u>產生沉澱？',
+     options:['AgNO<sub>3</sub> ＋ NaCl','BaCl<sub>2</sub> ＋ Na<sub>2</sub>SO<sub>4</sub>','KNO<sub>3</sub> ＋ NaCl','Pb(NO<sub>3</sub>)<sub>2</sub> ＋ KI'],answer:2,
+     hint:'把陽離子和陰離子重新配對，看看有沒有落在黑名單裡。',
+     explain:'KNO<sub>3</sub> 與 NaCl 混合後可能的組合是 KCl 和 NaNO<sub>3</sub>，兩個都可溶，所以沒有沉澱。'},
+    {q:'某溶液加入 NaOH 後產生沉澱，加入 Na<sub>2</sub>SO<sub>4</sub> 卻沒有沉澱。此溶液最可能含有？',
+     options:['Ba<sup>2+</sup>','Mg<sup>2+</sup>','Na<sup>+</sup>','K<sup>+</sup>'],answer:1,
+     hint:'要找「碰氫氧根會沉澱、碰硫酸根不沉澱」的陽離子。',
+     explain:'Mg(OH)<sub>2</sub> 難溶而 MgSO<sub>4</sub> 可溶，符合條件。鋇剛好相反，鈉和鉀則兩者都不沉澱。'},
+    {q:'某溶液加入 Na<sub>2</sub>SO<sub>4</sub> 會沉澱，加入 NaOH 卻不沉澱。此溶液最可能含有？',
+     options:['Ba<sup>2+</sup>','Cu<sup>2+</sup>','Fe<sup>3+</sup>','Zn<sup>2+</sup>'],answer:0,
+     hint:'哪一個陽離子是氫氧根白名單中的例外？',
+     explain:'Ba<sup>2+</sup> 在氫氧根的白名單中所以不沉澱，但碰到硫酸根會生成 BaSO<sub>4</sub>。'},
+    {q:'下列哪一種試劑，可以用來區分 NaCl(aq) 與 NaNO<sub>3</sub>(aq)？',
+     options:['NaOH(aq)','AgNO<sub>3</sub>(aq)','KNO<sub>3</sub>(aq)','NH<sub>4</sub>Cl(aq)'],answer:1,
+     hint:'要找一個只會跟其中一邊沉澱的試劑。',
+     explain:'銀離子與氯離子生成白色 AgCl 沉澱，硝酸根則不沉澱，因此可以區分。'},
+    {q:'把 Pb(NO<sub>3</sub>)<sub>2</sub>(aq) 加入 KI(aq)，會觀察到什麼？',
+     options:['無變化','白色沉澱','亮黃色沉澱','紅棕色沉澱'],answer:2,
+     hint:'課本的「黃金雨」實驗。',
+     explain:'生成亮黃色的 PbI<sub>2</sub> 沉澱，冷卻再結晶後像下黃金雨一樣。'}
+  ]
+}
+];
+
+/* ===================== 抽題工具 ===================== */
+function shuffle(a){
+  const r = a.slice();
+  for(let i=r.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [r[i],r[j]]=[r[j],r[i]]; }
+  return r;
+}
+function sample(a,n){ return shuffle(a).slice(0,Math.min(n,a.length)); }
+function sampleBalanced(pool,n,key){
+  key = key || (p=>p.ans);
+  const ins = shuffle(pool.filter(p=>key(p)==='insol'));
+  const sol = shuffle(pool.filter(p=>key(p)!=='insol'));
+  const half = Math.floor(n/2);
+  const out = ins.slice(0,half).concat(sol.slice(0,n-half));
+  return shuffle(out);
+}
+const byTone = p=> p.tone==='insol' ? 'insol' : 'sol';
+
+/* ===================== 狀態 ===================== */
+/* 只有網址帶 ?teacher（或 #teacher）才會出現教師版切換鈕 */
+const TEACHER_URL = /teacher/i.test(location.search) || /teacher/i.test(location.hash);
+const SAVE_KEY='chem_rules_v1';
+function loadSave(){ try{ return JSON.parse(localStorage.getItem(SAVE_KEY))||{}; }catch(e){ return {}; } }
+function saveProgress(){
+  try{ localStorage.setItem(SAVE_KEY, JSON.stringify({done:state.done, unlocked:state.unlocked})); }catch(e){}
+}
+function clearProgress(){
+  try{ localStorage.removeItem(SAVE_KEY); }catch(e){}
+  state.done={}; state.unlocked=1; renderHome();
+}
+const saved = loadSave();
+const state = { screen:'home', lv:null,
+  unlocked: saved.unlocked || 1,
+  done: saved.done || {},
+  teacher:TEACHER_URL };
+const app = document.getElementById('app');
+const backBtn = document.getElementById('back');
+const topTitle = document.getElementById('topTitle');
+const starEl = document.getElementById('starCount');
+const unlockBtn = document.getElementById('unlockBtn');
+
+if(!TEACHER_URL){ unlockBtn.style.display='none'; }
+else { unlockBtn.textContent='學生版'; unlockBtn.classList.add('on'); }
+
+function isOpen(i){ return state.teacher || i+1 <= state.unlocked || state.done[LEVELS[i].id]; }
+function refreshTop(){
+  starEl.innerHTML = '<b>★</b> ' + Object.keys(state.done).length + '/6';
+  backBtn.classList.toggle('show', state.screen!=='home');
+  topTitle.textContent = state.screen==='home' ? '溶解度規則卡' : ('關卡 '+state.lv.id+'｜'+state.lv.title);
+}
+unlockBtn.onclick = ()=>{
+  state.teacher = !state.teacher;
+  unlockBtn.textContent = state.teacher ? '學生版' : '教師版';
+  unlockBtn.classList.toggle('on', state.teacher);
+  if(state.screen==='home') renderHome(); else if(state.lv) openLevel(LEVELS.indexOf(state.lv));
+};
+backBtn.onclick = ()=> renderHome();
+
+/* ===================== 首頁 ===================== */
+function renderHome(){
+  state.screen='home'; state.lv=null; refreshTop(); window.scrollTo(0,0);
+  const pct = Math.round(Object.keys(state.done).length/6*100);
+  let h = `
+  <div class="hero">
+    <h1>溶解度規則卡</h1>
+    <p>六個關卡，把課本那張大表拆成記得住的小規則。每次進關卡都會重新抽題。</p>
+    <div class="eq">Ag<sup>+</sup><span class="a">(aq)</span> ＋ Cl<sup>−</sup><span class="a">(aq)</span> → AgCl<span class="p">(s)↓</span></div>
+  </div>
+  <div class="pbar"><i style="width:${pct}%"></i></div>
+  ${state.teacher?`<div class="tbanner">教師版：所有關卡已解鎖，練習中會顯示正解，進入關卡後可查看完整題庫或直接標記通過。</div>`:''}
+  <div class="section-label">依序闖關，每一關先看規則卡再練習</div>`;
+  LEVELS.forEach((lv,i)=>{
+    const open=isOpen(i), done=state.done[lv.id];
+    h += `<button class="level-card ${open?'':'locked'}" data-i="${i}" ${open?'':'disabled'}>
+      <div class="badge" style="background:${lv.color}">${lv.boss?'★':lv.id}</div>
+      <div class="lv-body">
+        <div class="lv-title">${lv.title}</div>
+        <div class="lv-sub">${lv.sub}</div>
+        <span class="lv-tag">${lv.tag}</span>
+      </div>
+      <div class="lv-state">${done?'✅':(open?'›':'🔒')}</div>
+    </button>`;
+  });
+  const cleared = !!state.done[6];
+  h += cleared
+    ? `<button class="teaser open" id="goColors">
+         <b>🎨 沉澱顏色圖鑑　已解鎖</b>
+         先猜顏色再揭曉，把 23 種常見沉澱一支一支收集起來。
+       </button>`
+    : `<div class="teaser"><b>🔒 沉澱顏色圖鑑</b>通過綜合大魔王之後解鎖。</div>`;
+  if(Object.keys(state.done).length){
+    h += `<button class="clearbtn" id="clearBtn">清除進度，從頭開始</button>`;
+  }
+  app.innerHTML = h;
+  const cb = document.getElementById('clearBtn');
+  if(cb) cb.onclick = ()=>{ if(confirm('確定要清除這台裝置上的闖關進度嗎？')) clearProgress(); };
+  const gc = document.getElementById('goColors');
+  if(gc) gc.onclick = ()=> location.href = 'precipitate_colors.html';
+  app.querySelectorAll('.level-card[data-i]').forEach(b=> b.onclick = ()=> openLevel(+b.dataset.i));
+}
+
+/* ===================== 規則卡 ===================== */
+function openLevel(i){
+  const lv = LEVELS[i];
+  state.screen='rule'; state.lv=lv; refreshTop(); window.scrollTo(0,0);
+  const r = lv.rule;
+  let h = `<div class="card" style="margin-top:16px">
+    <div class="rule-head">
+      <div class="rule-ion" style="background:${r.ionColor}">${r.ion}</div>
+      <h2>${r.headline}</h2>
+    </div>`;
+  if(r.keyphrase){
+    h += `<div class="keyphrase">
+      <div class="kp">${r.keyphrase.phrase}</div>
+      <div class="kp-grid">${r.keyphrase.cells.map(c=>
+        `<div class="kp-cell"><div class="k">${c.k}</div><div class="ion">${c.ion}</div><div class="nm">${c.nm}</div></div>`
+      ).join('')}</div></div>`;
+  }
+  r.blocks.forEach(b=>{
+    const sym = b.tone==='sol'?'○':(b.tone==='slight'?'△':'✕');
+    h += `<div class="block ${b.tone}">
+      <div class="block-label"><span class="icon">${sym}</span><span class="lbl">${b.label}</span></div>
+      <div class="chips">${b.chips.map(c=>`<span class="chip">${c}</span>`).join('')}</div>
+      ${b.note?`<div class="note">${b.note}</div>`:''}
+    </div>`;
+  });
+  h += `<div class="mnemonic">${r.mnemonic}</div></div>
+  <button class="btn" id="startBtn">開始練習</button>`;
+  if(state.teacher){
+    h += `<div class="btn-row">
+      <button class="btn ghost" id="bankBtn">檢視完整題庫</button>
+      <button class="btn ghost" id="passBtn">直接標記通過</button>
+    </div>`;
+  }
+  app.innerHTML = h;
+  document.getElementById('startBtn').onclick = ()=> startPractice(lv);
+  if(state.teacher){
+    document.getElementById('bankBtn').onclick = ()=> renderBank(lv);
+    document.getElementById('passBtn').onclick = ()=>{
+      state.done[lv.id]=3;
+      if(i+2>state.unlocked) state.unlocked=i+2;
+      saveProgress();
+      renderHome();
+    };
+  }
+}
+
+/* ===================== 教師版：題庫總覽 ===================== */
+function renderBank(lv){
+  state.screen='bank'; state.lv=lv; refreshTop(); window.scrollTo(0,0);
+  let h = `<div class="tbanner" style="margin-top:16px">關卡 ${lv.id}｜${lv.title}　題庫共 ${(lv.bank||lv.pool).length} 題，每次隨機抽 ${lv.draw} 題。</div>
+  <div class="card">`;
+
+  if(lv.type==='mc'){
+    lv.bank.forEach((it,k)=>{
+      h += `<div class="bank-q">
+        <div class="n">${k+1}</div>
+        <div class="t">${it.q}</div>
+        <div class="a">正解：<span class="ok">${it.options[it.answer]}</span></div>
+        <div class="e">${it.explain}</div>
+      </div>`;
+    });
+  } else if(lv.type==='drag'){
+    const sol = lv.pool.filter(p=>p.ans==='sol'), ins = lv.pool.filter(p=>p.ans==='insol');
+    h += `<div class="bank-cols">
+      <div class="bank-col sol"><h3>可溶（${sol.length}）</h3><ul>${sol.map(p=>`<li>${p.f}</li>`).join('')}</ul></div>
+      <div class="bank-col insol"><h3>難溶（${ins.length}）</h3><ul>${ins.map(p=>`<li>${p.f}</li>`).join('')}</ul></div>
+    </div>`;
+  } else {
+    lv.pool.forEach((p,k)=>{
+      const cls = p.tone==='insol'?'no':'ok';
+      h += `<div class="bank-q">
+        <div class="n">${k+1}</div>
+        <div class="t">${p.front}</div>
+        <div class="a">正解：<span class="${cls}">${p.verdict}</span></div>
+        <div class="e">${p.why}</div>
+      </div>`;
+    });
+  }
+  h += `</div><button class="btn ghost" id="bk">回規則卡</button>`;
+  app.innerHTML = h;
+  document.getElementById('bk').onclick = ()=> openLevel(LEVELS.indexOf(lv));
+}
+
+/* ===================== 練習分派 ===================== */
+function startPractice(lv){
+  state.screen='play';
+  if(lv.type==='mc') runMC(lv, sample(lv.bank, lv.draw));
+  else if(lv.type==='drag') runDrag(lv, sampleBalanced(lv.pool, lv.draw));
+  else runFlash(lv, sampleBalanced(lv.pool, lv.draw, byTone));
+}
+
+/* ---------- 選擇題 ---------- */
+function runMC(lv, items){
+  let idx=0, right=0, wrongList=[];
+  function draw(){
+    window.scrollTo(0,0);
+    const it = items[idx];
+    const pct = Math.round(idx/items.length*100);
+    app.innerHTML = `
+      <div class="pbar" style="margin-top:14px"><i style="width:${pct}%"></i></div>
+      <div class="card">
+        <div class="qcount">第 ${idx+1} 題 / 共 ${items.length} 題</div>
+        <div class="qtext">${it.q}</div>
+        ${state.teacher?`<div class="tcue">正解：${it.options[it.answer]}</div>`:''}
+        <div id="opts">${it.options.map((o,k)=>`<button class="opt" data-k="${k}">${o}</button>`).join('')}</div>
+        <div id="fb"></div>
+      </div>
+      <div id="nextWrap"></div>`;
+    app.querySelectorAll('.opt').forEach(b=> b.onclick = ()=> pick(+b.dataset.k, it));
+  }
+  function pick(k,it){
+    const ok = k===it.answer;
+    if(ok) right++; else wrongList.push({q:it.q.replace(' 在水中是？',''), explain:it.explain});
+    app.querySelectorAll('.opt').forEach((b,j)=>{
+      b.disabled = true;
+      if(j===it.answer){ b.classList.add('correct'); b.innerHTML += '<span class="mark">○</span>'; }
+      else if(j===k){ b.classList.add('wrong'); b.innerHTML += '<span class="mark">✕</span>'; }
+      else b.classList.add('dim');
+    });
+    document.getElementById('fb').innerHTML = ok
+      ? `<div class="feedback ok"><b>答對了</b>${it.explain}</div>`
+      : `<div class="feedback no"><b>再想一下：${it.hint}</b>${it.explain}</div>`;
+    const last = idx===items.length-1;
+    document.getElementById('nextWrap').innerHTML = `<button class="btn" id="nx">${last?'看結果':'下一題'}</button>`;
+    document.getElementById('nx').onclick = ()=>{
+      if(last) showResult(lv,right,items.length,wrongList);
+      else { idx++; draw(); }
+    };
+  }
+  draw();
+}
+
+/* ---------- 拖曳配對 ---------- */
+function runDrag(lv, chips){
+  const data = chips.map((c,i)=>({...c,i,placed:null}));
+  window.scrollTo(0,0);
+  app.innerHTML = `
+    <div class="card" style="margin-top:14px">
+      <div class="drag-hint">把下方的化合物拖進正確的桶子（也可以先點一下化合物，再點桶子）。</div>
+      <div class="pool" id="pool"></div>
+      <div class="bins">
+        <div class="bin sol" data-bin="sol"><h3>可溶</h3><div class="drop" id="dropSol"></div></div>
+        <div class="bin insol" data-bin="insol"><h3>難溶（沉澱）</h3><div class="drop" id="dropInsol"></div></div>
+      </div>
+    </div>
+    <div id="dragFoot"></div>`;
+  const pool = document.getElementById('pool');
+  let picked = null;
+
+  function renderPool(){
+    pool.innerHTML='';
+    data.filter(d=>!d.placed).forEach(d=>{
+      const el=document.createElement('div');
+      el.className='tile';
+      el.innerHTML = d.f + (state.teacher?`<span class="cue">${d.ans==='sol'?'溶':'沉'}</span>`:'');
+      attach(el,d); pool.appendChild(el);
+    });
+    if(!data.some(d=>!d.placed)) finish();
+  }
+  function place(d,bin){
+    d.placed=bin;
+    const box=document.getElementById(bin==='sol'?'dropSol':'dropInsol');
+    const el=document.createElement('div');
+    el.className='tile settled '+(bin===d.ans?'right':'bad');
+    el.innerHTML=d.f+(bin===d.ans?' ○':' ✕');
+    box.appendChild(el); picked=null; renderPool();
+  }
+  function attach(el,d){
+    el.addEventListener('click',()=>{
+      if(el.dataset.moved==='1'){ el.dataset.moved='0'; return; }
+      pool.querySelectorAll('.tile').forEach(t=>t.classList.remove('picked'));
+      if(picked && picked.i===d.i){ picked=null; return; }
+      picked=d; el.classList.add('picked');
+    });
+    el.addEventListener('pointerdown',e=>{
+      if(e.pointerType==='mouse' && e.button!==0) return;
+      const rect=el.getBoundingClientRect();
+      const offX=e.clientX-rect.left, offY=e.clientY-rect.top;
+      let moved=false; const ghost=el.cloneNode(true);
+      const start=()=>{
+        ghost.classList.add('tile','dragging');
+        ghost.style.width=rect.width+'px';
+        ghost.style.left=rect.left+'px'; ghost.style.top=rect.top+'px';
+        document.body.appendChild(ghost); el.style.opacity='.3';
+      };
+      const move=ev=>{
+        if(!moved){
+          if(Math.abs(ev.clientX-e.clientX)+Math.abs(ev.clientY-e.clientY)<6) return;
+          moved=true; el.dataset.moved='1'; start();
+        }
+        ghost.style.left=(ev.clientX-offX)+'px';
+        ghost.style.top=(ev.clientY-offY)+'px';
+        highlight(ev.clientX,ev.clientY);
+      };
+      const up=ev=>{
+        window.removeEventListener('pointermove',move);
+        window.removeEventListener('pointerup',up);
+        window.removeEventListener('pointercancel',up);
+        if(!moved) return;
+        ghost.remove(); el.style.opacity='';
+        const bin=binAt(ev.clientX,ev.clientY); clearHi();
+        if(bin) place(d,bin);
+      };
+      window.addEventListener('pointermove',move,{passive:true});
+      window.addEventListener('pointerup',up);
+      window.addEventListener('pointercancel',up);
+    });
+  }
+  function binAt(x,y){
+    const els=document.elementsFromPoint(x,y);
+    for(const el of els){ const b=el.closest && el.closest('.bin'); if(b) return b.dataset.bin; }
+    return null;
+  }
+  function clearHi(){ document.querySelectorAll('.bin').forEach(b=>b.classList.remove('over')); }
+  function highlight(x,y){
+    clearHi(); const b=binAt(x,y);
+    if(b) document.querySelector('.bin[data-bin="'+b+'"]').classList.add('over');
+  }
+  document.querySelectorAll('.bin').forEach(b=>{
+    b.addEventListener('click',()=>{ if(picked) place(picked,b.dataset.bin); });
+  });
+  function finish(){
+    const right=data.filter(d=>d.placed===d.ans).length;
+    const wrongList=data.filter(d=>d.placed!==d.ans).map(d=>({q:d.f,explain:d.why}));
+    document.getElementById('dragFoot').innerHTML=`<button class="btn" id="dgo">看結果</button>`;
+    document.getElementById('dgo').onclick=()=> showResult(lv,right,data.length,wrongList);
+  }
+  renderPool();
+}
+
+/* ---------- 閃卡 ---------- */
+function runFlash(lv, items){
+  let idx=0, right=0, wrongList=[];
+  function draw(){
+    window.scrollTo(0,0);
+    const it=items[idx];
+    const pct=Math.round(idx/items.length*100);
+    app.innerHTML=`
+      <div class="pbar" style="margin-top:14px"><i style="width:${pct}%"></i></div>
+      <div class="qcount" style="margin-left:4px">第 ${idx+1} 張 / 共 ${items.length} 張</div>
+      <div class="flash-wrap">
+        <div class="flash" id="flash">
+          <div class="big">${it.front}</div>
+          <div class="tip">先自己判斷，再按下面的按鈕</div>
+        </div>
+      </div>
+      ${state.teacher?`<div class="tcue">正解：${it.verdict}</div>`:''}
+      <div class="ans-row">
+        <button class="ans sol" data-a="sol">可溶</button>
+        <button class="ans insol" data-a="insol">沉澱</button>
+      </div>
+      <div id="fb"></div>
+      <div id="fbtns"></div>`;
+    app.querySelectorAll('.ans').forEach(b=> b.onclick=()=> answer(b.dataset.a, it));
+  }
+  function answer(choice, it){
+    const key = it.tone==='insol' ? 'insol' : 'sol';   // 微溶依課本歸在可溶那一列
+    const ok = choice===key;
+    if(ok) right++; else wrongList.push({q:it.front, explain:it.verdict+'：'+it.why});
+
+    // 換面：轉到側面時抽換內容，再轉回來
+    const card = document.getElementById('flash');
+    card.classList.add('turning');
+    setTimeout(()=>{
+      card.innerHTML = `
+        <div class="formula">${it.front}</div>
+        <div class="verdict">${it.verdict}</div>
+        <div class="why">${it.why}</div>`;
+      card.classList.add(it.tone);
+      card.classList.remove('turning');
+    }, 220);
+
+    app.querySelectorAll('.ans').forEach(b=>{
+      b.disabled=true;
+      if(b.dataset.a===choice){
+        b.classList.add('chosen');
+        b.innerHTML += '<span class="mk">'+(ok?'○':'✕')+'</span>';
+      }
+    });
+    document.getElementById('fb').innerHTML = ok
+      ? `<div class="feedback ok"><b>答對了</b></div>`
+      : `<div class="feedback no"><b>答錯了，把卡片上的說明看一次再往下走。</b></div>`;
+
+    const last = idx===items.length-1;
+    document.getElementById('fbtns').innerHTML =
+      `<button class="btn" id="nx">${last?'看結果':'下一張'}</button>`;
+    document.getElementById('nx').onclick=()=>{
+      if(last) showResult(lv,right,items.length,wrongList);
+      else { idx++; draw(); }
+    };
+  }
+  draw();
+}
+
+/* ===================== 結算 ===================== */
+function showResult(lv,right,total,wrongList){
+  state.screen='result'; refreshTop(); window.scrollTo(0,0);
+  const rate=right/total;
+  const stars=rate>=0.9?3:(rate>=0.7?2:1);
+  const pass=rate>=0.6;
+  if(pass){
+    state.done[lv.id]=stars;
+    const i=LEVELS.findIndex(l=>l.id===lv.id);
+    if(i+2>state.unlocked) state.unlocked=i+2;
+    saveProgress();
+  }
+  let msg;
+  if(rate===1) msg='全部答對，這一關的規則你已經抓到了。';
+  else if(rate>=0.7) msg='大部分都對，把下面錯的地方再看一次就好。';
+  else if(rate>=0.6) msg='低空通過，建議回頭再看一次規則卡。';
+  else msg='還沒過關，回去看規則卡再挑戰一次。';
+
+  let h=`<div class="card result" style="margin-top:16px">
+    <div class="star-row">${'★'.repeat(stars)}${'☆'.repeat(3-stars)}</div>
+    <div class="score">${right}<span style="font-size:24px;color:var(--muted)"> / ${total}</span></div>
+    <p>${msg}</p>`;
+  if(wrongList.length){
+    h += `<div class="review"><h4>再看一次這幾個</h4>`+
+      wrongList.map(w=>`<div class="review-item"><b>${w.q}</b>${w.explain}</div>`).join('')+`</div>`;
+  }
+  h+=`</div>`;
+  const i=LEVELS.findIndex(l=>l.id===lv.id);
+  const hasNext=i<LEVELS.length-1;
+  h+=`<div class="btn-row">
+      <button class="btn ghost" id="retry">換一批再練</button>
+      ${pass&&hasNext?`<button class="btn" id="next">下一關</button>`:`<button class="btn" id="home">回關卡選單</button>`}
+    </div>`;
+  if(pass&&hasNext) h+=`<button class="btn ghost" id="home2" style="margin-top:10px">回關卡選單</button>`;
+  if(pass&&lv.boss){
+    h+=`<button class="teaser open" id="goColors2" style="margin-top:14px">
+        <b>🎨 沉澱顏色圖鑑　已解鎖</b>
+        六關全部通過了，接著去看這些沉澱長什麼樣子。
+      </button>`;
+  }
+  app.innerHTML=h;
+  const gc2=document.getElementById('goColors2');
+  if(gc2) gc2.onclick=()=> location.href='precipitate_colors.html';
+  document.getElementById('retry').onclick=()=> startPractice(lv);
+  const nx=document.getElementById('next');
+  if(nx) nx.onclick=()=> openLevel(i+1);
+  ['home','home2'].forEach(id=>{ const b=document.getElementById(id); if(b) b.onclick=renderHome; });
+}
+
+renderHome();
+</script>
+</body>
+</html>
