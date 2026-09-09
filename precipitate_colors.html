@@ -148,8 +148,15 @@ header{position:sticky;top:0;z-index:20;background:rgba(18,16,14,.95);
 .done-box h3{font-size:17px;font-weight:800;color:var(--amber);margin-bottom:6px}
 .done-box p{font-size:13.5px;color:var(--text2);line-height:1.8}
 .soon{margin-top:14px;border:1px dashed var(--line2);border-radius:16px;padding:14px 16px;
-  color:var(--text3);font-size:13px;line-height:1.75}
+  color:var(--text3);font-size:13px;line-height:1.75;width:100%;text-align:left;display:block}
 .soon b{display:block;color:var(--text2);font-size:14px;margin-bottom:3px}
+.soon.go{border-style:solid;border-color:rgba(245,197,66,.4);
+  background:linear-gradient(135deg,rgba(245,197,66,.14),rgba(245,197,66,.04));
+  color:rgba(242,234,216,.82);box-shadow:0 3px 0 rgba(120,90,20,.3)}
+.soon.go b{color:var(--amber);font-size:15px}
+.soon.go:active{transform:translateY(2px);box-shadow:0 1px 0 rgba(120,90,20,.3)}
+.clearbtn{display:block;width:100%;margin-top:18px;font-size:13px;color:var(--text3);
+  border:1px solid var(--line);border-radius:12px;padding:10px}
 
 .foot{text-align:center;color:var(--text3);font-size:11.5px;line-height:1.9;margin-top:26px}
 @media (max-width:340px){ .shelf{gap:9px} .slot .f{font-size:12.5px} }
@@ -267,7 +274,10 @@ const ALL = FAMILIES.flatMap(f=>f.items.map(it=>({...it, fam:f.id})));
 
 /* ===================== 狀態 ===================== */
 const TEACHER = /teacher/i.test(location.search) || /teacher/i.test(location.hash);
-const state = { tab:'ag', got:{}, teacher:TEACHER };   // got[f] = 'ok' | 'no'
+const SAVE_KEY='chem_colors_v1';
+function loadSave(){ try{ return JSON.parse(localStorage.getItem(SAVE_KEY))||{}; }catch(e){ return {}; } }
+function saveProgress(){ try{ localStorage.setItem(SAVE_KEY, JSON.stringify(state.got)); }catch(e){} }
+const state = { tab:'ag', got:loadSave(), teacher:TEACHER };   // got[f] = 'ok' | 'no'
 
 const app = document.getElementById('app');
 const tabsEl = document.getElementById('tabs');
@@ -286,6 +296,7 @@ tbtn.onclick = ()=>{
   const on = Object.keys(state.got).length < ALL.length;
   if(on) ALL.forEach(it=> state.got[it.f]='ok');
   else state.got = {};
+  saveProgress();
   render();
 };
 
@@ -339,11 +350,19 @@ function render(){
     h += `<div class="done-box"><h3>${fam.name}家族收錄完成</h3>
       <p>把這一頁投影出來，就是完整的${fam.name}顏色對照。</p></div>`;
     if(fam.id==='ag'){
-      h += `<div class="soon"><b>下一步：誰先沉澱？</b>同一杯溶液裡同時有 Cl<sup>−</sup>、CrO<sub>4</sub><sup>2−</sup>、I<sup>−</sup>、S<sup>2−</sup>，滴入硝酸銀時它們不會一起沉下去。排序關卡製作中。</div>`;
+      h += `<button class="soon go" id="goOrder"><b>🧪 誰先沉澱？　可以玩了</b>同一杯溶液裡同時有 Cl<sup>−</sup>、CrO<sub>4</sub><sup>2−</sup>、I<sup>−</sup>、S<sup>2−</sup>，滴入硝酸銀時它們不會一起沉下去。先預測順序，再看滴定結果。</button>`;
     }
+  }
+  if(Object.keys(state.got).length){
+    h += `<button class="clearbtn" id="clearBtn">清除收錄進度</button>`;
   }
   h += `<div class="foot">顏色為示意，實際沉澱會因濃度與顆粒大小而略有差異</div>`;
   app.innerHTML = h;
+  const cb=document.getElementById('clearBtn');
+  if(cb) cb.onclick=()=>{ if(confirm('確定要清除這台裝置上的收錄進度嗎？')){
+    state.got={}; saveProgress(); render(); } };
+  const go=document.getElementById('goOrder');
+  if(go) go.onclick=()=> location.href='precipitation_order.html';
   app.querySelectorAll('.slot').forEach(b=> b.onclick=()=> openQuiz(fam.items[+b.dataset.k]));
 }
 
@@ -394,6 +413,7 @@ function openQuiz(it){
   function answer(g){
     const ok = g===it.g;
     state.got[it.f] = ok ? 'ok' : 'no';
+    saveProgress();
 
     ov.querySelectorAll('.copt').forEach(b=>{
       b.disabled = true;

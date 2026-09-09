@@ -11,9 +11,7 @@
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 :root{
   --bg:#12100e;
-  --bg2:#1a1712;
   --card:#1e1b16;
-  --card2:#242018;
   --border:rgba(255,210,120,0.09);
   --border2:rgba(255,210,120,0.18);
   --text:#f2ead8;
@@ -23,155 +21,138 @@
   --amber2:#e8a020;
   --amber3:#ffd880;
   --teal:#5ecfb0;
-  --rose:#e07060;
   --sky:#7ab6e8;
+  --peri:#9aa8ee;
+  --violet:#b49ae8;
+  --rose:#e07060;
   --font:-apple-system,BlinkMacSystemFont,'Segoe UI','Helvetica Neue',sans-serif;
 }
 html,body{min-height:100dvh;background:var(--bg);color:var(--text);font-family:var(--font);-webkit-text-size-adjust:100%;}
-body{padding-bottom:calc(30px + env(safe-area-inset-bottom));overflow-x:hidden;}
+body{padding-bottom:calc(20px + env(safe-area-inset-bottom));overflow-x:hidden;}
 
-/* ── Background canvas ── */
 #bg-canvas{position:fixed;inset:0;z-index:0;}
-
-/* ── Content ── */
 .content{position:relative;z-index:1;}
 
 /* ── Hero ── */
-.hero{padding:60px 24px 28px;text-align:center;}
-.hero-emblem{
-  width:76px;height:76px;margin:0 auto 20px;position:relative;
-  display:flex;align-items:center;justify-content:center;
-}
+.hero{padding:58px 24px 26px;text-align:center;}
+.hero-emblem{width:76px;height:76px;margin:0 auto 20px;position:relative;
+  display:flex;align-items:center;justify-content:center;}
 .hero-emblem svg{width:76px;height:76px;position:absolute;inset:0;}
 .hero-emblem span{font-size:32px;position:relative;z-index:1;}
-
-.hero h1{
-  font-size:27px;font-weight:800;letter-spacing:-.4px;line-height:1.2;
-  color:var(--text);margin-bottom:10px;
-}
-.hero h1 em{
-  font-style:normal;
-  background:linear-gradient(120deg,var(--amber3),var(--amber2));
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
-}
-.hero-sub{
-  font-size:14px;color:var(--text2);line-height:1.8;max-width:280px;margin:0 auto;
-}
+.hero h1{font-size:27px;font-weight:800;letter-spacing:-.4px;line-height:1.2;margin-bottom:10px;}
+.hero h1 em{font-style:normal;background:linear-gradient(120deg,var(--amber3),var(--amber2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.hero-sub{font-size:14px;color:var(--text2);line-height:1.8;max-width:280px;margin:0 auto;}
 .hero-sub strong{color:var(--amber);font-weight:600;}
 
-/* ── Divider ── */
-.divider{
-  display:flex;align-items:center;gap:10px;padding:0 20px;margin:8px 0 14px;
-}
+/* ── Section divider ── */
+.divider{display:flex;align-items:center;gap:10px;padding:0 20px;margin:26px 0 14px;}
 .divider-line{flex:1;height:1px;background:linear-gradient(to right,transparent,var(--border2),transparent);}
 .divider-label{font-size:10.5px;font-weight:700;letter-spacing:1.8px;color:var(--text3);text-transform:uppercase;}
 
+/* ── Group block ── */
+.cards{padding:0 16px;display:flex;flex-direction:column;gap:13px;}
+.group{background:rgba(255,255,255,.018);border:1px solid rgba(255,255,255,.05);
+  border-radius:20px;padding:12px 11px;display:flex;flex-direction:column;gap:9px;}
+.ghead{display:flex;align-items:center;gap:9px;padding:2px 4px 0;}
+.gnum{width:21px;height:21px;border-radius:7px;flex-shrink:0;font-size:11.5px;font-weight:800;
+  display:flex;align-items:center;justify-content:center;color:#12100e;}
+.g1 .gnum{background:var(--sky);}
+.g2 .gnum{background:var(--peri);}
+.g3 .gnum{background:var(--violet);}
+.ghead .gt{font-size:13.5px;font-weight:800;}
+.ghead .gs{font-size:11.5px;color:var(--text3);margin-left:auto;}
+
 /* ── Cards ── */
-.cards{padding:0 16px;display:flex;flex-direction:column;gap:13px;margin-bottom:28px;}
-
-.card{
-  background:var(--card);
-  border:1px solid var(--border);
-  border-radius:20px;
-  padding:18px 18px 18px 16px;
-  text-decoration:none;color:var(--text);
-  display:flex;align-items:center;gap:15px;
-  position:relative;overflow:hidden;
-  -webkit-tap-highlight-color:transparent;
-  transition:transform .16s,border-color .2s;
-}
-.card:active{transform:scale(.975);}
-
-/* Warm left accent bar */
-.card::after{
-  content:'';position:absolute;left:0;top:16px;bottom:16px;
-  width:3px;border-radius:0 3px 3px 0;
-  transition:opacity .2s;
-}
+.card{background:var(--card);border:1px solid var(--border);border-radius:18px;
+  padding:16px 16px 16px 15px;text-decoration:none;color:var(--text);
+  display:flex;align-items:center;gap:14px;position:relative;overflow:hidden;
+  -webkit-tap-highlight-color:transparent;transition:transform .16s,border-color .2s;}
+.card:active{transform:scale(.975);border-color:var(--border2);}
+.card::after{content:'';position:absolute;left:0;top:15px;bottom:15px;width:3px;border-radius:0 3px 3px 0;}
 .c1::after{background:linear-gradient(to bottom,var(--amber3),var(--amber2));}
 .c2::after{background:linear-gradient(to bottom,var(--teal),#3ab090);}
 .c3::after{background:linear-gradient(to bottom,var(--sky),#4a8cc0);}
-.c4::after{background:linear-gradient(to bottom,var(--rose),#c05040);}
+.c4::after{background:linear-gradient(to bottom,var(--peri),#6a78c8);}
+.c5::after{background:linear-gradient(to bottom,var(--violet),#8a6fd0);}
+.c6::after{background:linear-gradient(to bottom,var(--rose),#c05040);}
 
-.card:active{border-color:var(--border2);}
-
-/* Subtle inner glow on active */
-.card::before{
-  content:'';position:absolute;inset:0;border-radius:20px;opacity:0;
-  transition:opacity .2s;pointer-events:none;
-}
-.c1::before{background:radial-gradient(ellipse at 20% 50%,rgba(245,197,66,.06),transparent 70%);}
-.c2::before{background:radial-gradient(ellipse at 20% 50%,rgba(94,207,176,.06),transparent 70%);}
-.c3::before{background:radial-gradient(ellipse at 20% 50%,rgba(122,182,232,.06),transparent 70%);}
-.c4::before{background:radial-gradient(ellipse at 20% 50%,rgba(224,112,96,.06),transparent 70%);}
-.card:active::before{opacity:1;}
-
-.card-icon{
-  width:52px;height:52px;border-radius:14px;flex-shrink:0;
-  display:flex;align-items:center;justify-content:center;font-size:24px;
-  position:relative;
-}
+.card-icon{width:48px;height:48px;border-radius:13px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;font-size:22px;}
 .c1 .card-icon{background:rgba(245,197,66,.10);border:1px solid rgba(245,197,66,.2);}
 .c2 .card-icon{background:rgba(94,207,176,.10);border:1px solid rgba(94,207,176,.2);}
 .c3 .card-icon{background:rgba(122,182,232,.10);border:1px solid rgba(122,182,232,.2);}
-.c4 .card-icon{background:rgba(224,112,96,.10);border:1px solid rgba(224,112,96,.2);}
+.c4 .card-icon{background:rgba(154,168,238,.10);border:1px solid rgba(154,168,238,.2);}
+.c5 .card-icon{background:rgba(180,154,232,.10);border:1px solid rgba(180,154,232,.2);}
+.c6 .card-icon{background:rgba(224,112,96,.10);border:1px solid rgba(224,112,96,.2);}
 
 .card-body{flex:1;min-width:0;}
 .card-title{font-size:15.5px;font-weight:800;margin-bottom:3px;line-height:1.25;}
-.card-eq{
-  font-size:12px;font-weight:600;margin-bottom:6px;letter-spacing:.15px;
-  font-family:'Courier New',monospace;opacity:.85;
-}
+.card-eq{font-size:11.5px;font-weight:600;margin-bottom:5px;letter-spacing:.15px;
+  font-family:'Courier New',monospace;opacity:.85;}
 .c1 .card-eq{color:var(--amber);}
 .c2 .card-eq{color:var(--teal);}
 .c3 .card-eq{color:var(--sky);}
-.c4 .card-eq{color:var(--rose);}
+.c4 .card-eq{color:var(--peri);}
+.c5 .card-eq{color:var(--violet);}
+.c6 .card-eq{color:var(--rose);}
 .card-desc{font-size:12px;color:var(--text2);line-height:1.6;}
-.card-tags{display:flex;gap:5px;flex-wrap:wrap;margin-top:8px;}
-.tag{
-  font-size:10px;font-weight:600;padding:2px 7px;border-radius:20px;
-  background:rgba(255,255,255,.04);color:var(--text3);
-  border:1px solid rgba(255,255,255,.07);
-}
+.card-tags{display:flex;gap:5px;flex-wrap:wrap;margin-top:7px;}
+.tag{font-size:10px;font-weight:600;padding:2px 7px;border-radius:20px;
+  background:rgba(255,255,255,.04);color:var(--text3);border:1px solid rgba(255,255,255,.07);}
 .c1 .tag.hi{background:rgba(245,197,66,.12);color:var(--amber);border-color:rgba(245,197,66,.25);}
 .c2 .tag.hi{background:rgba(94,207,176,.12);color:var(--teal);border-color:rgba(94,207,176,.25);}
 .c3 .tag.hi{background:rgba(122,182,232,.12);color:var(--sky);border-color:rgba(122,182,232,.25);}
-.c4 .tag.hi{background:rgba(224,112,96,.12);color:var(--rose);border-color:rgba(224,112,96,.25);}
+.c4 .tag.hi{background:rgba(154,168,238,.12);color:var(--peri);border-color:rgba(154,168,238,.25);}
+.c5 .tag.hi{background:rgba(180,154,232,.12);color:var(--violet);border-color:rgba(180,154,232,.25);}
 
 .card-arrow{font-size:20px;color:var(--text3);flex-shrink:0;transition:transform .16s;}
 .card:active .card-arrow{transform:translateX(3px);}
 
-/* Coming soon */
-.card.soon{opacity:.38;pointer-events:none;}
-.soon-badge{
-  position:absolute;top:13px;right:14px;
-  font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;
-  padding:3px 8px;border-radius:20px;
-  background:rgba(255,255,255,.06);color:var(--text3);border:1px solid rgba(255,255,255,.08);
+/* ── 精簡卡片：兩兩並排 ── */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:9px;}
+.grid2.solo{grid-template-columns:1fr;}
+.card.mini{flex-direction:column;align-items:flex-start;gap:9px;padding:14px 13px 13px 15px;}
+.card.mini::after{top:13px;bottom:13px;}
+.mini .card-icon{width:38px;height:38px;font-size:19px;border-radius:11px;}
+.mini .card-title{font-size:14.5px;margin-bottom:4px;line-height:1.3;}
+.mini .card-eq{display:none;}
+.mini .card-desc{font-size:11.5px;line-height:1.6;}
+.mini .card-tags{margin-top:8px;}
+.mini .tag{font-size:9.5px;padding:2px 6px;}
+.mini .card-arrow{position:absolute;top:14px;right:12px;font-size:17px;}
+.grid2.solo .card.mini{flex-direction:row;align-items:center;gap:14px;}
+.grid2.solo .mini .card-icon{width:44px;height:44px;font-size:21px;}
+.grid2.solo .mini .card-eq{display:block;font-size:11px;}
+.grid2.solo .mini .card-arrow{position:static;}
+@media (max-width:330px){
+  .grid2{grid-template-columns:1fr;}
+  .mini .card-arrow{top:15px;}
 }
+
+.card.soon{opacity:.38;pointer-events:none;}
+.soon-badge{position:absolute;top:12px;right:13px;font-size:9px;font-weight:700;letter-spacing:1px;
+  text-transform:uppercase;padding:3px 8px;border-radius:20px;
+  background:rgba(255,255,255,.06);color:var(--text3);border:1px solid rgba(255,255,255,.08);}
 
 /* ── PWA hint ── */
-.pwa-hint{
-  margin:0 16px 20px;
-  background:rgba(245,197,66,.07);
-  border:1px solid rgba(245,197,66,.18);
-  border-radius:16px;padding:12px 14px;
-  display:flex;align-items:flex-start;gap:10px;
-}
+.pwa-hint{margin:0 16px;background:rgba(245,197,66,.07);border:1px solid rgba(245,197,66,.18);
+  border-radius:16px;padding:12px 14px;display:flex;align-items:flex-start;gap:10px;}
 .pwa-hint p{font-size:12px;color:rgba(245,197,66,.75);line-height:1.7;flex:1;}
 .pwa-hint strong{color:var(--amber);}
-#pwa-close{
-  background:none;border:none;color:rgba(245,197,66,.4);font-size:17px;
-  cursor:pointer;flex-shrink:0;padding:0;margin-top:1px;
-  -webkit-tap-highlight-color:transparent;
-}
+#pwa-close{background:none;border:none;color:rgba(245,197,66,.4);font-size:17px;
+  cursor:pointer;flex-shrink:0;padding:0;margin-top:1px;-webkit-tap-highlight-color:transparent;}
 
 /* ── Footer ── */
-.footer{padding:0 20px 4px;text-align:center;}
+.footer{padding:30px 22px 6px;text-align:center;}
 .footer p{font-size:11px;color:var(--text3);line-height:1.9;}
-
-/* ── Molecule float labels ── */
-.mol-symbol{pointer-events:none;user-select:none;}
+.copyright{margin:22px 16px 0;padding:18px 16px;border-top:1px solid var(--border);
+  text-align:center;}
+.copyright .name{font-size:13px;font-weight:700;color:var(--text2);letter-spacing:.3px;}
+.copyright .mail{display:inline-block;margin-top:6px;font-size:12.5px;color:var(--amber);
+  text-decoration:none;border-bottom:1px solid rgba(245,197,66,.3);padding-bottom:1px;}
+.copyright .rights{font-size:11px;color:var(--text3);line-height:1.85;margin-top:11px;}
+.copyright .ver{font-size:10.5px;color:var(--text3);opacity:.6;margin-top:8px;}
 </style>
 </head>
 <body>
@@ -180,9 +161,7 @@ body{padding-bottom:calc(30px + env(safe-area-inset-bottom));overflow-x:hidden;}
 
 <div class="content">
 
-  <!-- Hero -->
   <div class="hero">
-    <!-- Hexagonal emblem -->
     <div class="hero-emblem">
       <svg viewBox="0 0 76 76" fill="none" xmlns="http://www.w3.org/2000/svg">
         <polygon points="38,4 70,21 70,55 38,72 6,55 6,21"
@@ -196,21 +175,19 @@ body{padding-bottom:calc(30px + env(safe-area-inset-bottom));overflow-x:hidden;}
     <p class="hero-sub">把教科書上的反應式<br>變成<strong>你眼前活起來的東西</strong>✨</p>
   </div>
 
-  <!-- PWA hint -->
   <div class="pwa-hint" id="pwa-hint">
     <p>📲 點 Safari <strong>分享</strong> → <strong>加入主畫面</strong>，像 App 一樣隨時開啟！</p>
     <button id="pwa-close" onclick="closePwa()">✕</button>
   </div>
 
-  <!-- Section -->
+  <!-- ═══ 化學平衡 ═══ -->
   <div class="divider">
     <div class="divider-line"></div>
-    <div class="divider-label">教材列表</div>
+    <div class="divider-label">化學平衡</div>
     <div class="divider-line"></div>
   </div>
 
   <div class="cards">
-
     <a class="card c1" href="fescn_mobile.html">
       <div class="card-icon">🧪</div>
       <div class="card-body">
@@ -240,24 +217,104 @@ body{padding-bottom:calc(30px + env(safe-area-inset-bottom));overflow-x:hidden;}
       </div>
       <div class="card-arrow">›</div>
     </a>
+  </div>
 
-    <a class="card c3" href="precipitation_rules.html">
-      <div class="card-icon">🧂</div>
-      <div class="card-body">
-        <div class="card-title">沉澱規則表</div>
-        <div class="card-eq">Ag⁺ + Cl⁻ → AgCl(s)↓</div>
-        <div class="card-desc">六關闖關＋隨機抽題，通關後解鎖沉澱顏色圖鑑</div>
-        <div class="card-tags">
-          <span class="tag hi">溶解度規則</span>
-          <span class="tag hi">闖關測驗</span>
-          <span class="tag">共同牽引他</span>
-        </div>
+  <!-- ═══ 離子的沉澱 ═══ -->
+  <div class="divider">
+    <div class="divider-line"></div>
+    <div class="divider-label">離子的沉澱</div>
+    <div class="divider-line"></div>
+  </div>
+
+  <div class="cards">
+
+    <div class="group g1">
+      <div class="ghead">
+        <span class="gnum">1</span>
+        <span class="gt">先把規則記起來</span>
+        <span class="gs">基礎</span>
       </div>
-      <div class="card-arrow">›</div>
-    </a>
+      <div class="grid2">
+        <a class="card c3 mini" href="precipitation_rules.html">
+          <div class="card-icon">🧂</div>
+          <div class="card-body">
+            <div class="card-title">沉澱規則表</div>
+            <div class="card-desc">六關闖關＋隨機抽題，把溶解度規則背起來</div>
+            <div class="card-tags"><span class="tag hi">共同牽引他</span></div>
+          </div>
+          <div class="card-arrow">›</div>
+        </a>
+        <a class="card c3 mini" href="precipitate_colors.html">
+          <div class="card-icon">🎨</div>
+          <div class="card-body">
+            <div class="card-title">沉澱顏色圖鑑</div>
+            <div class="card-desc">先猜顏色再揭曉，收集 23 種沉澱</div>
+            <div class="card-tags"><span class="tag hi">預測練習</span></div>
+          </div>
+          <div class="card-arrow">›</div>
+        </a>
+      </div>
+    </div>
 
-    <div class="card c4 soon">
-      <div class="soon-badge">即將推出</div>
+    <div class="group g2">
+      <div class="ghead">
+        <span class="gnum">2</span>
+        <span class="gt">誰先沉澱下來</span>
+        <span class="gs">進階</span>
+      </div>
+      <div class="grid2 solo">
+        <a class="card c4 mini" href="precipitation_order.html">
+          <div class="card-icon">💧</div>
+          <div class="card-body">
+            <div class="card-title">誰先沉澱？</div>
+            <div class="card-eq">Ksp 越小 ≠ 越先沉澱</div>
+            <div class="card-desc">先預測順序再逐滴揭曉，附完整計算與小算盤</div>
+          </div>
+          <div class="card-arrow">›</div>
+        </a>
+      </div>
+    </div>
+
+    <div class="group g3">
+      <div class="ghead">
+        <span class="gnum">3</span>
+        <span class="gt">拿來解決問題</span>
+        <span class="gs">應用</span>
+      </div>
+      <div class="grid2">
+        <a class="card c5 mini" href="salt_purification.html">
+          <div class="card-icon">⚗️</div>
+          <div class="card-body">
+            <div class="card-title">分離與純化</div>
+            <div class="card-desc">三關由淺入深，選對試劑再排對順序</div>
+            <div class="card-tags"><span class="tag hi">粗鹽純化</span></div>
+          </div>
+          <div class="card-arrow">›</div>
+        </a>
+        <a class="card c5 mini" href="mystery_solutions.html">
+          <div class="card-icon">🔍</div>
+          <div class="card-body">
+            <div class="card-title">猜猜我是誰</div>
+            <div class="card-desc">兩兩混合，靠沉澱顏色推理未知溶液</div>
+            <div class="card-tags"><span class="tag hi">實驗預演</span></div>
+          </div>
+          <div class="card-arrow">›</div>
+        </a>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ═══ 即將推出 ═══ -->
+  <div class="divider">
+    <div class="divider-line"></div>
+    <div class="divider-label">即將推出</div>
+    <div class="divider-line"></div>
+  </div>
+
+  <div class="cards">
+    <div class="card c6 soon">
+      <div class="soon-badge">籌備中</div>
       <div class="card-icon">⚡</div>
       <div class="card-body">
         <div class="card-title">氧化還原反應</div>
@@ -270,24 +327,38 @@ body{padding-bottom:calc(30px + env(safe-area-inset-bottom));overflow-x:hidden;}
       </div>
       <div class="card-arrow">›</div>
     </div>
-
   </div>
 
   <div class="footer">
     <p>用 Safari 開啟效果最佳 · 無需安裝 · 免費使用<br>
-    每一個方程式背後，都藏著一個故事 🔬<br>
-    <span id="ver-label" style="opacity:.6"></span></p>
+    每一個方程式背後，都藏著一個故事 🔬</p>
+  </div>
+
+  <div class="copyright">
+    <div class="name">© 2026 Chiayin Lin</div>
+    <a class="mail" href="mailto:lyt284@lygsh.ilc.edu.tw">lyt284@lygsh.ilc.edu.tw</a>
+    <p class="rights">本站教材由作者自行設計製作，供教學與學習使用。<br>
+    轉載或改作請先來信告知，歡迎教學交流與回饋。</p>
+    <p class="ver" id="ver-label"></p>
   </div>
 
 </div>
 
 <script>
-/* ── Honeycomb + floating atoms background ── */
+/* ── 版本號：更新教材後改成當天日期 ── */
+const SITE_VER = '20260909';
+
+document.querySelectorAll('a.card').forEach(a => {
+  const href = a.getAttribute('href');
+  if (href && href.endsWith('.html')) a.setAttribute('href', href + '?v=' + SITE_VER);
+});
+document.getElementById('ver-label').textContent = '版本 ' + SITE_VER;
+
+/* ── 背景：蜂巢與漂浮原子 ── */
 const canvas = document.getElementById('bg-canvas');
 const ctx = canvas.getContext('2d');
 let W, H;
 
-// Random chemistry symbols — generic, not equation-specific
 const SYMBOLS = [
   'H','He','Li','C','N','O','F','Na','Mg','Al','Si','P','S','Cl','K','Ca',
   'Fe','Cu','Zn','Ag','Au','Hg','Pb',
@@ -304,7 +375,6 @@ function resize() {
   buildAtoms();
 }
 
-/* Honeycomb grid */
 function buildHexes() {
   hexes = [];
   const s = 28, w = s * Math.sqrt(3), h = s * 2;
@@ -337,7 +407,6 @@ function drawHexes() {
   });
 }
 
-/* Floating atom labels */
 function buildAtoms() {
   atoms = [];
   const n = Math.min(Math.floor(W * H / 16000), 40);
@@ -374,7 +443,6 @@ function drawAtoms() {
   });
 }
 
-/* Subtle connection lines between nearby atoms */
 function drawConnections() {
   for (let i = 0; i < atoms.length; i++) {
     for (let j = i + 1; j < atoms.length; j++) {
@@ -403,17 +471,7 @@ function frame() {
 resize(); frame();
 window.addEventListener('resize', resize);
 
-/* ── 版本號：每次更新教材後，把下面這個數字改成當天日期即可 ── */
-const SITE_VER = '20260907b';
-
-// 幫每張卡片的連結加上版本參數，強迫瀏覽器抓新版
-document.querySelectorAll('a.card').forEach(a => {
-  const href = a.getAttribute('href');
-  if (href && href.endsWith('.html')) a.setAttribute('href', href + '?v=' + SITE_VER);
-});
-document.getElementById('ver-label').textContent = '版本 ' + SITE_VER;
-
-/* PWA hint */
+/* ── PWA 提示 ── */
 function closePwa() {
   document.getElementById('pwa-hint').style.display = 'none';
   try { localStorage.setItem('pwa-closed', '1'); } catch(e) {}

@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>猜猜我是誰</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#12100e; --card:#1e1b16; --card2:#252119;
+  --line:rgba(255,210,120,.10); --line2:rgba(255,210,120,.24);
+  --text:#f2ead8; --text2:#9a9080; --text3:#6a6058;
+  --amber:#f5c542; --amber2:#e8a020; --amber3:#ffd880;
+  --ok:#5ecfb0; --no:#e07060;
+  --font:"Noto Sans TC","PingFang TC","Microsoft JhengHei",-apple-system,BlinkMacSystemFont,sans-serif;
+}
+html,body{min-height:100dvh;background:var(--bg);color:var(--text);font-family:var(--font);-webkit-text-size-adjust:100%}
+body{padding-bottom:calc(40px + env(safe-area-inset-bottom));overflow-x:hidden;font-size:16px;line-height:1.7}
+sub,sup{font-size:.68em;line-height:0}
+button{font-family:inherit;font-size:inherit;color:inherit;border:none;background:none;cursor:pointer}
+.wrap{max-width:600px;margin:0 auto;padding:0 14px}
+
+header{position:sticky;top:0;z-index:20;background:rgba(18,16,14,.95);
+  backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.hrow{display:flex;align-items:center;gap:10px;padding:12px 0}
+.htitle{font-size:17px;font-weight:800;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.htitle em{font-style:normal;background:linear-gradient(120deg,var(--amber3),var(--amber2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.tbtn{font-size:16px;color:var(--text2);border:1px solid var(--line);border-radius:99px;padding:3px 11px;flex:none}
+.hstep{font-size:12.5px;color:var(--text2);font-weight:700;flex:none}
+.hstep b{color:var(--amber)}
+.hstep.warn b{color:var(--no)}
+
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:17px;margin-top:16px}
+.card h2{font-size:17px;font-weight:800;margin-bottom:8px}
+.card p{font-size:14px;color:var(--text2);line-height:1.85}
+.card p+p{margin-top:9px}
+.hl{color:var(--amber);font-weight:700}
+
+.btn{display:block;width:100%;background:var(--amber);color:#12100e;border-radius:15px;padding:15px;
+  font-size:16.5px;font-weight:800;text-align:center;margin-top:14px}
+.btn:active{transform:translateY(2px)}
+.btn[disabled]{opacity:.35}
+.btn.ghost{background:transparent;color:var(--text2);border:1px solid var(--line);font-weight:700}
+.btn-row{display:flex;gap:10px}
+.btn-row .btn{margin-top:14px}
+
+.pickcard{display:block;width:100%;text-align:left;background:var(--card);border:1px solid var(--line);
+  border-radius:18px;padding:17px;margin-top:14px;transition:transform .14s,border-color .2s}
+.pickcard:active{transform:scale(.982);border-color:var(--line2)}
+.pickcard .tag{font-size:11px;font-weight:800;letter-spacing:1px;color:var(--text3);
+  text-transform:uppercase;margin-bottom:5px;display:block}
+.pickcard h3{font-size:18px;font-weight:800;margin-bottom:5px}
+.pickcard p{font-size:13.5px;color:var(--text2);line-height:1.8}
+.chiprow{display:flex;gap:6px;flex-wrap:wrap;margin-top:11px}
+.chiprow span{font-size:11.5px;font-weight:700;color:var(--text3);background:rgba(255,255,255,.04);
+  border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:3px 8px}
+
+/* ---------- 藥瓶 ---------- */
+.shelf{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:18px}
+.vial{width:52px;display:flex;flex-direction:column;align-items:center;gap:5px;
+  transition:transform .13s}
+.vial:active{transform:scale(.94)}
+.vbody{width:34px;height:58px;border:2px solid rgba(255,255,255,.22);border-top:none;
+  border-radius:3px 3px 14px 14px;position:relative;overflow:hidden;
+  background:linear-gradient(160deg,rgba(255,255,255,.05),rgba(255,255,255,.01))}
+.vbody::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:rgba(255,255,255,.28)}
+.vbody i{position:absolute;left:0;right:0;bottom:0;height:70%;display:block}
+.vlab{font-size:14px;font-weight:900}
+.vial.sel .vbody{border-color:var(--amber);box-shadow:0 0 0 3px rgba(245,197,66,.22)}
+.vial.sel .vlab{color:var(--amber)}
+.vial.named .vlab{font-size:11px;font-weight:800;color:var(--ok);line-height:1.2;text-align:center}
+
+/* ---------- 候選藥品 ---------- */
+.candbox{background:var(--card);border:1px solid var(--line);border-radius:16px;
+  padding:12px 14px;margin-top:14px}
+.candbox h4{font-size:11.5px;font-weight:800;color:var(--text3);letter-spacing:.5px;margin-bottom:9px}
+.cands{display:flex;flex-wrap:wrap;gap:7px}
+.cand{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.09);
+  border-radius:10px;padding:5px 10px;display:flex;flex-direction:column;line-height:1.35}
+.cand b{font-size:14px;font-weight:800}
+.cand small{font-size:10.5px;color:var(--text3);font-weight:600}
+
+/* ---------- 混合區 ---------- */
+.mixzone{background:var(--card);border:1px solid var(--line);border-radius:18px;
+  padding:16px;margin-top:16px;text-align:center}
+.mixzone .hint{font-size:13.5px;color:var(--text3)}
+.tube{width:56px;height:104px;border:2px solid rgba(255,255,255,.2);border-top:none;
+  border-radius:4px 4px 22px 22px;position:relative;overflow:hidden;margin:10px auto 12px;
+  background:linear-gradient(160deg,rgba(255,255,255,.05),rgba(255,255,255,.01))}
+.tube .liq{position:absolute;left:0;right:0;bottom:0;height:64%;background:rgba(150,200,255,.07)}
+.tube .ppt{position:absolute;left:0;right:0;bottom:0;height:0;transition:height .7s cubic-bezier(.3,1.2,.5,1)}
+.tube .ppt.on{height:30%}
+.tube .cloud{position:absolute;inset:22% 0 0;opacity:0;transition:opacity .6s;
+  background:radial-gradient(circle at 50% 60%,rgba(255,255,255,.28),transparent 70%)}
+.tube .cloud.on{opacity:1}
+.bub{position:absolute;width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.5);
+  opacity:0;animation:bub 1.1s ease-out forwards}
+@keyframes bub{0%{opacity:0;bottom:6px}25%{opacity:.85}100%{opacity:0;bottom:74px}}
+.grain{position:absolute;width:4px;height:4px;border-radius:50%;opacity:0;animation:sink .8s ease-in forwards}
+@keyframes sink{0%{opacity:0;transform:translateY(-40px)}25%{opacity:.95}100%{opacity:.25;transform:translateY(0)}}
+.mixres{font-size:15px;font-weight:800;margin-top:4px}
+.mixres small{display:block;font-size:12.5px;font-weight:600;color:var(--text3);margin-top:3px}
+
+/* ---------- 矩陣 ---------- */
+.matrix{display:grid;gap:4px;margin-top:6px}
+.mh{font-size:12.5px;font-weight:800;color:var(--text2);text-align:center;padding:4px 0}
+.mc{aspect-ratio:1;border-radius:9px;border:1px solid rgba(255,255,255,.08);
+  background:rgba(255,255,255,.03);display:flex;align-items:center;justify-content:center;
+  font-size:13px;font-weight:800;color:var(--text3)}
+.mc.diag{background:rgba(255,255,255,.06);color:var(--text3)}
+.mc.none{color:var(--text3)}
+.mc.dot{padding:5px}
+.mc.dot i{width:100%;height:100%;border-radius:5px;display:block;border:1px solid rgba(255,255,255,.25)}
+.mc.gas{position:relative}
+.mc.gas::after{content:'↑';position:absolute;top:1px;right:3px;font-size:10px;color:var(--text2)}
+.mc.slight{opacity:.55}
+.mc.hlt{box-shadow:0 0 0 2px var(--no)}
+
+/* ---------- 指認 ---------- */
+.assign{display:flex;flex-direction:column;gap:9px;margin-top:4px}
+.arow{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.03);
+  border:1px solid rgba(255,255,255,.08);border-radius:13px;padding:10px 12px}
+.arow .lab{font-size:16px;font-weight:900;width:22px;flex:none}
+.arow .swatch{width:16px;height:16px;border-radius:5px;flex:none;border:1px solid rgba(255,255,255,.25)}
+.arow select{flex:1;background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.15);
+  border-radius:10px;color:var(--text);font-family:inherit;font-size:14.5px;padding:9px 8px;
+  -webkit-appearance:none;appearance:none}
+.arow select:focus{outline:none;border-color:var(--amber)}
+
+.msg{border-radius:14px;padding:13px 15px;margin-top:14px;font-size:14px;line-height:1.8}
+.msg.bad{background:rgba(224,112,96,.12);border:1px solid rgba(224,112,96,.35);color:#f2b6ac}
+.msg.warn{background:rgba(245,197,66,.1);border:1px solid rgba(245,197,66,.3);color:rgba(245,197,66,.85)}
+.msg.good{background:rgba(94,207,176,.1);border:1px solid rgba(94,207,176,.3);color:#a9e3d3}
+.msg b{display:block;margin-bottom:4px;font-size:14.5px}
+
+.eqbox{border:1px solid var(--line);border-radius:14px;overflow:hidden;margin-top:12px}
+.eqr{padding:11px 13px;border-bottom:1px solid rgba(255,255,255,.05)}
+.eqr:last-child{border-bottom:none}
+.eqr .pair{font-size:12.5px;color:var(--text3);font-weight:700;margin-bottom:3px}
+.eqr .net{font-size:14px;color:var(--text2);line-height:1.8}
+.eqr .net b{color:var(--text);font-weight:800}
+
+.result-head{text-align:center;padding:22px 10px 6px}
+.result-head .big{font-size:30px;font-weight:900;color:var(--amber);line-height:1.25}
+.result-head p{font-size:14px;color:var(--text2);margin-top:6px}
+.note{background:rgba(245,197,66,.07);border:1px solid rgba(245,197,66,.2);border-radius:15px;
+  padding:14px 16px;margin-top:16px}
+.note h3{font-size:15px;font-weight:800;color:var(--amber);margin-bottom:5px}
+.note p{font-size:13.5px;color:rgba(245,197,66,.82);line-height:1.85}
+.note p+p{margin-top:8px}
+.foot{text-align:center;color:var(--text3);font-size:11.5px;line-height:1.9;margin-top:26px}
+.clearbtn{display:block;width:100%;margin-top:18px;font-size:13px;color:var(--text3);
+  border:1px solid var(--line);border-radius:12px;padding:10px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <div class="hrow">
+      <button class="tbtn" id="backBtn">←</button>
+      <div class="htitle" id="htitle">猜猜<em>我是誰</em></div>
+      <div class="hstep" id="hstep"></div>
+    </div>
+  </div>
+</header>
+
+<main class="wrap" id="app"></main>
+
+<script>
+/* ===================== 藥品庫 ===================== */
+const LIB = {
+  AgNO3:{ nm:'AgNO₃', zh:'硝酸銀',   cat:'Ag', an:'NO3', sol:'transparent' },
+  CuNO3:{ nm:'Cu(NO₃)₂', zh:'硝酸銅', cat:'Cu', an:'NO3', sol:'rgba(62,134,214,.45)' },
+  FeCl3:{ nm:'FeCl₃', zh:'氯化鐵',   cat:'Fe', an:'Cl',  sol:'rgba(190,130,50,.45)' },
+  BaNO3:{ nm:'Ba(NO₃)₂', zh:'硝酸鋇', cat:'Ba', an:'NO3', sol:'transparent' },
+  PbNO3:{ nm:'Pb(NO₃)₂', zh:'硝酸鉛', cat:'Pb', an:'NO3', sol:'transparent' },
+  MgCl2:{ nm:'MgCl₂', zh:'氯化鎂',   cat:'Mg', an:'Cl',  sol:'transparent' },
+  Na2CO3:{ nm:'Na₂CO₃', zh:'碳酸鈉', cat:'Na', an:'CO3', sol:'transparent' },
+  NaOH:{ nm:'NaOH', zh:'氫氧化鈉',   cat:'Na', an:'OH',  sol:'transparent' },
+  Na2SO4:{ nm:'Na₂SO₄', zh:'硫酸鈉', cat:'Na', an:'SO4', sol:'transparent' },
+  NaCl:{ nm:'NaCl', zh:'氯化鈉',     cat:'Na', an:'Cl',  sol:'transparent' },
+  K2CrO4:{ nm:'K₂CrO₄', zh:'鉻酸鉀', cat:'K',  an:'CrO4', sol:'rgba(242,194,48,.45)' }
+};
+
+/* 沉澱表：陽離子_陰離子 */
+const PPT = {
+  Ag_Cl:{ t:'白色沉澱', c:'#EFEDE6', f:'AgCl' },
+  Ag_CO3:{ t:'白色沉澱', c:'#EFEDE6', f:'Ag₂CO₃' },
+  Ag_OH:{ t:'褐黑色沉澱', c:'#4A3A2A', f:'Ag₂O',
+           eq:'2Ag⁺ + 2OH⁻ → Ag₂O(s)↓ + H₂O',
+           note:'先生成的 AgOH 不安定，立刻脫水變成褐黑色的 Ag₂O，不是白色沉澱。' },
+  Ag_CrO4:{ t:'磚紅色沉澱', c:'#C0492B', f:'Ag₂CrO₄' },
+  Ag_SO4:{ t:'白色混濁', c:'#EFEDE6', f:'Ag₂SO₄', slight:true,
+           note:'Ag₂SO₄ 屬微溶，只會出現淡淡的白色混濁，判斷時容易誤認為有沉澱。' },
+  Ba_SO4:{ t:'白色沉澱', c:'#EFEDE6', f:'BaSO₄' },
+  Ba_CO3:{ t:'白色沉澱', c:'#EFEDE6', f:'BaCO₃' },
+  Ba_CrO4:{ t:'黃色沉澱', c:'#F2C230', f:'BaCrO₄' },
+  Pb_Cl:{ t:'白色沉澱', c:'#EFEDE6', f:'PbCl₂' },
+  Pb_SO4:{ t:'白色沉澱', c:'#EFEDE6', f:'PbSO₄' },
+  Pb_CO3:{ t:'白色沉澱', c:'#EFEDE6', f:'PbCO₃' },
+  Pb_CrO4:{ t:'黃色沉澱', c:'#F2C230', f:'PbCrO₄' },
+  Pb_OH:{ t:'白色沉澱', c:'#EFEDE6', f:'Pb(OH)₂' },
+  Cu_OH:{ t:'藍色沉澱', c:'#3E86D6', f:'Cu(OH)₂' },
+  Cu_CO3:{ t:'藍綠色沉澱', c:'#2E9B8F', f:'CuCO₃' },
+  Fe_OH:{ t:'紅棕色沉澱', c:'#A0491F', f:'Fe(OH)₃' },
+  Fe_CO3:{ t:'紅棕色沉澱＋氣泡', c:'#A0491F', f:'Fe(OH)₃', gas:true,
+           eq:'2Fe³⁺ + 3CO₃²⁻ + 3H₂O → 2Fe(OH)₃(s)↓ + 3CO₂↑',
+           note:'鐵離子會水解，生成的是 Fe(OH)₃ 並放出 CO₂，不是碳酸鐵。' },
+  Mg_OH:{ t:'白色沉澱', c:'#EFEDE6', f:'Mg(OH)₂' },
+  Mg_CO3:{ t:'白色沉澱', c:'#EFEDE6', f:'MgCO₃' }
+};
+
+const ION = { Ag:'Ag⁺', Cu:'Cu²⁺', Fe:'Fe³⁺', Ba:'Ba²⁺', Pb:'Pb²⁺', Mg:'Mg²⁺', Na:'Na⁺', K:'K⁺',
+  NO3:'NO₃⁻', Cl:'Cl⁻', CO3:'CO₃²⁻', OH:'OH⁻', SO4:'SO₄²⁻', CrO4:'CrO₄²⁻' };
+const CHG = { Ag:1, Cu:2, Fe:3, Ba:2, Pb:2, Mg:2, Na:1, K:1,
+  NO3:1, Cl:1, CO3:2, OH:1, SO4:2, CrO4:2 };
+
+function react(a,b){
+  const hits=[];
+  [[a.cat,b.an],[b.cat,a.an]].forEach(([c,n])=>{
+    const k=c+'_'+n;
+    if(PPT[k]) hits.push({...PPT[k], cat:c, an:n});
+  });
+  if(!hits.length) return { none:true, t:'沒有變化' };
+  // 若兩邊都沉澱，取比較明顯的（非微溶優先）
+  hits.sort((x,y)=> (x.slight?1:0)-(y.slight?1:0));
+  return hits[0];
+}
+function netIonic(r){
+  if(r.none) return null;
+  if(r.eq) return r.eq;
+  const c=r.cat, n=r.an, cc=CHG[c], nc=CHG[n];
+  const g=(x,y)=>{while(y){[x,y]=[y,x%y]}return x};
+  const L=cc*nc/g(cc,nc);
+  const a=L/cc, b=L/nc;
+  const co = a>1?a:'', no = b>1?b:'';
+  return `${co}${ION[c]} + ${no}${ION[n]} → ${r.f}(s)↓`;
+}
+
+/* ===================== 關卡 ===================== */
+const MODES = [
+{ id:'basic', tag:'入門', title:'四瓶練習', keys:['AgNO3','Na2CO3','NaOH','CuNO3'],
+  limit:0, blurb:'先用四瓶熟悉玩法，只有六種組合。',
+  chips:['4 瓶','6 種組合','不限次數'],
+  intro:['桌上有四瓶標示 A～D 的未知溶液，它們分別是下面四種藥品，但順序被打亂了。',
+    '把任意兩瓶混合，觀察有沒有沉澱、沉澱是什麼顏色。<span class="hl">溶液本身的顏色也是線索</span>。',
+    '把所有組合試過一遍，就能推理出每一瓶是誰。'] },
+{ id:'std', tag:'標準', title:'六瓶挑戰', keys:['AgNO3','FeCl3','Na2CO3','NaOH','Na2SO4','CuNO3'],
+  limit:0, blurb:'跟實驗課學習單同一組藥品，十五種組合。',
+  chips:['6 瓶','15 種組合','與學習單相同'],
+  intro:['這一組跟實驗課用的六瓶完全一樣，可以當作實驗前的預演或事後複習。',
+    '有一瓶幾乎不跟任何人反應，也有一瓶碰到某些藥品會冒氣泡。',
+    '提示：Ag₂SO₄ 屬於微溶，會出現淡淡的白色混濁，判斷時要小心。'] },
+{ id:'limit', tag:'進階', title:'限次推理', keys:['AgNO3','FeCl3','Na2CO3','NaOH','Na2SO4','CuNO3'],
+  limit:7, blurb:'同樣六瓶，但只能混合七次就得指認。',
+  chips:['6 瓶','只能混 7 次','考驗策略'],
+  intro:['藥品跟標準模式一樣，但試劑有限：<span class="hl">最多只能混合七次</span>。',
+    '十五種組合裡，有些帶來的資訊比別的多。先想清楚哪一組能一次分出最多瓶，再動手。',
+    '溶液顏色是免費的線索，不算在次數裡。'] },
+{ id:'random', tag:'隨機', title:'每次都不同', keys:null, n:5,
+  limit:0, blurb:'從十一種藥品裡隨機抽五瓶，每次玩都不一樣。',
+  chips:['5 瓶','隨機組合','可重複練習'],
+  intro:['這一次的五瓶是從藥品庫隨機抽出來的，每次進來都不同。',
+    '系統會確保這五瓶一定可以靠混合結果分辨出來，不會有兩瓶完全一樣的反應模式。',
+    '把它當成回家的練習題，多玩幾次就熟了。'] }
+];
+
+/* 隨機抽題：確保每一瓶的反應模式唯一 */
+function drawRandom(n){
+  const keys=Object.keys(LIB);
+  for(let tries=0;tries<300;tries++){
+    const pick=keys.slice().sort(()=>Math.random()-.5).slice(0,n);
+    const sig=pick.map(k=>{
+      const a=LIB[k];
+      const s=pick.filter(x=>x!==k).map(x=>{
+        const r=react(a,LIB[x]); return r.none?'-':r.t;
+      }).sort().join('|');
+      return s+'#'+a.sol;
+    });
+    if(new Set(sig).size===n && sig.some(s=>!s.startsWith('-'))) return pick;
+  }
+  return ['AgNO3','Na2CO3','NaOH','CuNO3','Na2SO4'].slice(0,n);
+}
+
+/* ===================== 狀態 ===================== */
+const LET='ABCDEF';
+const SAVE_KEY='chem_whoami_v1';
+function loadSave(){ try{ return JSON.parse(localStorage.getItem(SAVE_KEY))||{}; }catch(e){ return {}; } }
+function saveProgress(){ try{ localStorage.setItem(SAVE_KEY, JSON.stringify(st.done)); }catch(e){} }
+
+const st = { mode:null, screen:'menu', keys:[], order:[], obs:{}, sel:[], mixes:0, guess:{}, done:loadSave() };
+const app=document.getElementById('app'), htitle=document.getElementById('htitle'), hstep=document.getElementById('hstep');
+
+document.getElementById('backBtn').onclick=()=>{
+  // 一次只退一步，觀察紀錄不會消失
+  switch(st.screen){
+    case 'guess':  renderPlay(); break;          // 指認 → 回實驗畫面
+    case 'play':   renderIntro(); break;         // 實驗 → 回關卡說明
+    case 'result': renderMenu(); break;
+    case 'intro':  renderMenu(); break;
+    default:
+      if(history.length>1) history.back(); else location.href='index.html';
+  }
+};
+function bottleOf(i){ return LIB[st.order[i]]; }
+function obsKey(i,j){ return Math.min(i,j)+'_'+Math.max(i,j); }
+
+/* ===================== 選單 ===================== */
+function renderMenu(){
+  st.mode=null; st.screen='menu'; htitle.innerHTML='猜猜<em>我是誰</em>'; hstep.textContent=''; window.scrollTo(0,0);
+  let h=`<div class="card">
+    <h2>用沉澱反應找出未知溶液</h2>
+    <p>桌上幾瓶溶液只標了字母，不知道誰是誰。把兩瓶混在一起，看有沒有沉澱、沉澱什麼顏色，就能一步步縮小範圍。</p>
+    <p>這是整個單元的總結：<span class="hl">溶解度規則、沉澱顏色、離子的分離</span>全部用得上。</p>
+  </div>`;
+  MODES.forEach(m=>{
+    h+=`<button class="pickcard" data-m="${m.id}">
+      <span class="tag">${m.tag}${st.done[m.id]?' ✅':''}</span>
+      <h3>${m.title}</h3><p>${m.blurb}</p>
+      <div class="chiprow">${m.chips.map(c=>`<span>${c}</span>`).join('')}</div>
+    </button>`;
+  });
+  if(Object.keys(st.done).length) h+=`<button class="clearbtn" id="clearBtn">清除完成紀錄</button>`;
+  h+=`<div class="foot">建議依序進行，隨機模式可重複練習</div>`;
+  app.innerHTML=h;
+  app.querySelectorAll('.pickcard').forEach(b=> b.onclick=()=> startMode(MODES.find(m=>m.id===b.dataset.m)));
+  const cb=document.getElementById('clearBtn');
+  if(cb) cb.onclick=()=>{ if(confirm('確定清除完成紀錄嗎？')){ st.done={}; saveProgress(); renderMenu(); } };
+}
+
+/* ===================== 開始 ===================== */
+function startMode(m){
+  st.mode=m;
+  st.keys = m.keys ? m.keys.slice() : drawRandom(m.n);
+  st.order = st.keys.slice().sort(()=>Math.random()-.5);
+  st.obs={}; st.sel=[]; st.mixes=0; st.guess={};
+  htitle.innerHTML = m.tag+'｜'+m.title;
+  renderIntro();
+}
+function renderIntro(){
+  const m=st.mode; st.screen='intro'; window.scrollTo(0,0); hstep.textContent='';
+  const list = st.keys.slice().sort().map(k=>`${LIB[k].nm}（${LIB[k].zh}）`).join('、');
+  app.innerHTML=`<div class="card"><h2>${m.title}</h2>
+      ${m.intro.map(p=>`<p>${p}</p>`).join('')}
+      <p style="margin-top:12px"><span class="hl">這次的藥品是：</span><br>${list}</p>
+      <p style="color:var(--text3);font-size:13px">（順序已打亂，不等於 A～${LET[st.keys.length-1]} 的順序）</p>
+    </div>
+    <button class="btn" id="go">開始實驗</button>`;
+  document.getElementById('go').onclick=()=> renderPlay();
+}
+
+/* ===================== 主畫面 ===================== */
+function vialHTML(i, sel){
+  const b=bottleOf(i);
+  const named = st.guess[i];
+  return `<button class="vial ${sel?'sel':''}" data-i="${i}">
+    <div class="vbody"><i style="background:${b.sol}"></i></div>
+    <div class="vlab">${LET[i]}</div></button>`;
+}
+function matrixHTML(highlight){
+  const n=st.keys.length;
+  let h=`<div class="matrix" style="grid-template-columns:repeat(${n+1},1fr)">
+    <div class="mh"></div>${Array.from({length:n},(_,j)=>`<div class="mh">${LET[j]}</div>`).join('')}`;
+  for(let i=0;i<n;i++){
+    h+=`<div class="mh">${LET[i]}</div>`;
+    for(let j=0;j<n;j++){
+      if(i===j){ h+=`<div class="mc diag">—</div>`; continue; }
+      const r=st.obs[obsKey(i,j)];
+      const hl = highlight && highlight.includes(obsKey(i,j)) ? ' hlt':'';
+      if(!r){ h+=`<div class="mc${hl}"></div>`; }
+      else if(r.none){ h+=`<div class="mc none${hl}">✕</div>`; }
+      else { h+=`<div class="mc dot${r.gas?' gas':''}${r.slight?' slight':''}${hl}"><i style="background:${r.c}"></i></div>`; }
+    }
+  }
+  return h+`</div>`;
+}
+function renderPlay(msg){
+  const m=st.mode, n=st.keys.length;
+  st.screen='play';
+  const total=n*(n-1)/2;
+  window.scrollTo(0,0);
+  hstep.innerHTML = m.limit
+    ? `<span class="${st.mixes>=m.limit?'warn':''}">已混合 <b>${st.mixes}</b> / ${m.limit} 次</span>`
+    : `已記錄 <b>${Object.keys(st.obs).length}</b> / ${total} 組`;
+  const canMix = !m.limit || st.mixes<m.limit;
+  const cand = st.keys.slice().sort();
+  app.innerHTML=`
+    <div class="shelf">${st.order.map((_,i)=>vialHTML(i, st.sel.includes(i))).join('')}</div>
+    <div class="candbox">
+      <h4>這 ${cand.length} 瓶分別是下面這些，順序已打亂</h4>
+      <div class="cands">${cand.map(k=>`<span class="cand">
+        <b>${LIB[k].nm}</b><small>${LIB[k].zh}</small></span>`).join('')}</div>
+    </div>
+    <div class="mixzone" id="mixzone">
+      <div class="hint">${canMix?'點兩瓶把它們混在一起':'混合次數已用完，直接去指認吧'}</div>
+    </div>
+    <div id="msg">${msg||''}</div>
+    <div class="card"><h2 style="font-size:15px">觀察紀錄</h2>${matrixHTML()}
+      <p style="font-size:12px;color:var(--text3);margin-top:10px">✕ 沒有變化　色塊 = 沉澱顏色　↑ 有氣泡　半透明 = 微溶混濁</p>
+    </div>
+    <button class="btn" id="toGuess">我要指認</button>
+    <button class="btn ghost" id="restart">重新開始（清空紀錄）</button>`;
+  app.querySelectorAll('.vial').forEach(b=> b.onclick=()=> tapVial(+b.dataset.i, canMix));
+  document.getElementById('toGuess').onclick=renderGuess;
+  document.getElementById('restart').onclick=()=>{ if(confirm('重新開始會清空目前的觀察紀錄，確定嗎？')) startMode(m); };
+}
+
+function tapVial(i, canMix){
+  if(!canMix) return;
+  const k=st.sel.indexOf(i);
+  if(k>=0) st.sel.splice(k,1);
+  else st.sel.push(i);
+  if(st.sel.length===2){
+    const [a,b]=st.sel;
+    st.sel=[];
+    doMix(a,b);
+  } else renderPlay();
+}
+
+function doMix(i,j){
+  const key=obsKey(i,j);
+  const already = st.obs[key];
+  const r = already || react(bottleOf(i), bottleOf(j));
+  if(!already){ st.obs[key]=r; if(st.mode.limit) st.mixes++; }
+  renderPlay();
+  const zone=document.getElementById('mixzone');
+  zone.innerHTML=`<div class="hint">${LET[i]} ＋ ${LET[j]}</div>
+    <div class="tube" id="tube"><div class="liq"></div>
+      <div class="ppt" style="background:${r.none?'transparent':r.c}"></div>
+      <div class="cloud"></div></div>
+    <div class="mixres" id="mixres">…</div>`;
+  const tube=document.getElementById('tube');
+  setTimeout(()=>{
+    if(!r.none){
+      if(r.slight){ tube.querySelector('.cloud').classList.add('on'); }
+      else{
+        for(let k=0;k<9;k++){
+          const g=document.createElement('div'); g.className='grain';
+          g.style.background=r.c; g.style.left=(6+Math.random()*40)+'px';
+          g.style.bottom=(30+Math.random()*8)+'px'; g.style.animationDelay=(k*0.05)+'s';
+          tube.appendChild(g);
+        }
+        setTimeout(()=> tube.querySelector('.ppt').classList.add('on'), 250);
+      }
+      if(r.gas){
+        for(let k=0;k<7;k++){
+          const b=document.createElement('div'); b.className='bub';
+          b.style.left=(8+Math.random()*38)+'px'; b.style.animationDelay=(k*0.13)+'s';
+          tube.appendChild(b);
+        }
+      }
+    }
+    document.getElementById('mixres').innerHTML = r.none
+      ? '<span style="color:var(--text3)">沒有變化</span>'
+      : `<span style="color:${r.c==='#4A3A2A'?'#bda88c':r.c}">${r.t}</span>
+         ${already?'<small>（這一組先前已經記錄過）</small>':''}`;
+  }, 220);
+}
+
+/* ===================== 指認 ===================== */
+function renderGuess(){
+  const n=st.keys.length; st.screen='guess'; window.scrollTo(0,0);
+  const opts=st.keys.slice().sort();
+  app.innerHTML=`<div class="card"><h2>指認每一瓶</h2>
+      <p>根據你的觀察紀錄，判斷每一瓶分別是什麼。每種藥品只會出現一次。</p>
+      <p style="color:var(--text3);font-size:13px">還沒把握也沒關係，可以隨時回去補做幾組，<span class="hl">已經記錄的結果都會保留</span>。</p></div>
+    <div class="card"><div class="assign">
+      ${Array.from({length:n},(_,i)=>`<div class="arow">
+        <span class="lab">${LET[i]}</span>
+        <span class="swatch" style="background:${bottleOf(i).sol||'transparent'}"></span>
+        <select data-i="${i}">
+          <option value="">請選擇…</option>
+          ${opts.map(k=>`<option value="${k}" ${st.guess[i]===k?'selected':''}>${LIB[k].nm}　${LIB[k].zh}</option>`).join('')}
+        </select></div>`).join('')}
+    </div></div>
+    <div class="card"><h2 style="font-size:15px">你的觀察紀錄</h2>${matrixHTML()}</div>
+    <div id="gmsg"></div>
+    <button class="btn" id="submit">送出</button>
+    <button class="btn ghost" id="back">← 回去再測幾組（紀錄保留）</button>`;
+  app.querySelectorAll('select').forEach(s=> s.onchange=()=>{ st.guess[+s.dataset.i]=s.value; });
+  document.getElementById('submit').onclick=checkGuess;
+  document.getElementById('back').onclick=()=> renderPlay();
+}
+
+function checkGuess(){
+  const n=st.keys.length, box=document.getElementById('gmsg');
+  const g=[]; for(let i=0;i<n;i++) g.push(st.guess[i]||'');
+  if(g.some(x=>!x)){
+    box.innerHTML=`<div class="msg bad"><b>還有沒填的</b>每一瓶都要指認。</div>`;
+    box.scrollIntoView({behavior:'smooth',block:'nearest'}); return;
+  }
+  if(new Set(g).size!==n){
+    box.innerHTML=`<div class="msg bad"><b>有重複</b>每種藥品只會出現一次，請檢查是不是有兩瓶選到同一個。</div>`;
+    box.scrollIntoView({behavior:'smooth',block:'nearest'}); return;
+  }
+  // 找出跟自己紀錄互相矛盾的地方
+  const clash=[];
+  Object.keys(st.obs).forEach(k=>{
+    const [i,j]=k.split('_').map(Number);
+    const real=st.obs[k];
+    const pred=react(LIB[g[i]], LIB[g[j]]);
+    const same = (!!real.none===!!pred.none) && (real.none || real.t===pred.t);
+    if(!same) clash.push({k,i,j,real,pred});
+  });
+  if(clash.length){
+    const c=clash[0];
+    box.innerHTML=`<div class="msg bad"><b>跟你自己的紀錄對不起來</b>
+      你說 ${LET[c.i]} 是 ${LIB[g[c.i]].nm}、${LET[c.j]} 是 ${LIB[g[c.j]].nm}，
+      那麼兩者混合應該是「${c.pred.none?'沒有變化':c.pred.t}」，
+      但你記錄到的是「${c.real.none?'沒有變化':c.real.t}」。
+      ${clash.length>1?`（另外還有 ${clash.length-1} 處對不起來）`:''}</div>`;
+    renderGuessWithHighlight(clash.map(x=>x.k));
+    return;
+  }
+  // 沒有矛盾，但答案不一定唯一
+  const correct = g.every((k,i)=> k===st.order[i]);
+  if(!correct){
+    box.innerHTML=`<div class="msg warn"><b>目前的紀錄還不足以判斷</b>
+      你的答案跟已經做過的組合都沒有衝突，但實際上不對。
+      代表<span style="font-weight:800">還有關鍵的組合沒有測</span>——回去把空白的格子補幾個，就能分辨出來。</div>`;
+    box.scrollIntoView({behavior:'smooth',block:'nearest'});
+    return;
+  }
+  renderResult();
+}
+function renderGuessWithHighlight(keys){
+  const cards=app.querySelectorAll('.card');
+  const target=cards[cards.length-1];
+  if(target && target.querySelector('.matrix')){
+    target.innerHTML=`<h2 style="font-size:15px">你的觀察紀錄</h2>${matrixHTML(keys)}`;
+  }
+  document.getElementById('gmsg').scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+/* ===================== 結果 ===================== */
+function renderResult(){
+  const m=st.mode, n=st.keys.length;
+  st.screen='result';
+  st.done[m.id]=true; saveProgress(); window.scrollTo(0,0); hstep.textContent='';
+  const used=Object.keys(st.obs).length, total=n*(n-1)/2;
+
+  const eqs=[];
+  for(let i=0;i<n;i++) for(let j=i+1;j<n;j++){
+    const r=react(bottleOf(i),bottleOf(j));
+    if(!r.none) eqs.push({i,j,r});
+  }
+  let h=`<div class="result-head"><div class="big">全部指認正確</div>
+      <p>你用了 ${used} 組觀察${m.limit?`（上限 ${m.limit} 次）`:`，全部共 ${total} 組`}就推理出答案。</p></div>
+    <div class="card"><h2>答案</h2>
+      <div class="assign">${Array.from({length:n},(_,i)=>`<div class="arow">
+        <span class="lab">${LET[i]}</span>
+        <span class="swatch" style="background:${bottleOf(i).sol||'transparent'}"></span>
+        <span style="font-weight:800">${bottleOf(i).nm}</span>
+        <span style="color:var(--text3);font-size:13px;margin-left:auto">${bottleOf(i).zh}</span>
+      </div>`).join('')}</div>
+    </div>
+    <div class="card"><h2>完整反應矩陣</h2>${(()=>{
+      const save=JSON.parse(JSON.stringify(st.obs));
+      for(let i=0;i<n;i++) for(let j=i+1;j<n;j++) st.obs[obsKey(i,j)]=react(bottleOf(i),bottleOf(j));
+      const html=matrixHTML(); st.obs=save; return html;
+    })()}
+    </div>
+    <div class="card"><h2>淨離子反應式</h2>
+      <div class="eqbox">${eqs.map(e=>`<div class="eqr">
+        <div class="pair">${LET[e.i]} ＋ ${LET[e.j]}　${bottleOf(e.i).nm} ＋ ${bottleOf(e.j).nm}　→　${e.r.t}</div>
+        <div class="net"><b>${netIonic(e.r)}</b></div>
+        ${e.r.note?`<div class="pair" style="margin-top:4px">${e.r.note}</div>`:''}
+      </div>`).join('')}</div>
+    </div>`;
+
+  if(m.id==='std' || m.id==='limit'){
+    h+=`<div class="note"><h3>推理的切入點</h3>
+      <p>先看<b>溶液顏色</b>：藍色的是 Cu(NO₃)₂、黃棕色的是 FeCl₃，這兩瓶不用混就能認出來。</p>
+      <p>再找<b>幾乎不反應的那一瓶</b>：Na₂SO₄ 只會跟 AgNO₃ 產生微溶的白色混濁，其餘全部沒反應，很好認。</p>
+      <p>剩下三瓶反應次數都是三次，要靠<b>顏色</b>分辨：AgNO₃ 碰鹼是褐黑色、Na₂CO₃ 碰鐵會冒氣泡、NaOH 碰銅是純藍不是藍綠。</p></div>`;
+  } else {
+    h+=`<div class="note"><h3>推理的通則</h3>
+      <p>先用<b>溶液本身的顏色</b>免費排除幾瓶，再數<b>每一瓶反應了幾次</b>，反應次數特別多或特別少的最好認。</p>
+      <p>最後才用<b>沉澱顏色</b>去分辨反應次數相同的那幾瓶。</p></div>`;
+  }
+
+  h+=`<div class="btn-row">
+      <button class="btn ghost" id="again">再玩一次</button>
+      <button class="btn" id="menu">回模式選單</button>
+    </div>
+    <div class="foot">實際實驗中沉澱顏色會受濃度與光線影響</div>`;
+  app.innerHTML=h;
+  document.getElementById('again').onclick=()=> startMode(m);
+  document.getElementById('menu').onclick=renderMenu;
+}
+
+renderMenu();
+</script>
+</body>
+</html>

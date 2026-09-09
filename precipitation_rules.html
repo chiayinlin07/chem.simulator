@@ -71,6 +71,8 @@ header.top{position:sticky;top:0;z-index:30;background:rgba(238,243,245,.94);
   color:rgba(255,255,255,.86);box-shadow:0 3px 0 rgba(10,60,75,.4)}
 .teaser.open b{color:#FFD98A}
 .teaser.open:active{transform:translateY(2px);box-shadow:0 1px 0 rgba(10,60,75,.4)}
+.clearbtn{display:block;width:100%;margin-top:18px;font-size:13px;color:var(--muted);
+  border:1px solid var(--line);border-radius:12px;padding:10px;background:var(--surface)}
 
 .pbar{height:7px;background:#DCE6EA;border-radius:99px;overflow:hidden;margin:2px 0 16px}
 .pbar i{display:block;height:100%;background:var(--accent);border-radius:99px;transition:width .35s ease}
@@ -590,7 +592,20 @@ const byTone = p=> p.tone==='insol' ? 'insol' : 'sol';
 /* ===================== 狀態 ===================== */
 /* 只有網址帶 ?teacher（或 #teacher）才會出現教師版切換鈕 */
 const TEACHER_URL = /teacher/i.test(location.search) || /teacher/i.test(location.hash);
-const state = { screen:'home', lv:null, unlocked:1, done:{}, teacher:TEACHER_URL };
+const SAVE_KEY='chem_rules_v1';
+function loadSave(){ try{ return JSON.parse(localStorage.getItem(SAVE_KEY))||{}; }catch(e){ return {}; } }
+function saveProgress(){
+  try{ localStorage.setItem(SAVE_KEY, JSON.stringify({done:state.done, unlocked:state.unlocked})); }catch(e){}
+}
+function clearProgress(){
+  try{ localStorage.removeItem(SAVE_KEY); }catch(e){}
+  state.done={}; state.unlocked=1; renderHome();
+}
+const saved = loadSave();
+const state = { screen:'home', lv:null,
+  unlocked: saved.unlocked || 1,
+  done: saved.done || {},
+  teacher:TEACHER_URL };
 const app = document.getElementById('app');
 const backBtn = document.getElementById('back');
 const topTitle = document.getElementById('topTitle');
@@ -646,7 +661,12 @@ function renderHome(){
          先猜顏色再揭曉，把 23 種常見沉澱一支一支收集起來。
        </button>`
     : `<div class="teaser"><b>🔒 沉澱顏色圖鑑</b>通過綜合大魔王之後解鎖。</div>`;
+  if(Object.keys(state.done).length){
+    h += `<button class="clearbtn" id="clearBtn">清除進度，從頭開始</button>`;
+  }
   app.innerHTML = h;
+  const cb = document.getElementById('clearBtn');
+  if(cb) cb.onclick = ()=>{ if(confirm('確定要清除這台裝置上的闖關進度嗎？')) clearProgress(); };
   const gc = document.getElementById('goColors');
   if(gc) gc.onclick = ()=> location.href = 'precipitate_colors.html';
   app.querySelectorAll('.level-card[data-i]').forEach(b=> b.onclick = ()=> openLevel(+b.dataset.i));
@@ -692,6 +712,7 @@ function openLevel(i){
     document.getElementById('passBtn').onclick = ()=>{
       state.done[lv.id]=3;
       if(i+2>state.unlocked) state.unlocked=i+2;
+      saveProgress();
       renderHome();
     };
   }
@@ -955,6 +976,7 @@ function showResult(lv,right,total,wrongList){
     state.done[lv.id]=stars;
     const i=LEVELS.findIndex(l=>l.id===lv.id);
     if(i+2>state.unlocked) state.unlocked=i+2;
+    saveProgress();
   }
   let msg;
   if(rate===1) msg='全部答對，這一關的規則你已經抓到了。';

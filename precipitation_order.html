@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>誰先沉澱？</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#12100e; --card:#1e1b16; --card2:#252119;
+  --line:rgba(255,210,120,.10); --line2:rgba(255,210,120,.24);
+  --text:#f2ead8; --text2:#9a9080; --text3:#6a6058;
+  --amber:#f5c542; --amber2:#e8a020; --amber3:#ffd880;
+  --ok:#5ecfb0; --no:#e07060;
+  --font:"Noto Sans TC","PingFang TC","Microsoft JhengHei",-apple-system,BlinkMacSystemFont,sans-serif;
+}
+html,body{min-height:100dvh;background:var(--bg);color:var(--text);font-family:var(--font);-webkit-text-size-adjust:100%}
+body{padding-bottom:calc(40px + env(safe-area-inset-bottom));overflow-x:hidden;font-size:16px;line-height:1.7}
+sub,sup{font-size:.68em;line-height:0}
+button{font-family:inherit;font-size:inherit;color:inherit;border:none;background:none;cursor:pointer}
+.wrap{max-width:600px;margin:0 auto;padding:0 14px}
+
+header{position:sticky;top:0;z-index:20;background:rgba(18,16,14,.95);
+  backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.hrow{display:flex;align-items:center;gap:10px;padding:12px 0}
+.htitle{font-size:17px;font-weight:800;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.htitle em{font-style:normal;background:linear-gradient(120deg,var(--amber3),var(--amber2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.tbtn{font-size:16px;color:var(--text2);border:1px solid var(--line);border-radius:99px;padding:3px 11px;flex:none}
+.step-dots{display:flex;gap:5px;flex:none}
+.step-dots i{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.16);display:block}
+.step-dots i.on{background:var(--amber)}
+
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:17px;margin-top:16px}
+.card h2{font-size:17px;font-weight:800;margin-bottom:8px}
+.card p{font-size:14px;color:var(--text2);line-height:1.85}
+.card p+p{margin-top:9px}
+.hl{color:var(--amber);font-weight:700}
+
+.btn{display:block;width:100%;background:var(--amber);color:#12100e;border-radius:15px;
+  padding:15px;font-size:16.5px;font-weight:800;text-align:center;margin-top:14px}
+.btn:active{transform:translateY(2px)}
+.btn[disabled]{opacity:.35}
+.btn.ghost{background:transparent;color:var(--text2);border:1px solid var(--line);font-weight:700}
+.btn-row{display:flex;gap:10px}
+.btn-row .btn{margin-top:14px}
+
+/* ---------- 情境選單 ---------- */
+.pickcard{display:block;width:100%;text-align:left;background:var(--card);
+  border:1px solid var(--line);border-radius:18px;padding:17px;margin-top:14px;
+  transition:transform .14s,border-color .2s;position:relative;overflow:hidden}
+.pickcard:active{transform:scale(.982);border-color:var(--line2)}
+.pickcard .tag{font-size:11px;font-weight:800;letter-spacing:1px;color:var(--text3);
+  text-transform:uppercase;margin-bottom:5px;display:block}
+.pickcard h3{font-size:18px;font-weight:800;margin-bottom:4px}
+.pickcard .rg{font-size:13px;color:var(--amber);font-weight:700;margin-bottom:9px}
+.pickcard p{font-size:13.5px;color:var(--text2);line-height:1.8}
+.dots4{display:flex;gap:7px;margin-top:12px;flex-wrap:wrap}
+.dots4 span{display:flex;align-items:center;gap:5px;font-size:11.5px;color:var(--text3);
+  font-weight:700;background:rgba(255,255,255,.04);border-radius:8px;padding:4px 8px}
+.dots4 i{width:11px;height:11px;border-radius:3px;display:block;border:1px solid rgba(255,255,255,.22)}
+
+/* ---------- 燒杯 ---------- */
+.scene{display:flex;justify-content:center;padding:26px 0 6px;position:relative}
+.beaker-wrap{position:relative;width:160px}
+.rglabel{position:absolute;top:-52px;left:50%;transform:translateX(-50%);
+  font-size:12px;font-weight:800;color:var(--text2);white-space:nowrap;
+  background:rgba(255,255,255,.06);border-radius:8px;padding:3px 9px}
+.dropper{position:absolute;top:-30px;left:50%;transform:translateX(-50%);
+  width:26px;height:34px;border-radius:5px 5px 3px 3px;
+  background:linear-gradient(180deg,rgba(255,255,255,.16),rgba(255,255,255,.06));
+  border:1px solid rgba(255,255,255,.22)}
+.dropper::after{content:'';position:absolute;bottom:-9px;left:50%;transform:translateX(-50%);
+  width:6px;height:10px;background:rgba(255,255,255,.2);border-radius:0 0 3px 3px}
+.drop{position:absolute;top:14px;left:50%;width:7px;height:10px;border-radius:50% 50% 60% 60%;
+  background:rgba(190,225,255,.85);margin-left:-3.5px;opacity:0}
+.drop.go{animation:dropfall .55s ease-in forwards}
+@keyframes dropfall{
+  0%{opacity:0;transform:translateY(0) scaleY(.8)}
+  15%{opacity:1}
+  100%{opacity:0;transform:translateY(74px) scaleY(1.3)}
+}
+.beaker{width:160px;height:200px;border:3px solid rgba(255,255,255,.2);border-top:none;
+  border-radius:5px 5px 18px 18px;position:relative;overflow:hidden;
+  background:linear-gradient(160deg,rgba(255,255,255,.045),rgba(255,255,255,.012))}
+.beaker::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:rgba(255,255,255,.24)}
+.water{position:absolute;left:0;right:0;bottom:0;height:80%;background:rgba(140,195,255,.075)}
+.ionfloat{position:absolute;inset:0;pointer-events:none}
+.ionfloat span{position:absolute;font-size:12px;font-weight:700;color:rgba(255,255,255,.34);
+  animation:bob 4s ease-in-out infinite}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+.layers{position:absolute;left:0;right:0;bottom:0;display:flex;flex-direction:column-reverse}
+.layer{height:0;transition:height .85s cubic-bezier(.3,1.2,.5,1);position:relative}
+.layer.on{height:20px;border-top:1px solid rgba(0,0,0,.3)}
+.grain{position:absolute;width:4px;height:4px;border-radius:50%;opacity:0;animation:sink .8s ease-in forwards}
+@keyframes sink{0%{opacity:0;transform:translateY(-70px)}20%{opacity:.9}100%{opacity:.2;transform:translateY(0)}}
+
+/* ---------- 濃度軸 ---------- */
+.axis{margin:22px 4px 6px;position:relative}
+.axis .cap{display:flex;justify-content:space-between;font-size:11.5px;color:var(--text3)}
+.axis .cap.top{margin-bottom:7px}
+.track{height:9px;background:rgba(255,255,255,.07);border-radius:99px;position:relative}
+.fill{position:absolute;left:0;top:0;bottom:0;border-radius:99px;width:0;
+  background:linear-gradient(90deg,var(--amber2),var(--amber3));transition:width .9s ease}
+.tick{position:absolute;top:-4px;width:17px;height:17px;border-radius:50%;
+  border:2px solid rgba(255,255,255,.2);background:var(--bg);transform:translateX(-50%);transition:.4s}
+.tick.on{border-color:var(--amber);box-shadow:0 0 0 4px rgba(245,197,66,.16)}
+.tick .lab{position:absolute;top:20px;left:50%;transform:translateX(-50%);
+  font-size:10.5px;white-space:nowrap;color:var(--text3);font-weight:700;opacity:0;transition:.4s}
+.tick.on .lab{opacity:1;color:var(--text2)}
+.axis-space{height:24px}
+
+/* ---------- 預測 ---------- */
+.slots{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px}
+.slot{border:2px dashed rgba(255,255,255,.14);border-radius:13px;min-height:74px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:6px 3px}
+.slot .no{font-size:10.5px;color:var(--text3);font-weight:700}
+.slot.filled{border-style:solid;border-color:var(--line2);background:rgba(255,255,255,.04)}
+.slot .f{font-size:12.5px;font-weight:800;text-align:center;line-height:1.3}
+.picks{display:flex;flex-wrap:wrap;gap:9px;justify-content:center}
+.pick{border:2px solid rgba(255,255,255,.13);border-radius:13px;padding:10px 13px;
+  background:rgba(255,255,255,.04);display:flex;flex-direction:column;align-items:center;gap:2px;
+  min-width:136px;flex:1}
+.pick .pf{font-size:16px;font-weight:800}
+.pick .pk{font-size:11.5px;color:var(--text2);font-weight:600}
+.pick .pt{font-size:10.5px;color:var(--text3);font-weight:700}
+.pick:active{border-color:var(--amber)}
+.pick.used{opacity:.25;pointer-events:none}
+
+/* ---------- 計算 ---------- */
+.stagebox{background:rgba(255,255,255,.04);border-radius:14px;padding:14px 15px;margin-top:14px}
+.stagebox .top{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.swatch{width:30px;height:30px;border-radius:9px;flex:none;border:1px solid rgba(255,255,255,.2)}
+.stagebox .name{font-size:18px;font-weight:900}
+.stagebox .order{font-size:11.5px;color:var(--text3);font-weight:700;margin-left:auto}
+.stagebox p{font-size:14px;color:var(--text2);line-height:1.85}
+.calc{background:rgba(0,0,0,.25);border-left:3px solid var(--amber2);
+  border-radius:0 12px 12px 0;padding:12px 14px;margin-top:11px}
+.calc-h{font-size:11.5px;font-weight:700;color:var(--text3);letter-spacing:.5px;margin-bottom:7px}
+.calc .cl{font-size:14px;color:var(--text2);line-height:2.1;letter-spacing:.2px}
+.calc .cl.last{color:var(--amber);font-weight:800;border-top:1px solid rgba(255,255,255,.08);
+  margin-top:4px;padding-top:6px}
+
+/* ---------- 對照表 ---------- */
+.ktable{border:1px solid var(--line);border-radius:13px;overflow:hidden}
+.kr{display:grid;grid-template-columns:1.6fr .9fr 1.3fr 1.3fr;gap:4px;padding:10px;
+  font-size:12.5px;align-items:center;border-bottom:1px solid rgba(255,255,255,.05)}
+.kr:last-child{border-bottom:none}
+.kr.kh{background:rgba(255,255,255,.05);color:var(--text3);font-weight:800;font-size:11px}
+.kr span:first-child{font-weight:800;font-size:13px;display:flex;align-items:center;gap:6px}
+.kdot{width:11px;height:11px;border-radius:3px;flex:none;border:1px solid rgba(255,255,255,.2);display:block}
+.kneed{color:var(--amber);font-weight:800}
+
+.compare{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:10px}
+.cc{border-radius:12px;padding:9px 4px;text-align:center;border:2px solid}
+.cc.hit{border-color:var(--ok);background:rgba(94,207,176,.1)}
+.cc.miss{border-color:var(--no);background:rgba(224,112,96,.1)}
+.cc .f{font-size:12px;font-weight:800;line-height:1.3}
+.cc .n{font-size:10px;color:var(--text3);font-weight:700;margin-bottom:2px}
+.scoreline{text-align:center;font-size:15px;font-weight:800;margin:16px 0 4px}
+.scoreline.ok{color:var(--ok)} .scoreline.no{color:var(--no)}
+
+.note{background:rgba(245,197,66,.07);border:1px solid rgba(245,197,66,.2);border-radius:15px;
+  padding:14px 16px;margin-top:16px}
+.note h3{font-size:15px;font-weight:800;color:var(--amber);margin-bottom:5px}
+.note p{font-size:13.5px;color:rgba(245,197,66,.82);line-height:1.85}
+.note p+p{margin-top:9px}
+/* ---------- 小算盤 ---------- */
+.calcbox{border-color:var(--line2)}
+.cfills{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:14px}
+.cfill{font-size:12.5px;font-weight:700;color:var(--text2);background:rgba(255,255,255,.05);
+  border:1px solid rgba(255,255,255,.1);border-radius:9px;padding:5px 10px}
+.cfill:active{border-color:var(--amber);color:var(--amber)}
+.crow{display:flex;align-items:center;gap:7px;margin-bottom:10px}
+.clab{font-size:13px;font-weight:800;color:var(--text2);width:58px;flex:none}
+.cnum,.cexp{background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.14);border-radius:10px;
+  color:var(--text);font-family:inherit;font-size:16px;font-weight:700;padding:9px 8px;
+  text-align:center;min-width:0;-webkit-appearance:none}
+.cnum{width:62px;flex:none} .cexp{width:56px;flex:none}
+.cnum:focus,.cexp:focus{outline:none;border-color:var(--amber)}
+.cx{font-size:13px;color:var(--text3);font-weight:700;flex:none}
+.csign{width:32px;height:36px;border-radius:9px;background:rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.14);font-size:17px;font-weight:900;color:var(--text2);flex:none}
+.csign:active{border-color:var(--amber)}
+.croots{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin:14px 0 4px}
+.croot{border:2px solid rgba(255,255,255,.1);border-radius:11px;padding:9px 4px;
+  font-size:13px;font-weight:800;color:var(--text2);display:flex;flex-direction:column;gap:2px}
+.croot small{font-size:9.5px;font-weight:600;color:var(--text3);letter-spacing:-.2px}
+.croot.on{border-color:var(--amber);background:rgba(245,197,66,.12);color:var(--amber)}
+.croot.on small{color:rgba(245,197,66,.7)}
+.cstep{font-size:13px;color:var(--text3);font-weight:700;margin-top:10px}
+.cout{background:rgba(245,197,66,.12);border:1px solid rgba(245,197,66,.3);border-radius:12px;
+  padding:12px 14px;margin-top:8px;font-size:19px;font-weight:900;color:var(--amber);text-align:center}
+.cout.empty{background:rgba(255,255,255,.03);border-color:rgba(255,255,255,.08);
+  color:var(--text3);font-size:13.5px;font-weight:600;margin-top:12px}
+
+.foot{text-align:center;color:var(--text3);font-size:11.5px;line-height:1.9;margin-top:26px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <div class="hrow">
+      <button class="tbtn" id="backBtn">←</button>
+      <div class="htitle" id="htitle">誰<em>先沉澱</em>？</div>
+      <div class="step-dots" id="dots"></div>
+    </div>
+  </div>
+</header>
+
+<main class="wrap" id="app"></main>
+
+<script>
+/* ===================== 兩個情境 ===================== */
+const SCENARIOS = [
+{
+  id:'ag', tag:'情境一', title:'一個陽離子，四種陰離子',
+  reagent:'AgNO<sub>3</sub>', reagentShort:'滴入 AgNO₃',
+  target:'Ag<sup>+</sup>',
+  blurb:'燒杯裡有四種陰離子，逐滴加入硝酸銀。誰會先被銀離子抓走？',
+  ionsInBeaker:[
+    {t:'S<sup>2−</sup>', x:16, y:34}, {t:'I<sup>−</sup>', x:58, y:28},
+    {t:'Cl<sup>−</sup>', x:26, y:56}, {t:'CrO<sub>4</sub><sup>2−</sup>', x:54, y:62}
+  ],
+  introP:[
+    '燒杯裡同時含有 <span class="hl">S<sup>2−</sup>、I<sup>−</sup>、Cl<sup>−</sup>、CrO<sub>4</sub><sup>2−</sup></span>，四者的濃度都是 <span class="hl">0.010 M</span>。現在用滴管一滴一滴加入硝酸銀溶液。',
+    '銀離子跟這四個陰離子都會生成沉澱，但它們<span class="hl">不會同時沉下去</span>。每一種沉澱都有自己的溶度積 K<sub>sp</sub>，由它決定「要多少銀離子才開始沉澱」。',
+    '下一頁會給你四個 K<sub>sp</sub>，先自己算算看誰先誰後。'
+  ],
+  axisIon:'[Ag<sup>+</sup>]', axisLo:'10<sup>−25</sup> M', axisHi:'10<sup>−3</sup> M',
+  guessHint:'提示：A₂B 型的 K<sub>sp</sub> 裡，[Ag<sup>+</sup>] 是平方，別忘了開根號。',
+  items:[
+    { f:'Ag<sub>2</sub>S', short:'Ag₂S', color:'#232120', name:'黑色', pos:6, type:'A₂B 型',
+      ksp:'6.3×10<sup>−50</sup>', need:'2.5×10<sup>−24</sup>',
+      steps:[
+        'K<sub>sp</sub> = [Ag<sup>+</sup>]<sup>2</sup>[S<sup>2−</sup>] = 6.3×10<sup>−50</sup>',
+        '[S<sup>2−</sup>] = 1.0×10<sup>−2</sup> M',
+        '[Ag<sup>+</sup>]<sup>2</sup> = 6.3×10<sup>−50</sup> ÷ 1.0×10<sup>−2</sup> = 6.3×10<sup>−48</sup>',
+        '[Ag<sup>+</sup>] = √(6.3×10<sup>−48</sup>) ≈ 2.5×10<sup>−24</sup> M'
+      ],
+      why:'所需的銀離子濃度只有 10<sup>−24</sup> 這個等級，幾乎一碰到銀離子就沉澱，所以第一個落下。' },
+    { f:'AgI', short:'AgI', color:'#F0CB33', name:'黃色', pos:50, type:'AB 型',
+      ksp:'8.5×10<sup>−17</sup>', need:'8.5×10<sup>−15</sup>',
+      steps:[
+        'K<sub>sp</sub> = [Ag<sup>+</sup>][I<sup>−</sup>] = 8.5×10<sup>−17</sup>',
+        '[I<sup>−</sup>] = 1.0×10<sup>−2</sup> M',
+        '[Ag<sup>+</sup>] = 8.5×10<sup>−17</sup> ÷ 1.0×10<sup>−2</sup> = 8.5×10<sup>−15</sup> M'
+      ],
+      why:'比硫化銀多了九個數量級，但仍遠低於氯化銀所需，所以第二個沉澱。此時硫離子已被除得差不多了。' },
+    { f:'AgCl', short:'AgCl', color:'#EFEDE6', name:'白色', pos:78, type:'AB 型',
+      ksp:'1.8×10<sup>−10</sup>', need:'1.8×10<sup>−8</sup>',
+      steps:[
+        'K<sub>sp</sub> = [Ag<sup>+</sup>][Cl<sup>−</sup>] = 1.8×10<sup>−10</sup>',
+        '[Cl<sup>−</sup>] = 1.0×10<sup>−2</sup> M',
+        '[Ag<sup>+</sup>] = 1.8×10<sup>−10</sup> ÷ 1.0×10<sup>−2</sup> = 1.8×10<sup>−8</sup> M'
+      ],
+      why:'注意：氯化銀的 K<sub>sp</sub>（10<sup>−10</sup>）其實比鉻酸銀（10<sup>−12</sup>）還大，但它反而先沉澱。原因就在下一個。' },
+    { f:'Ag<sub>2</sub>CrO<sub>4</sub>', short:'Ag₂CrO₄', color:'#C0492B', name:'磚紅色', pos:92, type:'A₂B 型',
+      ksp:'1.1×10<sup>−12</sup>', need:'1.0×10<sup>−5</sup>',
+      steps:[
+        'K<sub>sp</sub> = [Ag<sup>+</sup>]<sup>2</sup>[CrO<sub>4</sub><sup>2−</sup>] = 1.1×10<sup>−12</sup>',
+        '[CrO<sub>4</sub><sup>2−</sup>] = 1.0×10<sup>−2</sup> M',
+        '[Ag<sup>+</sup>]<sup>2</sup> = 1.1×10<sup>−12</sup> ÷ 1.0×10<sup>−2</sup> = 1.1×10<sup>−10</sup>',
+        '[Ag<sup>+</sup>] = √(1.1×10<sup>−10</sup>) ≈ 1.0×10<sup>−5</sup> M'
+      ],
+      why:'K<sub>sp</sub> 比氯化銀小，所需的銀離子濃度卻是四者中最高。關鍵在於它是 A₂B 型：K<sub>sp</sub> 裡的 [Ag<sup>+</sup>] 是<b>平方</b>，開根號之後數值被大幅拉高，所以它最後才沉澱。' }
+  ],
+  note:{
+    h:'為什麼不能直接比 K<sub>sp</sub>？',
+    p:[
+      'Ag<sub>2</sub>CrO<sub>4</sub> 的 K<sub>sp</sub>（1.1×10<sup>−12</sup>）比 AgCl（1.8×10<sup>−10</sup>）<b>小</b>，照直覺應該更難溶、更早沉澱，但實際上它是最後一個。',
+      '關鍵在於型式不同。AgCl 是 AB 型，[Ag<sup>+</sup>] = K<sub>sp</sub> ÷ [Cl<sup>−</sup>]，直接相除；Ag<sub>2</sub>CrO<sub>4</sub> 是 A₂B 型，[Ag<sup>+</sup>] = √(K<sub>sp</sub> ÷ [CrO<sub>4</sub><sup>2−</sup>])，開根號會把很小的數字大幅拉高，算出來 1.0×10<sup>−5</sup> 反而遠大於 1.8×10<sup>−8</sup>。',
+      '<b>結論：K<sub>sp</sub> 只有在型式相同時才能直接比大小。</b>型式不同時，一定要換算成「開始沉澱所需的離子濃度」再比較。',
+      '這也是莫爾法滴定的原理：用鉻酸鉀當指示劑，磚紅色一出現就代表氯離子幾乎沉澱完畢。'
+    ]
+  }
+},
+{
+  id:'oh', tag:'情境二', title:'一個陰離子，四種陽離子',
+  reagent:'NaOH', reagentShort:'滴入 NaOH',
+  target:'OH<sup>−</sup>',
+  blurb:'換個角度：燒杯裡有四種金屬離子，逐滴加入氫氧化鈉。這次還多了要開三次方的型式。',
+  ionsInBeaker:[
+    {t:'Fe<sup>3+</sup>', x:17, y:32}, {t:'Cu<sup>2+</sup>', x:57, y:27},
+    {t:'Mg<sup>2+</sup>', x:24, y:57}, {t:'Ca<sup>2+</sup>', x:58, y:61}
+  ],
+  introP:[
+    '燒杯裡同時含有 <span class="hl">Fe<sup>3+</sup>、Cu<sup>2+</sup>、Mg<sup>2+</sup>、Ca<sup>2+</sup></span>，四者的濃度都是 <span class="hl">0.010 M</span>。現在一滴一滴加入氫氧化鈉溶液。',
+    '這一次變動的是 <span class="hl">[OH<sup>−</sup>]</span>。每一種氫氧化物都有自己的 K<sub>sp</sub>，由它決定「要多少氫氧根才開始沉澱」。',
+    '注意 Fe(OH)<sub>3</sub> 是 <span class="hl">AB₃ 型</span>，K<sub>sp</sub> 裡的 [OH<sup>−</sup>] 是三次方，要開<b>三次方</b>才算得出來。'
+  ],
+  axisIon:'[OH<sup>−</sup>]', axisLo:'10<sup>−14</sup> M', axisHi:'10<sup>−1</sup> M',
+  guessHint:'提示：AB₂ 型開平方，AB₃ 型要開三次方。',
+  items:[
+    { f:'Fe(OH)<sub>3</sub>', short:'Fe(OH)₃', color:'#A0491F', name:'紅棕色', pos:14, type:'AB₃ 型',
+      ksp:'2.8×10<sup>−39</sup>', need:'6.5×10<sup>−13</sup>',
+      steps:[
+        'K<sub>sp</sub> = [Fe<sup>3+</sup>][OH<sup>−</sup>]<sup>3</sup> = 2.8×10<sup>−39</sup>',
+        '[Fe<sup>3+</sup>] = 1.0×10<sup>−2</sup> M',
+        '[OH<sup>−</sup>]<sup>3</sup> = 2.8×10<sup>−39</sup> ÷ 1.0×10<sup>−2</sup> = 2.8×10<sup>−37</sup>',
+        '[OH<sup>−</sup>] = ∛(2.8×10<sup>−37</sup>) ≈ 6.5×10<sup>−13</sup> M'
+      ],
+      why:'在中性水中 [OH<sup>−</sup>] 就已經是 10<sup>−7</sup>，遠高於這裡需要的 10<sup>−13</sup>。所以鐵離子溶液只要不是強酸性，就會慢慢生成紅棕色沉澱。' },
+    { f:'Cu(OH)<sub>2</sub>', short:'Cu(OH)₂', color:'#3E86D6', name:'藍色', pos:40, type:'AB₂ 型',
+      ksp:'2.2×10<sup>−20</sup>', need:'1.5×10<sup>−9</sup>',
+      steps:[
+        'K<sub>sp</sub> = [Cu<sup>2+</sup>][OH<sup>−</sup>]<sup>2</sup> = 2.2×10<sup>−20</sup>',
+        '[Cu<sup>2+</sup>] = 1.0×10<sup>−2</sup> M',
+        '[OH<sup>−</sup>]<sup>2</sup> = 2.2×10<sup>−20</sup> ÷ 1.0×10<sup>−2</sup> = 2.2×10<sup>−18</sup>',
+        '[OH<sup>−</sup>] = √(2.2×10<sup>−18</sup>) ≈ 1.5×10<sup>−9</sup> M'
+      ],
+      why:'第二個沉澱，藍色。此時鐵離子幾乎已經沉完，可以先過濾把兩者分開，這就是分離離子的基本手法。' },
+    { f:'Mg(OH)<sub>2</sub>', short:'Mg(OH)₂', color:'#EFEDE6', name:'白色', pos:72, type:'AB₂ 型',
+      ksp:'5.6×10<sup>−12</sup>', need:'2.4×10<sup>−5</sup>',
+      steps:[
+        'K<sub>sp</sub> = [Mg<sup>2+</sup>][OH<sup>−</sup>]<sup>2</sup> = 5.6×10<sup>−12</sup>',
+        '[Mg<sup>2+</sup>] = 1.0×10<sup>−2</sup> M',
+        '[OH<sup>−</sup>]<sup>2</sup> = 5.6×10<sup>−12</sup> ÷ 1.0×10<sup>−2</sup> = 5.6×10<sup>−10</sup>',
+        '[OH<sup>−</sup>] = √(5.6×10<sup>−10</sup>) ≈ 2.4×10<sup>−5</sup> M'
+      ],
+      why:'白色沉澱，就是胃乳的成分。要到弱鹼性環境才會出現，跟前兩個差了好幾個數量級。' },
+    { f:'Ca(OH)<sub>2</sub>', short:'Ca(OH)₂', color:'#E2DDCC', name:'白色（微溶）', pos:95, type:'AB₂ 型',
+      ksp:'5.5×10<sup>−6</sup>', need:'2.3×10<sup>−2</sup>',
+      steps:[
+        'K<sub>sp</sub> = [Ca<sup>2+</sup>][OH<sup>−</sup>]<sup>2</sup> = 5.5×10<sup>−6</sup>',
+        '[Ca<sup>2+</sup>] = 1.0×10<sup>−2</sup> M',
+        '[OH<sup>−</sup>]<sup>2</sup> = 5.5×10<sup>−6</sup> ÷ 1.0×10<sup>−2</sup> = 5.5×10<sup>−4</sup>',
+        '[OH<sup>−</sup>] = √(5.5×10<sup>−4</sup>) ≈ 2.3×10<sup>−2</sup> M'
+      ],
+      why:'最後才沉澱，需要的 [OH<sup>−</sup>] 高達 0.023 M，是相當濃的鹼液。這也解釋了為什麼氫氧化鈣被歸類為微溶——它本來就沒那麼難溶。' }
+  ],
+  note:{
+    h:'這一組能直接比 K<sub>sp</sub> 嗎？',
+    p:[
+      '這次四者的 K<sub>sp</sub> 由小到大剛好就是沉澱順序，看起來好像可以直接比。但這是<b>巧合</b>，不是通則。',
+      'Fe(OH)<sub>3</sub> 是 AB₃ 型，其他三個是 AB₂ 型，型式不同。之所以順序沒有翻轉，是因為 Fe(OH)<sub>3</sub> 的 K<sub>sp</sub> 小得太誇張（10<sup>−39</sup>），就算開三次方拉高了，還是遠低於其他三個。換成差距沒那麼大的組合，就會像銀鹽那一組一樣翻車。',
+      '<b>所以做法不變：一律換算成「開始沉澱所需的離子濃度」再比較。</b>只有確定型式相同時，才可以偷懶直接比 K<sub>sp</sub>。',
+      '順帶一提，這一組後兩個都是白色沉澱。如果只靠眼睛看顏色，根本分不出鎂和鈣，還是得靠計算與規則判斷。'
+    ]
+  }
+}
+];
+
+/* ===================== 狀態 ===================== */
+const state = { sc:null, step:'menu', guess:[], stage:0 };
+const app = document.getElementById('app');
+const dots = document.getElementById('dots');
+const htitle = document.getElementById('htitle');
+
+document.getElementById('backBtn').onclick = ()=>{
+  if(state.step==='menu'){
+    if(history.length>1) history.back(); else location.href='precipitate_colors.html';
+  } else renderMenu();
+};
+function S(){ return SCENARIOS[state.sc]; }
+function setDots(n){ dots.innerHTML = n ? [0,1,2].map(i=>`<i class="${i<n?'on':''}"></i>`).join('') : ''; }
+
+/* ===================== 場景元件 ===================== */
+function beakerHTML(stage, showIons){
+  const sc = S();
+  const layers = sc.items.map((s,i)=>
+    `<div class="layer ${i<stage?'on':''}" data-l="${i}" style="background:${s.color}"></div>`).join('');
+  const ions = showIons ? `<div class="ionfloat">${sc.ionsInBeaker.map((n,i)=>
+      `<span style="left:${n.x}%;top:${n.y}%;animation-delay:${i*0.8}s">${n.t}</span>`).join('')}</div>` : '';
+  return `<div class="scene"><div class="beaker-wrap">
+    <div class="rglabel">${sc.reagentShort}</div>
+    <div class="dropper"></div><div class="drop" id="drop"></div>
+    <div class="beaker">
+      <div class="water"></div>${ions}
+      <div class="layers" id="layers">${layers}</div>
+    </div>
+  </div></div>`;
+}
+
+function axisHTML(stage){
+  const sc = S();
+  const w = stage>0 ? sc.items[stage-1].pos+4 : 0;
+  return `<div class="axis">
+    <div class="cap top"><span>開始沉澱所需的 ${sc.axisIon}（對數尺度）</span></div>
+    <div class="track">
+      <div class="fill" id="fill" style="width:${w}%"></div>
+      ${sc.items.map((s,i)=>`<div class="tick ${i<stage?'on':''}" data-t="${i}" style="left:${s.pos}%">
+        <span class="lab">${s.short}</span></div>`).join('')}
+    </div>
+    <div class="cap" style="margin-top:8px"><span>${sc.axisLo}</span><span>${sc.axisHi}</span></div>
+    <div class="axis-space"></div>
+  </div>`;
+}
+
+/* ===================== 情境選單 ===================== */
+function renderMenu(){
+  state.step='menu'; state.sc=null; setDots(0); window.scrollTo(0,0);
+  htitle.innerHTML = '誰<em>先沉澱</em>？';
+  let h = `<div class="card">
+    <h2>兩個情境</h2>
+    <p>同一杯溶液裡有好幾種離子時，加入試劑後它們<span class="hl">不會同時沉澱</span>。先用 K<sub>sp</sub> 算出每一種「開始沉澱所需的離子濃度」，需要越少的越早沉下去。</p>
+    <p>兩個情境的計算方式一樣，但角度相反，建議依序玩過一遍。</p>
+  </div>`;
+  SCENARIOS.forEach((sc,i)=>{
+    h += `<button class="pickcard" data-i="${i}">
+      <span class="tag">${sc.tag}</span>
+      <h3>${sc.title}</h3>
+      <div class="rg">${sc.reagentShort}</div>
+      <p>${sc.blurb}</p>
+      <div class="dots4">${sc.items.map(s=>
+        `<span><i style="background:${s.color}"></i>${s.short}</span>`).join('')}</div>
+    </button>`;
+  });
+  h += `<div class="foot">K<sub>sp</sub> 為 25°C 常用參考值，不同資料來源略有出入</div>`;
+  app.innerHTML = h;
+  app.querySelectorAll('.pickcard').forEach(b=> b.onclick=()=>{ state.sc=+b.dataset.i; renderIntro(); });
+}
+
+/* ===================== 步驟一：情境 ===================== */
+function renderIntro(){
+  state.step='intro'; setDots(1); window.scrollTo(0,0);
+  const sc = S();
+  htitle.innerHTML = sc.tag+'｜'+sc.reagentShort;
+  app.innerHTML = `
+    ${beakerHTML(0,true)}
+    <div class="card">
+      <h2>${sc.title}</h2>
+      ${sc.introP.map(p=>`<p>${p}</p>`).join('')}
+    </div>
+    <button class="btn" id="go">開始預測</button>
+    <div class="foot">顏色為示意，實際沉澱會因濃度與顆粒大小略有差異</div>`;
+  document.getElementById('go').onclick = renderGuess;
+}
+
+/* ===================== 計算機 ===================== */
+const calc = { m:'', eNeg:true, e:'', cm:'1.0', dNeg:true, d:'2', root:1 };
+
+function fmtSci(log){
+  let e = Math.floor(log);
+  let m = Math.pow(10, log - e);
+  if(m >= 9.995){ m /= 10; e++; }
+  return { m:m.toFixed(2), e:e };
+}
+function sciHTML(o){
+  return `${o.m} × 10<sup>${o.e<0?'−':''}${Math.abs(o.e)}</sup>`;
+}
+function calcRun(){
+  const M = parseFloat(calc.m), C = parseFloat(calc.cm);
+  const E = parseInt(calc.e,10), D = parseInt(calc.d,10);
+  if(!isFinite(M) || M<=0 || !isFinite(C) || C<=0 || isNaN(E) || isNaN(D)) return null;
+  const Ev = calc.eNeg ? -E : E, Dv = calc.dNeg ? -D : D;
+  const logQ = Math.log10(M/C) + (Ev - Dv);
+  return { q:fmtSci(logQ), r:fmtSci(logQ/calc.root) };
+}
+function calcOut(){
+  const box = document.getElementById('calcOut');
+  if(!box) return;
+  const res = calcRun();
+  if(!res){ box.innerHTML = `<div class="cout empty">填入 K<sub>sp</sub> 後就會算出來</div>`; return; }
+  const rootTxt = calc.root===1 ? '' :
+    `<div class="cstep">${calc.root===2?'開平方':'開三次方'}</div>`;
+  box.innerHTML = `
+    <div class="cstep">相除後 = ${sciHTML(res.q)}</div>
+    ${rootTxt}
+    <div class="cout">≈ ${sciHTML(res.r)} M</div>`;
+}
+function calcHTML(sc){
+  const q = sc.items.map((s,i)=>`<button class="cfill" data-fill="${i}">${s.short}</button>`).join('');
+  return `<div class="card calcbox">
+    <h2>小算盤</h2>
+    <p style="margin-bottom:12px">把 K<sub>sp</sub> 除以離子濃度，再依型式開根號。點下面的名稱可以直接帶入 K<sub>sp</sub>。</p>
+    <div class="cfills">${q}</div>
+
+    <div class="crow">
+      <span class="clab">K<sub>sp</sub></span>
+      <input class="cnum" id="cm" inputmode="decimal" placeholder="6.3" value="${calc.m}">
+      <span class="cx">× 10</span>
+      <button class="csign" id="csign">${calc.eNeg?'−':'+'}</button>
+      <input class="cexp" id="ce" inputmode="numeric" placeholder="50" value="${calc.e}">
+    </div>
+
+    <div class="crow">
+      <span class="clab">÷ 濃度</span>
+      <input class="cnum" id="cc" inputmode="decimal" value="${calc.cm}">
+      <span class="cx">× 10</span>
+      <button class="csign" id="dsign">${calc.dNeg?'−':'+'}</button>
+      <input class="cexp" id="cd" inputmode="numeric" value="${calc.d}">
+    </div>
+
+    <div class="croots">
+      <button class="croot ${calc.root===1?'on':''}" data-r="1">不開根<small>AB 型</small></button>
+      <button class="croot ${calc.root===2?'on':''}" data-r="2">開平方<small>AB₂ · A₂B 型</small></button>
+      <button class="croot ${calc.root===3?'on':''}" data-r="3">開三次方<small>AB₃ 型</small></button>
+    </div>
+
+    <div id="calcOut"></div>
+    <button class="btn ghost" id="cclear" style="margin-top:12px">清除</button>
+  </div>`;
+}
+function calcWire(sc){
+  const bind=(id,fn)=>{ const el=document.getElementById(id); if(el) el.addEventListener('input',fn); };
+  bind('cm', e=>{ calc.m=e.target.value; calcOut(); });
+  bind('ce', e=>{ calc.e=e.target.value.replace(/[^0-9]/g,''); calcOut(); });
+  bind('cc', e=>{ calc.cm=e.target.value; calcOut(); });
+  bind('cd', e=>{ calc.d=e.target.value.replace(/[^0-9]/g,''); calcOut(); });
+  document.getElementById('csign').onclick=e=>{
+    calc.eNeg=!calc.eNeg; e.target.textContent=calc.eNeg?'−':'+'; calcOut(); };
+  document.getElementById('dsign').onclick=e=>{
+    calc.dNeg=!calc.dNeg; e.target.textContent=calc.dNeg?'−':'+'; calcOut(); };
+  document.querySelectorAll('.croot').forEach(b=> b.onclick=()=>{
+    calc.root=+b.dataset.r;
+    document.querySelectorAll('.croot').forEach(x=>x.classList.remove('on'));
+    b.classList.add('on'); calcOut();
+  });
+  document.querySelectorAll('.cfill').forEach(b=> b.onclick=()=>{
+    const s = sc.items[+b.dataset.fill];
+    const plain = s.ksp.replace(/<sup>/g,'^').replace(/<\/sup>/g,'').replace(/−/g,'-');
+    const mm = plain.match(/^([\d.]+)×10\^(-?\d+)$/);
+    if(mm){
+      calc.m = mm[1];
+      calc.e = String(Math.abs(parseInt(mm[2],10)));
+      calc.eNeg = parseInt(mm[2],10) < 0;
+      calc.root = s.type.indexOf('AB₃')>=0 ? 3 : (s.type.indexOf('AB 型')>=0 ? 1 : 2);
+      document.getElementById('cm').value=calc.m;
+      document.getElementById('ce').value=calc.e;
+      document.getElementById('csign').textContent=calc.eNeg?'−':'+';
+      document.querySelectorAll('.croot').forEach(x=>
+        x.classList.toggle('on', +x.dataset.r===calc.root));
+      calcOut();
+    }
+  });
+  document.getElementById('cclear').onclick=()=>{
+    calc.m=''; calc.e=''; calc.root=1; calc.eNeg=true;
+    document.getElementById('cm').value=''; document.getElementById('ce').value='';
+    document.getElementById('csign').textContent='−';
+    document.querySelectorAll('.croot').forEach(x=> x.classList.toggle('on', x.dataset.r==='1'));
+    calcOut();
+  };
+  calcOut();
+}
+
+/* ===================== 步驟二：預測排序 ===================== */
+function renderGuess(){
+  state.step='guess'; state.guess=[]; setDots(2); window.scrollTo(0,0);
+  const sc = S();
+  draw();
+  function draw(){
+    app.innerHTML = `
+      <div class="card">
+        <h2>你覺得誰先沉澱？</h2>
+        <p>四種離子的濃度都是 <span class="hl">0.010 M</span>。算出每一個「開始沉澱所需的 ${sc.axisIon}」，需要越少的越早沉澱。</p>
+        <p style="color:var(--text3);font-size:13px">${sc.guessHint}</p>
+      </div>
+      <div class="card">
+        <div class="slots">
+          ${[0,1,2,3].map(i=>{
+            const g=state.guess[i];
+            return `<div class="slot ${g?'filled':''}" data-s="${i}">
+              <div class="no">第 ${i+1} 個</div>${g?`<div class="f">${g.f}</div>`:''}</div>`;
+          }).join('')}
+        </div>
+        <div class="picks">
+          ${sc.items.map((s,i)=>`<button class="pick ${state.guess.includes(s)?'used':''}" data-p="${i}">
+            <span class="pf">${s.f}</span>
+            <span class="pk">K<sub>sp</sub> = ${s.ksp}</span>
+            <span class="pt">${s.type}</span></button>`).join('')}
+        </div>
+      </div>
+      <button class="btn" id="submit" ${state.guess.length<4?'disabled':''}>送出預測，開始滴定</button>
+      <button class="btn ghost" id="reset">重新排</button>
+      ${calcHTML(sc)}`;
+    calcWire(sc);
+    app.querySelectorAll('.pick').forEach(b=> b.onclick=()=>{
+      if(state.guess.length<4){ state.guess.push(sc.items[+b.dataset.p]); draw(); }
+    });
+    app.querySelectorAll('.slot').forEach(b=> b.onclick=()=>{
+      const i=+b.dataset.s;
+      if(state.guess[i]){ state.guess.splice(i,1); draw(); }
+    });
+    document.getElementById('reset').onclick=()=>{ state.guess=[]; draw(); };
+    const sb=document.getElementById('submit');
+    if(sb) sb.onclick=()=>{ state.stage=0; renderReveal(); };
+  }
+}
+
+/* ===================== 步驟三：逐滴揭曉 ===================== */
+function renderReveal(){
+  state.step='reveal'; setDots(3); window.scrollTo(0,0);
+  const sc = S(), done = state.stage;
+  app.innerHTML = `${beakerHTML(done, done===0)}${axisHTML(done)}<div id="box"></div><div id="ctrl"></div>`;
+  if(done===0){
+    document.getElementById('box').innerHTML = `<div class="card">
+      <h2>開始滴入 ${sc.reagent}</h2>
+      <p>每按一次就多滴一些，看看誰先撐不住。</p></div>`;
+  } else showStage(sc.items[done-1], done);
+  wireCtrl();
+}
+function wireCtrl(){
+  const last = state.stage>=4;
+  document.getElementById('ctrl').innerHTML = last
+    ? `<button class="btn" id="fin">看結果</button>`
+    : `<button class="btn" id="next">${state.stage===0?'滴一滴':'再滴一滴'}</button>`;
+  const nx=document.getElementById('next'); if(nx) nx.onclick=dropOnce;
+  const fi=document.getElementById('fin'); if(fi) fi.onclick=renderResult;
+}
+
+function dropOnce(){
+  const sc=S(), i=state.stage, s=sc.items[i];
+  const drop=document.getElementById('drop');
+  const btn=document.getElementById('next'); if(btn) btn.disabled=true;
+  drop.classList.remove('go'); void drop.offsetWidth; drop.classList.add('go');
+
+  setTimeout(()=>{
+    document.getElementById('fill').style.width=(s.pos+4)+'%';
+    document.querySelector(`.tick[data-t="${i}"]`).classList.add('on');
+    const layers=document.getElementById('layers');
+    const beaker=layers.parentElement;
+    for(let k=0;k<9;k++){
+      const g=document.createElement('div');
+      g.className='grain'; g.style.background=s.color;
+      g.style.left=(12+Math.random()*130)+'px';
+      g.style.bottom=(20+i*20)+'px';
+      g.style.animationDelay=(k*0.05)+'s';
+      beaker.appendChild(g);
+      setTimeout(()=>g.remove(),1100);
+    }
+    setTimeout(()=>{
+      layers.querySelector(`.layer[data-l="${i}"]`).classList.add('on');
+      state.stage=i+1;
+      showStage(s,i+1);
+      wireCtrl();
+    },420);
+  },480);
+}
+
+function showStage(s,order){
+  document.getElementById('box').innerHTML = `<div class="stagebox">
+    <div class="top">
+      <span class="swatch" style="background:${s.color}"></span>
+      <span class="name">${s.f}</span>
+      <span class="order">第 ${order} 個沉澱</span>
+    </div>
+    <p><b style="color:${s.color==='#232120'?'#bdb6ac':s.color}">${s.name}沉澱</b>　${s.type}　K<sub>sp</sub> = ${s.ksp}</p>
+    <div class="calc">
+      <div class="calc-h">開始沉澱所需的濃度</div>
+      ${s.steps.map((l,i)=>`<div class="cl ${i===s.steps.length-1?'last':''}">${l}</div>`).join('')}
+    </div>
+    <p style="margin-top:11px">${s.why}</p>
+  </div>`;
+}
+
+/* ===================== 步驟四：對答案 ===================== */
+function renderResult(){
+  state.step='result'; window.scrollTo(0,0);
+  const sc=S();
+  const hits = state.guess.filter((g,i)=> g===sc.items[i]).length;
+  const perfect = hits===4;
+  const other = SCENARIOS[1-state.sc];
+
+  let h = `${beakerHTML(4,false)}
+    <div class="scoreline ${perfect?'ok':'no'}">${perfect?'四個順序全部答對':'答對 '+hits+' 個位置'}</div>
+    <div class="card">
+      <h2>正解順序</h2>
+      <div class="compare">
+        ${sc.items.map((s,i)=>`<div class="cc ${state.guess[i]===s?'hit':'miss'}">
+          <div class="n">第 ${i+1}</div><div class="f">${s.f}</div></div>`).join('')}
+      </div>
+      <p style="margin-top:12px">${sc.items.map(s=>s.name.replace('（微溶）','')).join(' → ')}。你的預測中有 ${hits} 個位置放對了。</p>
+    </div>
+    <div class="card">
+      <h2>四者對照</h2>
+      <div class="ktable">
+        <div class="kr kh"><span>沉澱</span><span>型式</span><span>K<sub>sp</sub></span><span>所需濃度</span></div>
+        ${sc.items.map(s=>`<div class="kr">
+          <span><i class="kdot" style="background:${s.color}"></i>${s.f}</span>
+          <span>${s.type}</span><span>${s.ksp}</span><span class="kneed">${s.need}</span>
+        </div>`).join('')}
+      </div>
+      <p style="margin-top:12px">最右欄由上到下遞增，這就是沉澱的先後順序。</p>
+    </div>
+    <div class="note">
+      <h3>${sc.note.h}</h3>
+      ${sc.note.p.map(p=>`<p>${p}</p>`).join('')}
+    </div>
+    <div class="btn-row">
+      <button class="btn ghost" id="again">再玩一次</button>
+      <button class="btn" id="switch">玩${other.tag}</button>
+    </div>
+    <button class="btn ghost" id="menu" style="margin-top:10px">回情境選單</button>
+    <div class="foot">K<sub>sp</sub> 為 25°C 常用參考值，不同資料來源略有出入<br>顏色為示意，實際沉澱會因濃度與顆粒大小略有差異</div>`;
+  app.innerHTML = h;
+  document.getElementById('again').onclick = renderIntro;
+  document.getElementById('switch').onclick = ()=>{ state.sc = 1-state.sc; renderIntro(); };
+  document.getElementById('menu').onclick = renderMenu;
+}
+
+renderMenu();
+</script>
+</body>
+</html>
