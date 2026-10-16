@@ -1,0 +1,655 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="Cache-Control" content="no-cache">
+<title>緩衝溶液・開場實驗</title>
+<!--
+  操作方式（老師用）
+  → / 空白鍵 / Enter / PageDown / 點一下畫面：下一步
+  ← / PageUp / Backspace：上一步
+  Home：重頭開始　F：全螢幕
+  網址參數：?step=3 從第 4 步開始；?bar=0 隱藏下方控制列（嵌入投影片時可用）
+-->
+<style>
+:root{
+  --ink:#27434a; --ink2:#5c7c82;
+  --teal:#3f9d92; --teal-d:#2f7f76;
+  --acid:#e98f84; --acid-bg:#fdeeea; --acid-ink:#a4412f;
+  --base:#8b97dd; --base-bg:#edeffc; --base-ink:#434d9c;
+  --wall1:#f6fbfa; --wall2:#e1f0ed;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;overflow:hidden;background:#e1f0ed;color:var(--ink);
+  font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei","Heiti TC",sans-serif}
+#app{display:flex;flex-direction:column;height:100%}
+#view{flex:1;min-height:0;display:flex;align-items:center;justify-content:center}
+#fit{position:relative;flex:none}
+#stage{position:absolute;left:0;top:0;width:960px;height:540px;transform-origin:0 0;
+  background:linear-gradient(180deg,var(--wall1),var(--wall2));overflow:hidden;
+  user-select:none;-webkit-user-select:none;cursor:pointer}
+.layer{position:absolute;left:0;top:0;width:960px;height:540px;transition:opacity .6s ease}
+.layer.off{opacity:0;pointer-events:none}
+svg text{font-family:inherit}
+sub{font-size:.68em;line-height:0;vertical-align:-.28em;position:relative}
+
+/* 標題 */
+#title{position:absolute;left:44px;top:20px;font-weight:800;font-size:40px;letter-spacing:2px;line-height:52px;white-space:nowrap}
+#title small{display:inline-block;margin-left:14px;padding:0 14px;height:30px;line-height:30px;border-radius:15px;
+  background:var(--teal);color:#fff;font-size:15px;font-weight:600;letter-spacing:1px;position:relative;top:-4px}
+
+/* 試劑標籤（跟著滴管移動） */
+#chip{position:absolute;right:362px;top:26px;height:38px;line-height:34px;padding:0 16px;border-radius:19px;
+  font-size:17px;font-weight:700;border:2px solid;white-space:nowrap;opacity:0}
+#chip.acid{background:var(--acid-bg);color:var(--acid-ink);border-color:var(--acid)}
+#chip.base{background:var(--base-bg);color:var(--base-ink);border-color:var(--base)}
+
+/* 右側卡片 */
+#card{position:absolute;left:704px;top:78px;width:238px;padding:16px 18px 18px;border-radius:20px;
+  background:rgba(255,255,255,.82);border:2px solid rgba(63,157,146,.28);box-shadow:0 10px 30px rgba(47,127,118,.12)}
+#card.in>*{animation:rise .5s both}
+#card.in>*:nth-child(2){animation-delay:.06s}
+#card.in>*:nth-child(3){animation-delay:.12s}
+#card.in>*:nth-child(4){animation-delay:.18s}
+#card.in>*:nth-child(5){animation-delay:.24s}
+@keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.tag{display:inline-block;padding:0 12px;height:26px;line-height:26px;border-radius:13px;font-size:14px;font-weight:700;
+  letter-spacing:2px;background:var(--teal);color:#fff}
+.tag.res{background:var(--teal-d)}
+.q{margin:10px 0 6px;font-size:21px;line-height:1.5;font-weight:600}
+.q b{font-weight:800}
+.q .a{color:var(--acid-ink)} .q .b{color:var(--base-ink)}
+.opts{list-style:none;margin:8px 0 0;padding:0}
+.opts li{margin:9px 0;font-size:19px;line-height:30px;font-weight:600;white-space:nowrap}
+.opts i{display:inline-block;width:28px;height:28px;line-height:28px;margin-right:10px;border-radius:50%;
+  background:#e3f2ef;color:var(--teal-d);font-style:normal;font-size:15px;font-weight:800;text-align:center;vertical-align:middle}
+.big{margin:12px 0 0;font-size:32px;font-weight:800;line-height:42px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.big .ar{color:var(--teal);margin:0 8px;font-weight:600}
+.delta{font-size:21px;font-weight:700;color:var(--ink2);margin-top:2px}
+.note{margin-top:10px;font-size:19px;line-height:1.5;font-weight:700}
+.cmp{margin-top:14px;padding-top:12px;border-top:2px dashed rgba(63,157,146,.3)}
+.cmp .ct{font-size:15px;color:var(--ink2);font-weight:600;margin-bottom:4px}
+.cmp .r{height:30px;line-height:30px;white-space:nowrap;font-size:17px;font-weight:700}
+.cmp .nm{display:inline-block;width:44px}
+.cmp .bar{display:inline-block;height:14px;border-radius:7px;vertical-align:middle;margin-right:8px}
+.cmp .val{font-variant-numeric:tabular-nums}
+
+/* 樣品說明 */
+#cap{position:absolute;left:250px;width:460px;border-radius:24px;background:rgba(255,255,255,.88);
+  border:2px solid rgba(63,157,146,.3);text-align:center;box-shadow:0 6px 18px rgba(47,127,118,.12)}
+#cap.one{top:468px;height:50px;line-height:46px;font-size:24px;font-weight:800}
+#cap.two{top:452px;height:76px;padding-top:6px}
+#cap .l1{font-size:23px;font-weight:800;line-height:32px}
+#cap .l2{font-size:19px;font-weight:600;line-height:30px;color:var(--ink2)}
+#cap.pulse{animation:pulse .7s}
+@keyframes pulse{0%{transform:scale(1)}40%{transform:scale(1.045);background:#fff}100%{transform:scale(1)}}
+
+/* 結尾頁 */
+.fx{opacity:0;transition:opacity .55s ease}
+.fx.on{opacity:1}
+#banner{transform:translateY(14px);transition:opacity .6s ease,transform .6s ease}
+#banner.on{transform:none}
+
+/* 控制列 */
+#bar{flex:none;height:44px;display:flex;align-items:center;justify-content:center;gap:12px;
+  background:rgba(255,255,255,.55);border-top:1px solid rgba(63,157,146,.2);opacity:.6;transition:opacity .3s}
+#bar:hover{opacity:1}
+#bar button{font:inherit;font-size:16px;min-width:38px;height:30px;border-radius:15px;border:1.5px solid rgba(63,157,146,.5);
+  background:#fff;color:var(--teal-d);cursor:pointer}
+#bar button:hover{background:#e8f5f2}
+#dots{display:flex;gap:9px;align-items:center}
+.dot{width:11px;height:11px;border-radius:50%;background:#b8d4cf;border:0;padding:0;min-width:0 !important;height:11px !important;cursor:pointer}
+.dot.on{background:var(--teal-d);transform:scale(1.35)}
+#hint{font-size:13px;color:var(--ink2);margin-left:6px}
+body.nobar #bar{display:none}
+</style>
+</head>
+<body>
+<div id="app">
+ <div id="view">
+  <div id="fit">
+   <div id="stage">
+
+    <!-- ===== 實驗場景 ===== -->
+    <div class="layer" id="lab">
+     <svg id="svg" viewBox="0 0 960 540" width="960" height="540" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+       <linearGradient id="gBench" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#dcece8"/><stop offset="1" stop-color="#bfdbd5"/></linearGradient>
+       <linearGradient id="gMeter" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#4e6069"/><stop offset=".55" stop-color="#3b4b53"/><stop offset="1" stop-color="#2f3d45"/></linearGradient>
+       <linearGradient id="gLcd" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e3ecd8"/><stop offset="1" stop-color="#cbdcc2"/></linearGradient>
+       <linearGradient id="gShade" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".32"/><stop offset=".5" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".12"/></linearGradient>
+       <linearGradient id="gGlass" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff" stop-opacity=".38"/><stop offset=".25" stop-color="#fff" stop-opacity=".08"/><stop offset=".75" stop-color="#fff" stop-opacity=".05"/><stop offset="1" stop-color="#fff" stop-opacity=".3"/></linearGradient>
+       <linearGradient id="gPh" x1="0" y1="0" x2="1" y2="0"></linearGradient>
+       <clipPath id="cSurf"><ellipse cx="580" cy="257" rx="98" ry="11"/></clipPath>
+      </defs>
+
+      <circle cx="850" cy="70" r="150" fill="#fff" opacity=".35"/>
+      <circle cx="330" cy="330" r="90" fill="#fff" opacity=".18"/>
+
+      <!-- 桌面與陰影 -->
+      <rect x="0" y="398" width="960" height="142" fill="url(#gBench)"/>
+      <rect x="0" y="398" width="960" height="3" fill="#fff" opacity=".7"/>
+      <ellipse cx="130" cy="437" rx="104" ry="11" fill="#2a5a55" opacity=".13"/>
+      <ellipse cx="580" cy="438" rx="112" ry="13" fill="#2a5a55" opacity=".13"/>
+
+      <!-- pH 計 -->
+      <g id="meter">
+       <rect x="45" y="140" width="170" height="294" rx="18" fill="url(#gMeter)"/>
+       <rect x="47" y="142" width="166" height="290" rx="16" fill="none" stroke="#fff" stroke-opacity=".10" stroke-width="2"/>
+       <rect x="108" y="126" width="26" height="16" rx="3" fill="#b7c3c9"/>
+       <path d="M114,128V140M121,128V140M128,128V140" stroke="#8fa0a8" stroke-width="2"/>
+       <rect x="58" y="158" width="144" height="78" rx="9" fill="#212c33"/>
+       <rect x="64" y="164" width="132" height="66" rx="5" fill="url(#gLcd)"/>
+       <g id="digits" transform="translate(78,174) skewX(-5)"></g>
+       <text x="70" y="225" font-size="11" font-weight="700" fill="#34452f" opacity=".75">pH</text>
+       <polygon points="64,164 196,164 196,174 64,194" fill="#fff" opacity=".16"/>
+       <text x="130" y="262" font-size="9.5" fill="#9db0b8" text-anchor="middle" letter-spacing=".6">DIGITAL pH METER</text>
+       <g fill="#5a6c75"><circle cx="85" cy="300" r="12"/><circle cx="130" cy="300" r="12"/><circle cx="175" cy="300" r="12"/></g>
+       <g fill="none" stroke="#fff" stroke-opacity=".25" stroke-width="2" stroke-linecap="round"><path d="M77,296 A9,9 0 0 1 86,291"/><path d="M122,296 A9,9 0 0 1 131,291"/><path d="M167,296 A9,9 0 0 1 176,291"/></g>
+       <g stroke="#26333a" stroke-width="3" stroke-linecap="round" opacity=".55"><path d="M72,350H188M72,362H188M72,374H188M72,386H188"/></g>
+      </g>
+
+      <!-- 電極線 -->
+      <path d="M121,128 C121,98 205,104 285,116 S 430,150 500,134" stroke="#56666d" stroke-width="5" fill="none" stroke-linecap="round"/>
+      <path d="M121,128 C121,98 205,104 285,116 S 430,150 500,134" stroke="#fff" stroke-opacity=".18" stroke-width="1.5" fill="none" stroke-linecap="round" transform="translate(-1,-1.5)"/>
+
+      <!-- 燒杯內溶液 -->
+      <g id="liquid">
+       <path id="liq" d="M482,257 L487,420 A93,12 0 0 0 673,420 L678,257 Z" fill="#a9dba9" fill-opacity=".92"/>
+       <path d="M482,257 L487,420 A93,12 0 0 0 673,420 L678,257 Z" fill="url(#gShade)"/>
+       <ellipse id="surf" cx="580" cy="257" rx="98" ry="11" fill="#c5e8c5"/>
+       <ellipse cx="580" cy="257" rx="98" ry="11" fill="none" stroke="#fff" stroke-opacity=".55" stroke-width="1.5"/>
+      </g>
+
+      <!-- 電極 -->
+      <g id="electrode" transform="translate(500,140) rotate(-7.8)">
+       <rect x="-10" y="-4" width="20" height="22" rx="5" fill="#59686f"/>
+       <rect x="-12" y="16" width="24" height="84" rx="4" fill="#f6f9f9" stroke="#b3c3c7" stroke-width="1.5"/>
+       <rect x="-12" y="44" width="24" height="6" fill="#9ccbc4"/>
+       <rect x="-9" y="100" width="18" height="122" fill="#46565e"/>
+       <rect x="-5" y="104" width="3" height="112" fill="#fff" opacity=".22"/>
+       <path d="M-9,222 C-15,240 -13,258 0,262 C13,258 15,240 9,222 Z" fill="#dff0f2" stroke="#9db7be" stroke-width="1.5"/>
+      </g>
+      <path id="liqOv" d="M482,257 L487,420 A93,12 0 0 0 673,420 L678,257 Z" fill="#a9dba9" fill-opacity=".30"/>
+
+      <!-- 漣漪 -->
+      <g id="ripples" clip-path="url(#cSurf)"></g>
+
+      <!-- 玻璃杯前景 -->
+      <path d="M480,190 L487,420 A93,12 0 0 0 673,420 L680,190 Z" fill="url(#gGlass)"/>
+      <path d="M480,190 L487,420 A93,12 0 0 0 673,420 L680,190" fill="none" stroke="#7fa7ae" stroke-opacity=".75" stroke-width="2.5" stroke-linejoin="round"/>
+      <ellipse cx="580" cy="190" rx="100" ry="12" fill="none" stroke="#7fa7ae" stroke-opacity=".6" stroke-width="2.5"/>
+      <path d="M493,208 L498,398" stroke="#fff" stroke-opacity=".7" stroke-width="5" stroke-linecap="round"/>
+      <path d="M667,214 L663,330" stroke="#fff" stroke-opacity=".45" stroke-width="3" stroke-linecap="round"/>
+      <path d="M492,413 A89,10 0 0 0 668,413" fill="none" stroke="#fff" stroke-opacity=".4" stroke-width="3"/>
+      <g id="grad"></g>
+
+      <!-- 滴落的液滴 -->
+      <g id="drops"></g>
+
+      <!-- 滴管 -->
+      <g id="dropper" transform="translate(622,-260) scale(.65)">
+       <g id="bulb">
+        <path d="M-10,-162 C-26,-186 -20,-232 0,-234 C20,-232 26,-186 10,-162 Z" fill="#8fc2b9" stroke="#6ba49a" stroke-width="2.5"/>
+        <path d="M-12,-176 C-16,-196 -12,-218 -4,-224" stroke="#fff" stroke-opacity=".5" stroke-width="5" fill="none" stroke-linecap="round"/>
+       </g>
+       <rect x="-13" y="-166" width="26" height="14" rx="4" fill="#7a9199"/>
+       <path d="M-3,0 L3,0 L8.5,-46 L8.5,-152 L-8.5,-152 L-8.5,-46 Z" fill="#f2f9fa" fill-opacity=".85" stroke="#9db7be" stroke-width="2.5" stroke-linejoin="round"/>
+       <path id="dropLiq" d="M-1.8,-2 L1.8,-2 L6.2,-46 L6.2,-118 L-6.2,-118 L-6.2,-46 Z" fill="#f6b9b0"/>
+       <path d="M-5,-60 V-140" stroke="#fff" stroke-opacity=".7" stroke-width="2.5" stroke-linecap="round"/>
+      </g>
+
+      <!-- 色卡 -->
+      <g id="legend" transform="translate(48,0)">
+       <text x="0" y="458" font-size="13" font-weight="700" fill="#4d6f75">萬用指示劑色卡</text>
+       <rect x="0" y="480" width="170" height="12" rx="6" fill="url(#gPh)" stroke="#fff" stroke-opacity=".7"/>
+       <g id="mk"><polygon points="-6,466 6,466 0,477" fill="#2f7f76"/></g>
+       <g font-size="12" fill="#5c7c82" text-anchor="middle"><text x="0" y="508">0</text><text x="85" y="508">7</text><text x="170" y="508">14</text></g>
+      </g>
+     </svg>
+
+     <div id="title">緩衝溶液<small>開場實驗</small></div>
+     <div id="chip" class="acid">0.0100 mol HCl</div>
+     <div id="card"></div>
+     <div id="cap" class="one">純水 200 mL</div>
+    </div>
+
+    <!-- ===== 結尾比較頁 ===== -->
+    <div class="layer off" id="fin">
+     <svg viewBox="0 0 960 540" width="960" height="540" xmlns="http://www.w3.org/2000/svg" id="finsvg">
+      <circle cx="850" cy="70" r="150" fill="#fff" opacity=".35"/>
+      <text x="60" y="72" font-size="32" font-weight="800" fill="#27434a">同樣加入 0.0100 mol 強酸或強鹼，pH 怎麼變？</text>
+
+      <text class="fx f1" x="60" y="132" font-size="28" font-weight="800" fill="#27434a">純水</text>
+
+      <!-- 色階 -->
+      <rect x="80" y="240" width="800" height="32" rx="16" fill="url(#gPh)" stroke="#fff" stroke-opacity=".8" stroke-width="2"/>
+      <g id="ticks"></g>
+
+      <!-- 純水：箭頭與標記 -->
+      <g id="stems" class="fx f2" stroke="#8fabb0" stroke-width="2" stroke-dasharray="5 5">
+       <line x1="480" y1="192" x2="480" y2="247"/><line id="stemA" x1="154.3" y1="192" x2="154.3" y2="247"/><line id="stemB" x1="805.7" y1="192" x2="805.7" y2="247"/>
+      </g>
+      <g id="arrows">
+       <line id="lnA" x1="480" y1="192" x2="480" y2="192" stroke="#e98f84" stroke-width="7" stroke-linecap="round"/>
+       <polygon id="hdA" fill="#e98f84" style="opacity:0"/>
+       <line id="lnB" x1="480" y1="192" x2="480" y2="192" stroke="#8b97dd" stroke-width="7" stroke-linecap="round"/>
+       <polygon id="hdB" fill="#8b97dd" style="opacity:0"/>
+      </g>
+      <g class="fx f3">
+       <text x="317" y="166" font-size="21" font-weight="800" fill="#a4412f" text-anchor="middle">加入 HCl：7.00 → 1.30</text>
+       <text x="480" y="132" font-size="17" font-weight="700" fill="#5c7c82" text-anchor="middle">起點 pH 7.00</text>
+       <text x="317" y="224" font-size="18" font-weight="700" fill="#5c7c82" text-anchor="middle">ΔpH = −5.70</text>
+       <text x="643" y="166" font-size="21" font-weight="800" fill="#434d9c" text-anchor="middle">加入 NaOH：7.00 → 12.70</text>
+       <text x="643" y="224" font-size="18" font-weight="700" fill="#5c7c82" text-anchor="middle">ΔpH = +5.70</text>
+      </g>
+      <g class="fx f2" stroke-width="4" fill="#fff">
+       <circle cx="480" cy="256" r="9" stroke="#27434a"/>
+       <circle cx="154.3" cy="256" r="9" stroke="#e98f84"/>
+       <circle cx="805.7" cy="256" r="9" stroke="#8b97dd"/>
+      </g>
+
+      <!-- 緩衝溶液 -->
+      <text class="fx f4" x="60" y="344" font-size="28" font-weight="800" fill="#27434a">緩衝溶液</text>
+      <g class="fx f4">
+       <line x1="350.9" y1="272" x2="350.9" y2="326" stroke="#8fabb0" stroke-width="2" stroke-dasharray="5 5"/>
+       <circle cx="350.9" cy="256" r="9" fill="#fff" stroke="#2f7f76" stroke-width="4"/>
+       <circle cx="350.9" cy="336" r="8" fill="#2f7f76"/>
+       <text x="376" y="330" font-size="20" font-weight="700" fill="#27434a">加入 HCl：4.74 → 4.72</text>
+       <text x="376" y="359" font-size="20" font-weight="700" fill="#27434a">加入 NaOH：4.74 → 4.76</text>
+      </g>
+      <g class="fx f5">
+       <text x="376" y="398" font-size="26" font-weight="800" fill="#2f7f76">ΔpH 只有 ±0.02，幾乎沒動！</text>
+      </g>
+
+      <g id="banner" class="fx">
+       <rect x="120" y="436" width="720" height="68" rx="34" fill="#2f7f76"/>
+       <text x="480" y="481" font-size="30" font-weight="800" fill="#fff" text-anchor="middle" letter-spacing="1">為什麼緩衝溶液的 pH 幾乎不受影響？</text>
+      </g>
+     </svg>
+    </div>
+
+   </div>
+  </div>
+ </div>
+
+ <div id="bar">
+  <button id="prev" title="上一步（←）">◀</button>
+  <div id="dots"></div>
+  <button id="next" title="下一步（→ / 空白鍵）">▶</button>
+  <button id="restart" title="重頭開始（Home）">↻</button>
+  <button id="fs" title="全螢幕（F）">⛶</button>
+  <span id="hint">→／空白鍵 下一步　←上一步　F 全螢幕</span>
+ </div>
+</div>
+
+<script>
+(function(){
+'use strict';
+var $=function(s){return document.querySelector(s);};
+var NS='http://www.w3.org/2000/svg';
+function el(n,a,p){var e=document.createElementNS(NS,n);if(a)for(var k in a)e.setAttribute(k,a[k]);if(p)p.appendChild(e);return e;}
+
+/* ---------- 化學數據：用公式即時計算，不寫死 ---------- */
+var V=0.200, N=0.0100, PKA=4.74, HA0=0.500, A0=0.500;
+var chem={
+  waterHCl:function(){return -Math.log10(N/V);},
+  waterNaOH:function(){return 14+Math.log10(N/V);},
+  bufHCl:function(){return PKA+Math.log10((A0-N)/(HA0+N));},
+  bufNaOH:function(){return PKA+Math.log10((A0+N)/(HA0-N));}
+};
+function r2(x){return Math.round(x*100)/100;}
+
+var S=[
+ {k:'water',t:'ask',r:'HCl', start:7.00},
+ {k:'water',t:'add',r:'HCl', from:7.00,to:r2(chem.waterHCl())},
+ {k:'water',t:'ask',r:'NaOH',start:7.00,fresh:true},
+ {k:'water',t:'add',r:'NaOH',from:7.00,to:r2(chem.waterNaOH())},
+ {k:'buf', t:'ask',r:'HCl', start:4.74},
+ {k:'buf', t:'add',r:'HCl', from:4.74,to:r2(chem.bufHCl())},
+ {k:'buf', t:'ask',r:'NaOH',start:4.74,fresh:true},
+ {k:'buf', t:'add',r:'NaOH',from:4.74,to:r2(chem.bufNaOH())},
+ {t:'final'},
+ {t:'final2'}
+];
+var OPTS={
+ 'water-HCl':['6～7 之間','3～5 之間','1～2 之間'],
+ 'water-NaOH':['12～13 之間','9～11 之間','7～8 之間'],
+ 'buf-HCl':['1～2 之間','3～4 之間','4～5 之間'],
+ 'buf-NaOH':['4～5 之間','8～9 之間','12～13 之間']
+};
+
+/* ---------- 指示劑顏色（柔和色調） ---------- */
+function hex2rgb(h){return [1,3,5].map(function(i){return parseInt(h.substr(i,2),16);});}
+var STOPS=[[0,'#e88a8a'],[2,'#f0a08c'],[3.5,'#f5bd8a'],[4.7,'#f4d68b'],[6,'#cfe3a2'],[7,'#a9dba9'],[8.5,'#90d4c4'],[10.5,'#9bb6e6'],[12.5,'#b49ee2'],[14,'#a98dd8']]
+  .map(function(a){return [a[0],hex2rgb(a[1])];});
+function phRGB(p){
+  p=Math.max(0,Math.min(14,p));
+  for(var i=1;i<STOPS.length;i++){
+    if(p<=STOPS[i][0]){
+      var p0=STOPS[i-1][0],c0=STOPS[i-1][1],p1=STOPS[i][0],c1=STOPS[i][1],t=(p-p0)/(p1-p0);
+      return c0.map(function(v,j){return v+(c1[j]-v)*t;});
+    }
+  }
+  return STOPS[STOPS.length-1][1];
+}
+function css(c){return 'rgb('+c.map(Math.round).join(',')+')';}
+function mix(c,w){return c.map(function(v){return v+(255-v)*w;});}
+
+/* 色階漸層（色卡與結尾頁共用） */
+(function(){
+  var g=$('#gPh');
+  for(var p=0;p<=14;p++){ el('stop',{offset:(p/14*100)+'%','stop-color':css(phRGB(p))},g); }
+  var tk=$('#ticks');
+  for(var q=0;q<=14;q++){
+    var x=80+q*800/14;
+    el('line',{x1:x,y1:274,x2:x,y2:281,stroke:'#8fabb0','stroke-width':2},tk);
+    var t=el('text',{x:x,y:302,'font-size':15,'font-weight':700,fill:'#5c7c82','text-anchor':'middle'},tk); t.textContent=q;
+  }
+  var pt=el('text',{x:80,y:326,'font-size':14,'font-weight':600,fill:'#5c7c82'},tk); pt.textContent='pH';
+  pt.setAttribute('x',44); pt.setAttribute('y',302);
+})();
+
+/* 燒杯刻度 */
+(function(){
+  var g=$('#grad');
+  function yv(v){return 425-0.84*v;}
+  function xr(y){return 680-7*(y-190)/230;}
+  [25,50,75,100,125,150,175,200,225,250].forEach(function(v){
+    var y=yv(v),x=xr(y),major=(v%50===0);
+    el('line',{x1:x-(major?20:11),y1:y,x2:x,y2:y,stroke:'#4f7077','stroke-opacity':.75,'stroke-width':major?2:1.5},g);
+    if(major){var t=el('text',{x:x-24,y:y+4,'font-size':11,'font-weight':600,fill:'#4f7077','fill-opacity':.85,'text-anchor':'end'},g);t.textContent=v;}
+  });
+  var u=el('text',{x:xr(203)-24,y:203,'font-size':11,'font-weight':600,fill:'#4f7077','fill-opacity':.85,'text-anchor':'end'},g);u.textContent='mL';
+})();
+
+/* ---------- 七段顯示 ---------- */
+var ON='#26352b', OFF='rgba(38,53,43,.08)';
+var SEG={0:'abcdef',1:'bc',2:'abdeg',3:'abcdg',4:'bcfg',5:'acdfg',6:'acdefg',7:'abc',8:'abcdefg',9:'abcdfg'};
+function buildDigit(parent,x){
+  var g=el('g',{transform:'translate('+x+',0)'},parent),w=22,h=40,t=4.6,m=h/2,e=1.0;
+  function hz(cy){return [t*.5+e,cy,t+e,cy-t/2,w-t-e,cy-t/2,w-t*.5-e,cy,w-t-e,cy+t/2,t+e,cy+t/2].join(' ').replace(/(\S+) (\S+)/g,'$1,$2');}
+  function vt(cx,y0,y1){return [cx,y0,cx+t/2,y0+t/2,cx+t/2,y1-t/2,cx,y1,cx-t/2,y1-t/2,cx-t/2,y0+t/2].join(' ').replace(/(\S+) (\S+)/g,'$1,$2');}
+  var P={a:hz(t/2),g:hz(m),d:hz(h-t/2),
+    f:vt(t/2,t/2+e,m-e),b:vt(w-t/2,t/2+e,m-e),e:vt(t/2,m+e,h-t/2-e),c:vt(w-t/2,m+e,h-t/2-e)};
+  var o={};
+  for(var k in P){o[k]=el('polygon',{points:P[k],fill:OFF},g);}
+  return o;
+}
+var dg=$('#digits'),D=[];
+[0,28,60,88].forEach(function(x){D.push(buildDigit(dg,x));});
+el('circle',{cx:54,cy:37.8,r:2.7,fill:ON},dg);
+
+var shown=7.00,lastStr='';
+function renderSeg(p){
+  var s=Math.max(0,Math.min(99.99,p)).toFixed(2);
+  if(s===lastStr)return; lastStr=s;
+  var ip=s.split('.')[0],fp=s.split('.')[1];
+  var digs=[ip.length>1?ip[0]:' ',ip.length>1?ip[1]:ip[0],fp[0],fp[1]];
+  digs.forEach(function(d,k){
+    var on=SEG[d]||'';
+    'abcdefg'.split('').forEach(function(c){D[k][c].setAttribute('fill',on.indexOf(c)>=0?ON:OFF);});
+  });
+}
+var liq=$('#liq'),liqOv=$('#liqOv'),surf=$('#surf'),mk=$('#mk');
+function setPH(p){
+  shown=p; renderSeg(p);
+  var c=phRGB(p);
+  liq.setAttribute('fill',css(c)); liqOv.setAttribute('fill',css(c)); surf.setAttribute('fill',css(mix(c,.3)));
+  mk.setAttribute('transform','translate('+(170*p/14)+',0)');
+}
+
+/* ---------- 動畫工具 ---------- */
+var tok=0;
+function sleep(ms){return new Promise(function(r){setTimeout(r,ms);});}
+function tween(my,dur,fn,ease){
+  ease=ease||function(t){return t;};
+  return new Promise(function(res){
+    var t0=performance.now();
+    (function f(now){
+      if(my!==tok){res();return;}
+      var t=Math.min(1,(now-t0)/dur); fn(ease(t));
+      if(t<1)requestAnimationFrame(f); else res();
+    })(t0);
+  });
+}
+var easeOut=function(t){return 1-Math.pow(1-t,2);};
+var easeOut3=function(t){return 1-Math.pow(1-t,3);};
+var easeIn3=function(t){return t*t*t;};
+var easeInOut=function(t){return t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2;};
+function roll(my,to,dur,ease){
+  var from=shown;
+  return tween(my,dur,function(e){setPH(from+(to-from)*e);},ease);
+}
+
+/* ---------- 滴管 / 液滴 / 漣漪 ---------- */
+var dropper=$('#dropper'),bulb=$('#bulb'),chip=$('#chip'),dropLiq=$('#dropLiq'),drops=$('#drops'),ripples=$('#ripples');
+var TIP_Y=172,DX=622,HIDE_Y=-230;
+function setDropper(y){
+  dropper.setAttribute('transform','translate('+DX+','+y+') scale(.65)');
+  chip.style.transform='translateY('+(y-TIP_Y)+'px)';
+}
+function hideDropper(){setDropper(HIDE_Y);chip.style.opacity=0;}
+function squeeze(my){
+  return tween(my,220,function(e){
+    var s=1-0.08*Math.sin(Math.PI*e);
+    bulb.setAttribute('transform','translate(0,-162) scale(1,'+s+') translate(0,162)');
+  });
+}
+function clearDyn(){drops.innerHTML='';ripples.innerHTML='';bulb.setAttribute('transform','');}
+function ripple(my){
+  var a=el('ellipse',{cx:DX,cy:257,rx:3,ry:1,fill:'none',stroke:'#fff','stroke-width':2.4},ripples);
+  var b=el('ellipse',{cx:DX,cy:257,rx:3,ry:1,fill:'none',stroke:'#2a6a63','stroke-opacity':.18,'stroke-width':1.2},ripples);
+  return tween(my,1000,function(e){
+    var rx=3+58*e; var op=1-e;
+    a.setAttribute('rx',rx);a.setAttribute('ry',rx*.2);a.setAttribute('stroke-opacity',op*.95);
+    b.setAttribute('rx',rx+3);b.setAttribute('ry',(rx+3)*.2);b.setAttribute('stroke-opacity',op*.2);
+  },easeOut).then(function(){if(a.parentNode)a.remove();if(b.parentNode)b.remove();});
+}
+function fallDrop(my,tint){
+  var g=el('g',{},drops);
+  el('path',{d:'M0,-9 C5,-2 6,3 0,6 C-6,3 -5,-2 0,-9 Z',fill:tint,stroke:'rgba(255,255,255,.7)','stroke-width':1},g);
+  el('ellipse',{cx:-1.6,cy:0,rx:1.1,ry:2,fill:'#fff','fill-opacity':.8},g);
+  return tween(my,270,function(e){
+    g.setAttribute('transform','translate('+DX+','+(180+(257-180)*e)+')');
+  },function(t){return t*t;}).then(function(){
+    if(g.parentNode)g.remove();
+    if(my===tok)ripple(my);
+  });
+}
+
+/* ---------- 文字內容 ---------- */
+var card=$('#card'),cap=$('#cap');
+function reag(r){return '<b class="'+(r==='HCl'?'a':'b')+'">0.0100 mol '+r+'</b>';}
+function askCard(n){
+  var s=S[n],o=OPTS[s.k+'-'+s.r],L=['A','B','C'];
+  return '<div class="tag">預測</div>'+
+    '<div class="q">加入<br>'+reag(s.r)+'<br>pH 會變成多少？</div>'+
+    '<ul class="opts">'+o.map(function(t,i){return '<li><i>'+L[i]+'</i>'+t+'</li>';}).join('')+'</ul>';
+}
+function resultCard(n){
+  var s=S[n],d=r2(s.to-s.from),ds=(d>0?'+':'−')+Math.abs(d).toFixed(2);
+  var h='<div class="tag res">結果</div>'+
+    '<div class="big">'+s.from.toFixed(2)+'<span class="ar">→</span>'+s.to.toFixed(2)+'</div>'+
+    '<div class="delta">ΔpH = '+ds+'</div>';
+  if(s.k==='water'){
+    h+='<div class="note">pH 變化幅度<span style="color:var(--acid-ink)">劇烈</span></div>';
+  }else{
+    var w=S[s.r==='HCl'?1:3],dw=Math.abs(w.to-w.from),db=Math.abs(d),sc=100/dw;
+    h+='<div class="note">pH 變化幅度<span style="color:var(--teal-d)">不大</span></div>'+
+      '<div class="cmp"><div class="ct">同樣加入 '+s.r+'，變化量比較</div>'+
+      '<div class="r"><span class="nm">純水</span><span class="bar" style="width:'+(dw*sc)+'px;background:'+(s.r==='HCl'?'var(--acid)':'var(--base)')+'"></span><span class="val">'+dw.toFixed(2)+'</span></div>'+
+      '<div class="r"><span class="nm">緩衝</span><span class="bar" style="width:'+Math.max(3,db*sc)+'px;background:var(--teal-d)"></span><span class="val">'+db.toFixed(2)+'</span></div></div>';
+  }
+  return h;
+}
+function setCard(html,anim){
+  card.innerHTML=html;
+  if(anim){card.classList.remove('in');void card.offsetWidth;card.classList.add('in');}
+}
+function capInfo(n){
+  var a=S[n].t==='ask'?n:n-1,s=S[a];
+  if(s.k==='water')return {cls:'one',html:s.fresh?'換一杯新的純水 200 mL':'純水 200 mL'};
+  return {cls:'two',html:'<div class="l1">'+(s.fresh?'換一杯新的緩衝溶液 200 mL':'緩衝溶液 200 mL')+'</div>'+
+    '<div class="l2">0.500 mol CH<sub>3</sub>COOH ＋ 0.500 mol CH<sub>3</sub>COONa</div>'};
+}
+function setCap(n,pulse){
+  var c=capInfo(n);
+  cap.className=c.cls; cap.innerHTML=c.html;
+  if(pulse){void cap.offsetWidth;cap.classList.add('pulse');}
+}
+
+/* ---------- 結尾頁 ---------- */
+var lab=$('#lab'),fin=$('#fin');
+function xp(p){return 80+p*800/14;}
+var ARR=[
+  {x0:xp(7),x1:xp(1.30),y:192,ln:$('#lnA'),hd:$('#hdA')},
+  {x0:xp(7),x1:xp(12.70),y:192,ln:$('#lnB'),hd:$('#hdB')}
+];
+function drawArrow(a,t){
+  var d=a.x1>a.x0?1:-1,xe=a.x0+(a.x1-a.x0)*t;
+  a.ln.setAttribute('x1',a.x0);a.ln.setAttribute('x2',xe-d*(t>0.04?10:0));
+  a.hd.setAttribute('points',xe+','+a.y+' '+(xe-d*20)+','+(a.y-12)+' '+(xe-d*20)+','+(a.y+12));
+  a.hd.style.opacity=t>0.04?1:0;
+}
+function finFx(cls,on){document.querySelectorAll('#fin .'+cls).forEach(function(e){e.classList.toggle('on',on);});}
+function finalStatic(full){
+  ARR.forEach(function(a){drawArrow(a,1);});
+  ['f1','f2','f3'].forEach(function(c){finFx(c,true);});
+  ['f4','f5'].forEach(function(c){finFx(c,!!full);});
+  $('#banner').classList.toggle('on',!!full);
+}
+function finalReset(){
+  ARR.forEach(function(a){drawArrow(a,0);});
+  ['f1','f2','f3','f4','f5'].forEach(function(c){finFx(c,false);});
+  $('#banner').classList.remove('on');
+}
+async function playFinal(my){
+  finalReset();
+  lab.classList.add('off'); fin.classList.remove('off');
+  await sleep(550); if(my!==tok)return;
+  finFx('f1',true); finFx('f2',true);
+  await sleep(250); if(my!==tok)return;
+  await tween(my,1100,function(e){ARR.forEach(function(a){drawArrow(a,e);});},easeOut3);
+  if(my!==tok)return;
+  finFx('f3',true);
+}
+async function playFinal2(my){
+  finFx('f4',true);
+  await sleep(1500); if(my!==tok)return;
+  finFx('f5',true);
+  await sleep(1400); if(my!==tok)return;
+  $('#banner').classList.add('on');
+}
+
+/* ---------- 步驟控制 ---------- */
+var step=0;
+function applyStatic(n){
+  var s=S[n];
+  if(s.t==='final'||s.t==='final2'){lab.classList.add('off');fin.classList.remove('off');finalStatic(s.t==='final2');return;}
+  lab.classList.remove('off');fin.classList.add('off');
+  hideDropper();
+  setCap(n,false);
+  setPH(s.t==='add'?s.to:s.start);
+  setCard(s.t==='ask'?askCard(n):resultCard(n),false);
+}
+async function addReagent(my,n){
+  var s=S[n],acid=s.r==='HCl';
+  chip.className=acid?'acid':'base'; chip.textContent='0.0100 mol '+s.r;
+  dropLiq.setAttribute('fill',acid?'#f6b9b0':'#b9c1f2');
+  var tint=acid?'#f2a79c':'#a6b0ec';
+  chip.style.opacity=1;
+  await tween(my,700,function(e){setDropper(HIDE_Y+(TIP_Y-HIDE_Y)*e);},easeOut3);
+  if(my!==tok)return;
+  var rollP=null,jobs=[];
+  for(var i=0;i<6;i++){
+    (function(i){
+      jobs.push((async function(){
+        await sleep(i*340); if(my!==tok)return;
+        squeeze(my);
+        await sleep(90); if(my!==tok)return;
+        await fallDrop(my,tint); if(my!==tok)return;
+        if(i===0)rollP=roll(my,s.to,2300,easeOut);
+      })());
+    })(i);
+  }
+  await Promise.all(jobs); if(my!==tok)return;
+  await tween(my,600,function(e){setDropper(TIP_Y+(HIDE_Y-TIP_Y)*e);},easeIn3);
+  if(my!==tok)return;
+  chip.style.opacity=0;
+  if(rollP)await rollP;
+  if(my!==tok)return;
+  setPH(s.to);
+  setCard(resultCard(n),true);
+}
+async function play(my,n){
+  var s=S[n];
+  if(s.t==='ask'){
+    setCap(n,true); setCard(askCard(n),true);
+    await roll(my,s.start,1000,easeInOut);
+  }else if(s.t==='add'){
+    await addReagent(my,n);
+  }else if(s.t==='final'){
+    await playFinal(my);
+  }else{
+    await playFinal2(my);
+  }
+}
+var dotsEl=$('#dots'),dotBtns=[];
+S.forEach(function(_,i){
+  var b=document.createElement('button');b.className='dot';b.title='第 '+(i+1)+' 步';
+  b.addEventListener('click',function(e){e.stopPropagation();go(i);});
+  dotsEl.appendChild(b);dotBtns.push(b);
+});
+function updateBar(){dotBtns.forEach(function(b,i){b.classList.toggle('on',i===step);});}
+async function go(n){
+  n=Math.max(0,Math.min(S.length-1,n));
+  var prev=step,forward=(n===prev+1);
+  tok++;var my=tok;
+  clearDyn();step=n;updateBar();
+  if(forward){applyStatic(prev);await play(my,n);}
+  else{applyStatic(n);if(n===0)setCard(askCard(0),true);}
+}
+function next(){if(step<S.length-1)go(step+1);}
+function prev(){if(step>0)go(step-1);}
+
+document.addEventListener('keydown',function(e){
+  var k=e.key;
+  if(k==='ArrowRight'||k==='ArrowDown'||k==='PageDown'||k===' '||k==='Enter'){e.preventDefault();next();}
+  else if(k==='ArrowLeft'||k==='ArrowUp'||k==='PageUp'||k==='Backspace'){e.preventDefault();prev();}
+  else if(k==='Home'){e.preventDefault();go(0);}
+  else if(k==='f'||k==='F'){toggleFS();}
+});
+$('#stage').addEventListener('click',next);
+$('#next').addEventListener('click',function(e){e.stopPropagation();next();});
+$('#prev').addEventListener('click',function(e){e.stopPropagation();prev();});
+$('#restart').addEventListener('click',function(e){e.stopPropagation();go(0);});
+$('#fs').addEventListener('click',function(e){e.stopPropagation();toggleFS();});
+function toggleFS(){
+  var d=document,de=d.documentElement;
+  if(!d.fullscreenElement){(de.requestFullscreen||de.webkitRequestFullscreen||function(){}).call(de);}
+  else{(d.exitFullscreen||d.webkitExitFullscreen||function(){}).call(d);}
+}
+
+/* ---------- 縮放 ---------- */
+function fit(){
+  var v=$('#view'),s=Math.min(v.clientWidth/960,v.clientHeight/540);
+  var f=$('#fit');f.style.width=(960*s)+'px';f.style.height=(540*s)+'px';
+  $('#stage').style.transform='scale('+s+')';
+}
+window.addEventListener('resize',fit);fit();
+
+/* ---------- 啟動 ---------- */
+var q=new URLSearchParams(location.search);
+if(q.get('bar')==='0')document.body.classList.add('nobar');
+fit();
+var s0=parseInt(q.get('step'),10);
+if(!(s0>=0&&s0<S.length))s0=0;
+step=s0;updateBar();applyStatic(s0);
+if(S[s0].t==='ask')setCard(askCard(s0),true);
+window.__buffer={go:go,S:S,get step(){return step;}};
+})();
+</script>
+</body>
+</html>
