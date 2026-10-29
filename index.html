@@ -76,6 +76,7 @@ body{padding-bottom:calc(20px + env(safe-area-inset-bottom));overflow-x:hidden;}
 .c4::after{background:linear-gradient(to bottom,var(--peri),#6a78c8);}
 .c5::after{background:linear-gradient(to bottom,var(--violet),#8a6fd0);}
 .c6::after{background:linear-gradient(to bottom,var(--rose),#c05040);}
+.c7::after{background:linear-gradient(to bottom,#f6a6cb,#d0558f);}
 
 .card-icon{width:48px;height:48px;border-radius:13px;flex-shrink:0;
   display:flex;align-items:center;justify-content:center;font-size:22px;}
@@ -85,6 +86,7 @@ body{padding-bottom:calc(20px + env(safe-area-inset-bottom));overflow-x:hidden;}
 .c4 .card-icon{background:rgba(154,168,238,.10);border:1px solid rgba(154,168,238,.2);}
 .c5 .card-icon{background:rgba(180,154,232,.10);border:1px solid rgba(180,154,232,.2);}
 .c6 .card-icon{background:rgba(224,112,96,.10);border:1px solid rgba(224,112,96,.2);}
+.c7 .card-icon{background:rgba(240,138,184,.10);border:1px solid rgba(240,138,184,.2);}
 
 .card-body{flex:1;min-width:0;}
 .card-title{font-size:15.5px;font-weight:800;margin-bottom:3px;line-height:1.25;}
@@ -96,6 +98,7 @@ body{padding-bottom:calc(20px + env(safe-area-inset-bottom));overflow-x:hidden;}
 .c4 .card-eq{color:var(--peri);}
 .c5 .card-eq{color:var(--violet);}
 .c6 .card-eq{color:var(--rose);}
+.c7 .card-eq{color:#f08ab8;}
 .card-desc{font-size:12px;color:var(--text2);line-height:1.6;}
 .card-tags{display:flex;gap:5px;flex-wrap:wrap;margin-top:7px;}
 .tag{font-size:10px;font-weight:600;padding:2px 7px;border-radius:20px;
@@ -105,6 +108,7 @@ body{padding-bottom:calc(20px + env(safe-area-inset-bottom));overflow-x:hidden;}
 .c3 .tag.hi{background:rgba(122,182,232,.12);color:var(--sky);border-color:rgba(122,182,232,.25);}
 .c4 .tag.hi{background:rgba(154,168,238,.12);color:var(--peri);border-color:rgba(154,168,238,.25);}
 .c5 .tag.hi{background:rgba(180,154,232,.12);color:var(--violet);border-color:rgba(180,154,232,.25);}
+.c7 .tag.hi{background:rgba(240,138,184,.12);color:#f08ab8;border-color:rgba(240,138,184,.25);}
 
 .card-arrow{font-size:20px;color:var(--text3);flex-shrink:0;transition:transform .16s;}
 .card:active .card-arrow{transform:translateX(3px);}
@@ -305,6 +309,30 @@ body{padding-bottom:calc(20px + env(safe-area-inset-bottom));overflow-x:hidden;}
 
   </div>
 
+  <!-- ═══ 酸鹼滴定 ═══ -->
+  <div class="divider">
+    <div class="divider-line"></div>
+    <div class="divider-label">酸鹼滴定</div>
+    <div class="divider-line"></div>
+  </div>
+
+  <div class="cards">
+    <a class="card c7" href="titration.html">
+      <div class="card-icon">📈</div>
+      <div class="card-body">
+        <div class="card-title">酸鹼滴定模擬器</div>
+        <div class="card-eq">HCl + NaOH → NaCl + H₂O</div>
+        <div class="card-desc">認識實驗裝置、親手滴定，再看滴定曲線、選指示劑、算未知濃度</div>
+        <div class="card-tags">
+          <span class="tag hi">實驗裝置</span>
+          <span class="tag hi">滴定曲線</span>
+          <span class="tag">大螢幕版</span>
+        </div>
+      </div>
+      <div class="card-arrow">›</div>
+    </a>
+  </div>
+
   <!-- ═══ 即將推出 ═══ -->
   <div class="divider">
     <div class="divider-line"></div>
@@ -346,7 +374,7 @@ body{padding-bottom:calc(20px + env(safe-area-inset-bottom));overflow-x:hidden;}
 
 <script>
 /* ── 版本號：更新教材後改成當天日期 ── */
-const SITE_VER = '20260909';
+const SITE_VER = '20261029';
 
 document.querySelectorAll('a.card').forEach(a => {
   const href = a.getAttribute('href');
