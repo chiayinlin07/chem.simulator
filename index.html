@@ -317,29 +317,15 @@ body{padding-bottom:calc(20px + env(safe-area-inset-bottom));overflow-x:hidden;}
   </div>
 
   <div class="cards">
-    <a class="card c7" href="titration.html">
-      <div class="card-icon">📈</div>
-      <div class="card-body">
-        <div class="card-title">酸鹼滴定模擬器・投影版</div>
-        <div class="card-eq">HCl + NaOH → NaCl + H₂O</div>
-        <div class="card-desc">認識實驗裝置、親手滴定，再看滴定曲線、選指示劑、算未知濃度</div>
-        <div class="card-tags">
-          <span class="tag hi">實驗裝置</span>
-          <span class="tag hi">滴定曲線</span>
-          <span class="tag">大螢幕版</span>
-        </div>
-      </div>
-      <div class="card-arrow">›</div>
-    </a>
     <a class="card c7" href="titration_mobile.html">
       <div class="card-icon">📱</div>
       <div class="card-body">
-        <div class="card-title">酸鹼滴定模擬器・手機版</div>
+        <div class="card-title">酸鹼滴定模擬器</div>
         <div class="card-eq">HCl + NaOH → NaCl + H₂O</div>
-        <div class="card-desc">直式單手操作，一步一步帶你做完滴定，再看自己的滴定曲線</div>
+        <div class="card-desc">直式單手操作，一步步做完滴定；可選 HCl、醋酸、氨水，比較強酸、弱酸、弱鹼的滴定曲線</div>
         <div class="card-tags">
           <span class="tag hi">步驟引導</span>
-          <span class="tag hi">我的滴定曲線</span>
+          <span class="tag hi">弱酸弱鹼</span>
           <span class="tag">手機版</span>
         </div>
       </div>
@@ -388,7 +374,7 @@ body{padding-bottom:calc(20px + env(safe-area-inset-bottom));overflow-x:hidden;}
 
 <script>
 /* ── 版本號：更新教材後改成當天日期 ── */
-const SITE_VER = '20261030';
+const SITE_VER = '20261031';
 
 document.querySelectorAll('a.card').forEach(a => {
   const href = a.getAttribute('href');
