@@ -1,0 +1,1201 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<meta name="theme-color" content="#14213d">
+<title>酸鹼滴定模擬器（手機版）</title>
+<style>
+:root{
+  --bg:#f1f5fb; --card:#ffffff; --ink:#14213d; --muted:#4b5b75; --line:#cdd7e6;
+  --primary:#1f4fd8; --primary-d:#16398f; --ok:#0f7a3a; --bad:#c62828; --warn:#b45309;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none}
+body{font-family:"PingFang TC","Noto Sans TC","Microsoft JhengHei",system-ui,sans-serif;background:var(--bg);color:var(--ink);
+  font-size:16px;display:flex;flex-direction:column;height:100vh;height:100dvh;-webkit-text-size-adjust:100%;
+  -webkit-user-select:none;user-select:none}
+input{-webkit-user-select:text;user-select:text}
+button{font:inherit;touch-action:manipulation;cursor:pointer}
+[hidden]{display:none!important}
+sub,sup{line-height:0}
+
+/* ---------- 頂列 ---------- */
+header{flex:none;display:flex;align-items:center;gap:6px;padding:6px 8px;padding-top:max(6px,env(safe-area-inset-top));background:#14213d;color:#fff}
+#tabs{display:flex;gap:6px;flex:1}
+#tabs button{flex:1;max-width:120px;min-height:44px;font-size:16px;font-weight:800;border-radius:10px;border:2px solid #5b6f99;background:transparent;color:#dbe4f6}
+#tabs button.on{background:#fff;color:#14213d;border-color:#fff}
+header .hb{min-height:44px;min-width:44px;padding:0 10px;border-radius:10px;border:2px solid #5b6f99;background:transparent;color:#dbe4f6;font-size:14px;font-weight:800}
+header .hb.on{background:#fbbf24;border-color:#fbbf24;color:#14213d}
+#teacherTag{background:#fbbf24;color:#14213d;font-weight:800;font-size:12px;padding:2px 8px;border-radius:99px}
+
+main{flex:1;min-height:0;position:relative;display:flex;flex-direction:column}
+.page{flex:1;min-height:0;display:flex;flex-direction:column}
+
+/* ---------- 步驟引導列 ---------- */
+#guide{flex:none;display:flex;gap:8px;align-items:center;min-height:62px;padding:6px 8px;background:#fff;border-bottom:2px solid var(--line)}
+#gBadge{flex:none;width:58px;text-align:center;background:var(--primary);color:#fff;border-radius:10px;padding:3px 0;line-height:1.2;font-weight:800}
+#gBadge small{display:block;font-size:12px;font-weight:700;opacity:.9}
+#gBadge b{font-size:18px}
+#gBadge.free{background:#64748b}
+#gBadge.done{background:var(--ok)}
+#gText{flex:1;min-width:0;font-size:15px;line-height:1.3;font-weight:700}
+#gText.warn{color:#7a3a00;background:#fff3d6;border-radius:8px;padding:3px 8px}
+#gText.info{color:#16398f;background:#e8effd;border-radius:8px;padding:3px 8px}
+
+/* ---------- 場景 ---------- */
+#scene{flex:1;min-height:0;display:flex;gap:6px;padding:6px 8px;position:relative}
+#svgWrap{flex:1;min-width:0;position:relative;background:#fff;border:2px solid var(--line);border-radius:14px;overflow:hidden}
+#labSvg{position:absolute;inset:0;width:100%;height:100%;display:block}
+#labSvg .part{cursor:pointer}
+#labSvg .part.sel{filter:drop-shadow(0 0 3px #1f4fd8) drop-shadow(0 0 7px #1f4fd8)}
+#labSvg .pour{filter:drop-shadow(0 0 9px #1f4fd8)}
+#labSvg #lLabels{display:none}
+#side{flex:none;width:162px;display:flex;flex-direction:column;gap:6px;overflow-y:auto;min-height:0}
+#lLoupe{width:100%;aspect-ratio:1/1;height:auto;border:2px solid var(--line);border-radius:12px;background:#fff;display:block;flex:none}
+#loupeCap{font-size:12px;color:var(--muted);font-weight:700;line-height:1.3;margin-top:-2px}
+#rdRow{display:flex;gap:4px;flex:none}
+#rdIn{flex:1;min-width:0;width:0;font:inherit;font-size:18px;font-weight:800;padding:4px 6px;border:2px solid var(--line);border-radius:10px;min-height:44px;text-align:center;font-variant-numeric:tabular-nums}
+#rdIn:focus{outline:none;border-color:var(--primary)}
+#rdBtn{flex:none;min-width:62px;min-height:44px;border-radius:10px;border:2px solid var(--primary);background:var(--primary);color:#fff;font-weight:800;font-size:14px;padding:0 6px}
+#rdBtn:disabled{opacity:.4}
+#recBox{background:#fff;border:2px solid var(--line);border-radius:12px;padding:5px 8px;font-size:13px;line-height:1.4}
+#recBox .rh{display:flex;justify-content:space-between;align-items:center;font-weight:800;font-size:13px}
+#recBox .rh button{font-size:13px;padding:1px 8px;border:1.5px solid var(--line);background:#fff;border-radius:8px;min-height:32px;min-width:44px}
+.rt{display:flex;justify-content:space-between;gap:4px;font-variant-numeric:tabular-nums}
+.rt b{font-weight:800}
+.rt.ok b{color:var(--ok)}
+.rt.cur{color:var(--primary);font-weight:700}
+#recSum{margin-top:2px;font-weight:600}
+#recSum .bad{color:var(--bad)}
+#teacherPill{display:inline-block;background:#fbbf24;color:#14213d;font-weight:800;font-size:12px;border-radius:99px;padding:1px 8px;margin-top:2px}
+
+/* 點儀器的說明卡 */
+#sheet{position:absolute;left:8px;right:8px;bottom:8px;z-index:6;background:rgba(255,255,255,.98);border:2px solid var(--primary);border-radius:14px;padding:8px 12px 10px;box-shadow:0 6px 18px rgba(20,33,61,.25)}
+#sheet h3{margin:0 0 2px;font-size:17px}
+#sheet .use{font-size:15px;line-height:1.45;font-weight:600}
+#sheet .tip{margin-top:5px;font-size:14px;line-height:1.4;color:#7a3a00;background:#fff3d6;border-radius:8px;padding:3px 8px;font-weight:600}
+#sheet .x{position:absolute;top:2px;right:4px;border:0;background:transparent;font-size:20px;min-width:44px;min-height:44px;color:var(--muted)}
+
+/* ---------- 操作區（底） ---------- */
+#dock{flex:none;background:#fff;border-top:2px solid var(--line);padding:6px 8px calc(6px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:6px}
+#tray{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}
+#tray button{min-height:52px;border-radius:12px;border:2px solid var(--line);background:#f8fafd;color:var(--ink);font-size:12.5px;font-weight:800;line-height:1.15;padding:3px 2px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px}
+#tray button .ic{font-size:20px;line-height:1}
+#ctl{display:flex;gap:5px}
+#lHoldBtn{flex:2.3;min-height:54px;border-radius:14px;border:0;background:var(--primary);color:#fff;font-size:20px;font-weight:800}
+#lHoldBtn.run{background:#d97706}
+.lStep{flex:1;min-height:54px;border-radius:12px;border:2px solid var(--primary);background:#fff;color:var(--primary);font-size:14px;font-weight:800;padding:0 2px}
+#rateRow{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:var(--muted)}
+#rateRow input[type=range]{flex:1;min-width:0;height:36px}
+#rateRow label.chk{display:flex;align-items:center;gap:4px;white-space:nowrap;min-height:40px}
+#rateRow input[type=checkbox]{width:20px;height:20px}
+.nudge{animation:nudge 1.1s ease-in-out infinite}
+@keyframes nudge{0%,100%{box-shadow:0 0 0 0 rgba(251,146,60,.0);border-color:#f59e0b}50%{box-shadow:0 0 0 5px rgba(251,146,60,.55);border-color:#f59e0b}}
+#lHoldBtn.nudge{animation-name:nudgeBtn}
+@keyframes nudgeBtn{0%,100%{box-shadow:0 0 0 0 rgba(251,146,60,.0)}50%{box-shadow:0 0 0 5px rgba(251,146,60,.65)}}
+
+/* ---------- 認識儀器（全景） ---------- */
+#pano{position:fixed;inset:0;z-index:30;background:var(--bg);display:flex;flex-direction:column}
+#pano .ph{flex:none;display:flex;align-items:center;justify-content:space-between;padding:6px 10px;padding-top:max(6px,env(safe-area-inset-top));background:#14213d;color:#fff;font-weight:800}
+#pano .ph button{min-height:40px;padding:0 14px;border-radius:10px;border:2px solid #fff;background:transparent;color:#fff;font-weight:800}
+#panoScroll{flex:1;min-height:0;overflow:auto;background:#fff;-webkit-overflow-scrolling:touch}
+#panoScroll svg{height:100%;width:auto;min-width:640px;display:block}
+#panoSvg .part{cursor:pointer}
+#panoSvg .part.sel{filter:drop-shadow(0 0 3px #1f4fd8) drop-shadow(0 0 7px #1f4fd8)}
+#panoSvg .lbls text{font-size:19px;font-weight:800;fill:#14213d;paint-order:stroke;stroke:#fff;stroke-width:5px;stroke-linejoin:round}
+#panoSvg .lbls path{stroke:#14213d;stroke-width:1.8;fill:none}
+#panoInfo{flex:none;min-height:128px;padding:8px 14px calc(10px + env(safe-area-inset-bottom));background:#fff;border-top:2px solid var(--line)}
+#panoInfo h3{margin:0 0 3px;font-size:18px}
+#panoInfo .use{font-size:15px;line-height:1.45;font-weight:600}
+#panoInfo .tip{margin-top:5px;font-size:14px;line-height:1.4;color:#7a3a00;background:#fff3d6;border-radius:8px;padding:3px 8px;font-weight:600}
+
+/* ---------- 曲線頁 ---------- */
+#pgCurve{padding:6px 8px;gap:6px}
+#cvWrap{flex:1;min-height:0;position:relative;background:#fff;border:2px solid var(--line);border-radius:14px;overflow:hidden}
+#cv{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none}
+#cvSide{flex:none;display:flex;flex-direction:column;gap:6px;padding-bottom:env(safe-area-inset-bottom)}
+#cvRead{display:flex;align-items:center;gap:8px;min-height:44px;background:#fff;border:2px solid var(--line);border-radius:12px;padding:4px 10px;font-size:15px;font-weight:800;font-variant-numeric:tabular-nums}
+#cvSw{flex:none;width:22px;height:22px;border-radius:50%;border:2px solid #7b8aa6;background:#e1f0fa}
+#cvNote{font-size:13.5px;line-height:1.4;font-weight:600;color:var(--muted);background:#fff;border:2px solid var(--line);border-radius:12px;padding:5px 10px;min-height:40px}
+#cvNote b{color:var(--ink)}
+#cvNote .lock{color:#7a3a00}
+#cvChips{display:grid;grid-template-columns:repeat(4,1fr);gap:5px}
+#cvChips button{min-height:44px;border-radius:10px;border:2px solid var(--line);background:#fff;color:var(--ink);font-weight:800;font-size:14px;padding:0 2px}
+#cvChips button.on{background:var(--primary);border-color:var(--primary);color:#fff}
+#cvAct{display:flex;gap:5px;align-items:center}
+#cvHold{flex:1;min-height:46px;border-radius:12px;border:0;background:var(--primary);color:#fff;font-size:16px;font-weight:800}
+#cvHold.run{background:#d97706}
+#cvDrop{flex:none;min-width:84px;min-height:46px;border-radius:12px;border:2px solid var(--primary);background:#fff;color:var(--primary);font-weight:800}
+#cvMsg{font-size:13px;font-weight:700;color:#7a3a00;min-height:0}
+#cvMsg:empty{display:none}
+
+/* 橫放 */
+#rot{position:fixed;inset:0;z-index:40;background:rgba(20,33,61,.96);color:#fff;display:none;align-items:center;justify-content:center;flex-direction:column;gap:14px;text-align:center;padding:20px;font-size:18px;font-weight:700}
+#rot button{min-height:46px;padding:0 20px;border-radius:12px;border:2px solid #fff;background:transparent;color:#fff;font-weight:800;font-size:16px}
+@media (orientation:landscape) and (max-height:520px){
+  body.onlab #rot{display:flex}
+  header{padding-top:3px;padding-bottom:3px}
+  #pgCurve{flex-direction:row}
+  #cvSide{width:42%;max-width:340px;overflow-y:auto}
+  #cvRead{font-size:14px}
+}
+@media (max-height:700px){
+  #loupeCap{display:none}
+}
+@media (max-height:640px){
+  #guide{min-height:56px}
+  #tray button{min-height:48px}
+  #lHoldBtn,.lStep{min-height:48px}
+}
+@media (max-width:359px){
+  #side{width:140px}
+  #tray button{font-size:11.5px}
+}
+</style>
+</head>
+<body class="onlab">
+<header>
+  <nav id="tabs"><button data-pg="lab" class="on">🧪 實驗</button><button data-pg="curve">📈 曲線</button></nav>
+  <span id="teacherTag" hidden>教師</span>
+  <button class="hb" id="panoBtn" title="認識全部儀器">🧰 儀器</button>
+  <button class="hb on" id="guideBtn" aria-pressed="true">引導</button>
+</header>
+
+<main>
+  <!-- ================= 實驗頁 ================= -->
+  <section class="page" id="pgLab">
+    <div id="guide">
+      <div id="gBadge"><small id="gTrial">第 1 次</small><b id="gStep">1/6</b></div>
+      <div id="gText"></div>
+    </div>
+
+    <div id="scene">
+      <div id="svgWrap">    <svg id="labSvg" viewBox="8 54 326 596" preserveAspectRatio="xMidYMax meet" xmlns="http://www.w3.org/2000/svg" aria-label="酸鹼滴定實驗裝置">
+      <defs>
+        <clipPath id="lBurClip"><path d="M215 80 H245 V418 L233 434 V440 H227 V434 L215 418 Z M227 456 L229.4 486 H230.6 L233 456 Z"/></clipPath>
+        <clipPath id="lFlaskClip"><path d="M214 540 V566 L170 614 Q166 622 176 622 H284 Q294 622 290 614 L246 566 V540 Z"/></clipPath>
+        <clipPath id="lPipClip"><rect x="-2.8" y="-92" width="5.6" height="92"/><ellipse cx="0" cy="-140" rx="9" ry="50"/><rect x="-2.8" y="-262" width="5.6" height="132"/></clipPath>
+        <clipPath id="lWasteClip"><rect x="19" y="566" width="66" height="72"/></clipPath>
+        <clipPath id="lHclClip"><rect x="364" y="562" width="84" height="76"/></clipPath>
+        <radialGradient id="lFlashG"><stop offset="0" stop-color="#e01880" stop-opacity="1"/><stop offset="1" stop-color="#e01880" stop-opacity="0"/></radialGradient>
+      </defs>
+
+      <!-- 桌面 -->
+      <rect x="0" y="640" width="900" height="60" fill="#dfe5ee"/>
+      <rect x="0" y="640" width="900" height="5" fill="#b8c2d3"/>
+
+      <!-- 鐵架（立桿＋底座） -->
+      <g class="part" data-part="stand">
+        <rect class="hit" x="104" y="56" width="26" height="584" fill="transparent"/>
+        <rect x="112" y="56" width="10" height="572" rx="3" fill="#8b95a7" stroke="#4b5563" stroke-width="2"/>
+        <rect x="100" y="628" width="230" height="12" rx="3" fill="#6b7280" stroke="#374151" stroke-width="2"/>
+      </g>
+      <!-- 白紙 -->
+      <g class="part" data-part="tile">
+        <rect class="hit" x="160" y="618" width="140" height="12" fill="transparent"/>
+        <rect x="165" y="622" width="130" height="6" fill="#fff" stroke="#9ca3af" stroke-width="1.5"/>
+      </g>
+
+      <!-- 廢液燒杯（左下） -->
+      <g class="part" data-part="waste">
+        <rect class="hit" x="10" y="556" width="84" height="86" fill="transparent"/>
+        <g clip-path="url(#lWasteClip)"><rect id="lWasteLiq" x="19" y="640" width="66" height="0" fill="#e1f0fa"/></g>
+        <path d="M16 564 V636 Q16 640 20 640 H84 Q88 640 88 636 V564" fill="none" stroke="#1f2937" stroke-width="2.5"/>
+        <path d="M12 560 L16 564 M92 560 L88 564" stroke="#1f2937" stroke-width="2.5"/>
+        <g stroke="#475569" stroke-width="1.6"><path d="M16 590 h10 M16 610 h10 M16 630 h10"/></g>
+      </g>
+
+      <!-- 錐形瓶（可晃動、傾倒） -->
+      <g id="lFlaskG">
+        <g class="part" data-part="flask">
+          <rect class="hit" x="166" y="536" width="130" height="90" fill="transparent"/>
+          <g clip-path="url(#lFlaskClip)">
+            <rect id="lFLiquid" x="150" y="622" width="160" height="100" fill="#e1f0fa" opacity="0"/>
+            <ellipse id="lFlash" cx="230" cy="600" rx="34" ry="10" fill="url(#lFlashG)" opacity="0"/>
+          </g>
+          <path d="M214 540 V566 L170 614 Q166 622 176 622 H284 Q294 622 290 614 L246 566 V540" fill="none" stroke="#1f2937" stroke-width="3" stroke-linejoin="round"/>
+          <line x1="209" y1="540" x2="251" y2="540" stroke="#1f2937" stroke-width="3.5"/>
+          <path d="M204 584 L184 608" stroke="#fff" stroke-opacity=".65" stroke-width="5" stroke-linecap="round"/>
+        </g>
+      </g>
+
+      <!-- 滴定管 -->
+      <g class="part" data-part="burette">
+        <rect class="hit" x="206" y="74" width="92" height="368" fill="transparent"/>
+        <g clip-path="url(#lBurClip)"><rect id="lBLiquid" x="212" y="500" width="40" height="420" fill="#cfe6ff"/></g>
+        <path id="lBMen" d="" fill="none" stroke="#1e3a8a" stroke-width="1.6"/>
+        <g id="lTicks"></g>
+        <path d="M213 80 V418 L225 434 H235 L247 418 V80" fill="none" stroke="#1f2937" stroke-width="2.5" stroke-linejoin="round"/>
+        <path d="M225 456 L229 488 H231 L235 456" fill="none" stroke="#1f2937" stroke-width="2.5" stroke-linejoin="round"/>
+        <line x1="209" y1="80" x2="251" y2="80" stroke="#1f2937" stroke-width="3"/>
+      </g>
+      <!-- 活塞 -->
+      <g class="part" data-part="stopcock">
+        <rect class="hit" x="216" y="434" width="68" height="26" fill="transparent"/>
+        <rect x="221" y="440" width="18" height="16" rx="3" fill="#64748b" stroke="#334155" stroke-width="1.5"/>
+        <g id="lHandle" transform="rotate(0 230 448)"><rect x="236" y="444" width="44" height="8" rx="4" fill="#ef4444"/></g>
+      </g>
+      <!-- 滴定管夾 -->
+      <g class="part" data-part="clamp">
+        <rect class="hit" x="104" y="144" width="152" height="26" fill="transparent"/>
+        <rect x="122" y="152" width="86" height="8" fill="#6b7280" stroke="#374151" stroke-width="1.5"/>
+        <circle cx="117" cy="156" r="8" fill="#374151"/>
+        <rect x="207" y="146" width="46" height="20" rx="4" fill="#4b5563" stroke="#1f2937" stroke-width="2"/>
+      </g>
+
+      <!-- 待測 HCl 燒杯 -->
+      <g class="part" data-part="hclBeaker">
+        <rect class="hit" x="356" y="556" width="100" height="86" fill="transparent"/>
+        <g clip-path="url(#lHclClip)"><rect x="364" y="588" width="84" height="52" fill="#e1f0fa" opacity=".95"/></g>
+      </g>
+
+      <!-- 吸量管＋安全吸球（靜止時插在 HCl 燒杯中） -->
+      <g id="lPipG" transform="translate(405 632) rotate(0) scale(0.88)">
+        <g class="part" data-part="pipette">
+          <rect class="hit" x="-16" y="-296" width="32" height="296" fill="transparent"/>
+          <g clip-path="url(#lPipClip)"><rect id="lPipLiq" x="-15" y="0" width="30" height="0" fill="#bcdcf7"/></g>
+          <path d="M-1.2 0 L-2.8 -16 V-92 C-12 -100 -12 -180 -2.8 -188 V-300 M1.2 0 L2.8 -16 V-92 C12 -100 12 -180 2.8 -188 V-300" fill="none" stroke="#1f2937" stroke-width="2.4" stroke-linejoin="round"/>
+          <line x1="-6" y1="-262" x2="6" y2="-262" stroke="#dc2626" stroke-width="2.4"/>
+        </g>
+        <g class="part" data-part="bulb">
+          <rect class="hit" x="-24" y="-374" width="48" height="76" fill="transparent"/>
+          <rect x="-8" y="-312" width="16" height="16" rx="3" fill="#374151"/>
+          <ellipse cx="0" cy="-340" rx="19" ry="26" fill="#dc2626" stroke="#7f1d1d" stroke-width="2"/>
+          <ellipse cx="-6" cy="-348" rx="5" ry="9" fill="#fff" opacity=".35"/>
+          <rect x="-5" y="-372" width="10" height="9" rx="2" fill="#374151"/>
+        </g>
+      </g>
+      <!-- 燒杯外框（在吸量管前面，有插在杯中的感覺） -->
+      <path d="M362 560 V636 Q362 640 366 640 H446 Q450 640 450 636 V560" fill="none" stroke="#1f2937" stroke-width="2.5" pointer-events="none"/>
+      <path d="M358 556 L362 560 M454 556 L450 560" stroke="#1f2937" stroke-width="2.5" pointer-events="none"/>
+
+      <!-- NaOH 試劑瓶 -->
+      <g class="part" data-part="naoh" id="lNaohG">
+        <rect class="hit" x="474" y="544" width="80" height="98" fill="transparent"/>
+        <path d="M483 640 V584 Q483 574 493 570 L498 566 V552 H530 V566 L535 570 Q545 574 545 584 V640 Z" fill="#e7f0fb" stroke="#1f2937" stroke-width="2.5" stroke-linejoin="round"/>
+        <rect x="485" y="590" width="58" height="48" fill="#cfe6ff"/>
+        <rect x="490" y="598" width="48" height="30" rx="3" fill="#fff" stroke="#94a3b8"/>
+        <text x="514" y="612" text-anchor="middle" font-size="13" font-weight="800" fill="#14213d">NaOH</text>
+        <text x="514" y="625" text-anchor="middle" font-size="11" font-weight="700" fill="#14213d">0.100 M</text>
+        <rect x="496" y="543" width="36" height="11" rx="2" fill="#1f4fd8" stroke="#16398f"/>
+      </g>
+
+      <!-- 酚酞滴瓶（滴管可拿出來） -->
+      <g class="part" data-part="indicator" id="lIndG">
+        <rect class="hit" x="570" y="566" width="50" height="76" fill="transparent"/>
+        <g id="lDropperG" transform="translate(595 630) rotate(0)">
+          <path d="M-1 0 L-2.5 -12 V-72 M1 0 L2.5 -12 V-72" fill="#e8eef6" stroke="#1f2937" stroke-width="2"/>
+          <rect x="-6" y="-80" width="12" height="9" rx="2" fill="#374151"/>
+          <path d="M-8 -80 C-12 -100 -9 -122 0 -122 C9 -122 12 -100 8 -80 Z" fill="#111827"/>
+        </g>
+        <path d="M577 640 V596 Q577 586 586 582 V574 H604 V582 Q613 586 613 596 V640 Z" fill="#a9733a" fill-opacity=".55" stroke="#5b3a14" stroke-width="2.2" stroke-linejoin="round"/>
+        <rect x="581" y="606" width="28" height="24" rx="3" fill="#fff" stroke="#94a3b8"/>
+        <text x="595" y="623" text-anchor="middle" font-size="14" font-weight="800" fill="#14213d">酚酞</text>
+      </g>
+
+      <!-- 漏斗（放在木塊上） -->
+      <rect x="650" y="628" width="60" height="12" rx="3" fill="#a67c52" stroke="#6b4a2b" stroke-width="1.5"/>
+      <g id="lFunnelG" transform="translate(680 630)">
+        <g class="part" data-part="funnel">
+          <rect class="hit" x="-32" y="-88" width="64" height="92" fill="transparent"/>
+          <path d="M-4 0 V-32 L-30 -86 H30 L4 -32 V0 Z" fill="#e8f1fb" fill-opacity=".9" stroke="#1f2937" stroke-width="2.4" stroke-linejoin="round"/>
+          <line x1="-30" y1="-86" x2="30" y2="-86" stroke="#1f2937" stroke-width="3.5"/>
+        </g>
+      </g>
+
+      <!-- 洗瓶 -->
+      <g class="part" data-part="wash">
+        <rect class="hit" x="780" y="516" width="80" height="126" fill="transparent"/>
+        <path d="M792 640 V592 Q792 574 810 572 H830 Q848 574 848 592 V640 Z" fill="#f1f5f9" stroke="#1f2937" stroke-width="2.5" stroke-linejoin="round"/>
+        <rect x="794" y="598" width="52" height="40" fill="#cfe6ff"/>
+        <rect x="812" y="558" width="16" height="15" fill="#f1f5f9" stroke="#1f2937" stroke-width="2"/>
+        <rect x="808" y="549" width="24" height="10" rx="3" fill="#16a34a" stroke="#14532d"/>
+        <path d="M820 549 V540 Q820 528 832 528 L850 520" fill="none" stroke="#16a34a" stroke-width="5" stroke-linecap="round"/>
+        <text x="820" y="624" text-anchor="middle" font-size="15" font-weight="800" fill="#14213d">H₂O</text>
+      </g>
+
+      <!-- 水流、液滴（最上層） -->
+      <rect id="lStream" x="228.4" y="486" width="3.2" height="0" fill="#8fc3ff"/>
+      <rect id="lPStream" x="230.6" y="553" width="2.8" height="0" fill="#b7d9f5"/>
+      <rect id="lWStream" x="56.4" y="552" width="3.2" height="0" fill="#e1f0fa"/>
+      <g id="lDrops"></g>
+
+      <!-- 名稱標示 -->
+      <g id="lLabels" class="lbls" pointer-events="none">
+        <path d="M306 96 L250 96 M306 156 L254 156 M310 484 L242 454 M310 596 L277 596 M100 300 L113 300 M230 652 L230 630 M434 466 L411 466 M434 334 L424 334"/>
+        <text x="312" y="102">滴定管</text>
+        <text x="312" y="162">滴定管夾</text>
+        <text x="314" y="492">活塞</text>
+        <text x="314" y="602">錐形瓶</text>
+        <text x="96" y="306" text-anchor="end">鐵架</text>
+        <text x="230" y="668" text-anchor="middle">白紙</text>
+        <text x="405" y="668" text-anchor="middle">待測 HCl</text>
+        <text x="595" y="668" text-anchor="middle">酚酞指示劑</text>
+        <text x="818" y="668" text-anchor="middle">洗瓶</text>
+        <text x="52" y="668" text-anchor="middle">廢液燒杯</text>
+        <text x="514" y="692" text-anchor="middle">NaOH 標準液</text>
+        <text x="680" y="692" text-anchor="middle">漏斗</text>
+        <text x="438" y="472">吸量管</text>
+        <text x="438" y="340">安全吸球</text>
+      </g>
+    </svg></div>
+      <div id="side">
+        <svg id="lLoupe" viewBox="0 0 150 150"></svg>
+        <div id="loupeCap">🔍 放大圖：視線和凹液面最低處同高，數字往下變大，讀到 0.01</div>
+        <div id="rdRow">
+          <input id="rdIn" type="number" step="0.01" inputmode="decimal" placeholder="讀數" aria-label="滴定管讀數 (mL)">
+          <button id="rdBtn">記初讀</button>
+        </div>
+        <div id="recBox">
+          <div class="rh"><span>實驗記錄</span><button id="recClear">清除</button></div>
+          <div id="recList"></div>
+          <div id="recSum"></div>
+          <span id="teacherPill" hidden></span>
+          <span id="lTeacherRead" class="pill" hidden></span>
+        </div>
+      </div>
+      <div id="sheet" hidden>
+        <button class="x" id="sheetX" aria-label="關閉">✕</button>
+        <h3 id="shName"></h3>
+        <div class="use" id="shUse"></div>
+        <div class="tip" id="shTip"></div>
+      </div>
+    </div>
+
+    <div id="dock">
+      <div id="tray">
+        <button id="aFill"><span class="ic">🧪</span>裝 NaOH</button>
+        <button id="aPip"><span class="ic">💧</span>取待測液</button>
+        <button id="aInd"><span class="ic">🔴</span>加酚酞</button>
+        <button id="aSwirl"><span class="ic">🌀</span>搖晃</button>
+        <button id="aRinse"><span class="ic">🚿</span>倒掉沖洗</button>
+      </div>
+      <div id="ctl">
+        <button id="lHoldBtn">▶ 開始滴定</button>
+        <button class="lStep" data-v="0.05">+1 滴</button>
+        <button class="lStep" data-v="0.1">+0.1 mL</button>
+        <button class="lStep" data-v="1">+1 mL</button>
+      </div>
+      <div id="rateRow">
+        <span>滴速 慢</span><input type="range" id="lRate" min="0.1" max="3" step="0.1" value="1" aria-label="滴速"><span>快</span>
+        <label class="chk"><input type="checkbox" id="aAuto">邊滴邊搖</label>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 曲線頁 ================= -->
+  <section class="page" id="pgCurve" hidden>
+    <div id="cvWrap"><canvas id="cv"></canvas></div>
+    <div id="cvSide">
+      <div id="cvRead"><span id="cvSw"></span><span id="cvReadT">在曲線上滑動手指，看每個體積的 pH</span></div>
+      <div id="cvNote"></div>
+      <div id="cvChips">
+        <button data-i="pp" class="on">酚酞</button>
+        <button data-i="mo">甲基橙</button>
+        <button data-i="mr">甲基紅</button>
+        <button data-i="none">不顯示</button>
+      </div>
+      <div id="cvAct">
+        <button id="cvHold">▶ 繼續滴定</button>
+        <button id="cvDrop">+1 滴</button>
+      </div>
+      <div id="cvMsg"></div>
+    </div>
+  </section>
+</main>
+
+<!-- 認識儀器 -->
+<div id="pano" hidden>
+  <div class="ph"><span>🧰 認識儀器（左右滑動，點儀器看說明）</span><button id="panoX">關閉</button></div>
+  <div id="panoScroll"></div>
+  <div id="panoInfo"><h3 id="pnName">點一下任何儀器</h3><div class="use" id="pnUse">看看它叫什麼、做什麼用。</div><div class="tip" id="pnTip" hidden></div></div>
+</div>
+
+<div id="rot"><div style="font-size:42px">📱↻</div><div>實驗頁請把手機直放操作<br><small style="font-weight:600;opacity:.85">想看大一點的滴定曲線，可以到「曲線」頁再橫放</small></div><button id="rotGo">去曲線頁</button></div>
+
+<script>
+/* ===== ENGINE：酸鹼滴定 pH 計算（完整電荷平衡，含水自解離） ===== */
+const KW = 1e-14;       // 水的離子積
+const CB = 0.100;       // 滴定液濃度（固定）
+const V0 = 20.00;       // 燒瓶中被滴定液體積 (mL)
+const BUR = 50;         // 滴定管容量 (mL)
+
+const pK = k => -Math.log10(k);
+
+/* kind: acid（用 NaOH 滴定）、sbase（強鹼 NaOH，用 HCl 滴定）、nh3、carb（Na2CO3，用 HCl 滴定）
+   ka：酸性物種的逐級 Ka（carb 為 H2CO3 的 Ka1、Ka2；nh3 為 NH4+ 的 Ka）
+   stepPK：依滴定順序出現的 pKa（用來標示半當量點）
+   nEq：50 mL 滴定管內看得到的當量點數 */
+const SPECS = {
+  hcl:    { label: '鹽酸 HCl',       kind: 'acid',  strong: true, ka: [],                       stepPK: [],                         nEq: 1 },
+  hac:    { label: '醋酸 CH₃COOH',   kind: 'acid',  ka: [1.8e-5],                              stepPK: [pK(1.8e-5)],               nEq: 1 },
+  oxa:    { label: '草酸 H₂C₂O₄',    kind: 'acid',  ka: [5.9e-2, 6.4e-5],                      stepPK: [pK(5.9e-2), pK(6.4e-5)],   nEq: 2 },
+  pho:    { label: '磷酸 H₃PO₄',     kind: 'acid',  ka: [7.5e-3, 6.2e-8, 4.8e-13],             stepPK: [pK(7.5e-3), pK(6.2e-8)],   nEq: 2 },
+  naoh:   { label: '氫氧化鈉 NaOH',  kind: 'sbase', ka: [],                                     stepPK: [],                         nEq: 1 },
+  nh3:    { label: '氨水 NH₃',       kind: 'nh3',   ka: [KW / 1.8e-5],                         stepPK: [pK(KW / 1.8e-5)],          nEq: 1 },
+  na2co3: { label: '碳酸鈉 Na₂CO₃',  kind: 'carb',  ka: [4.3e-7, 4.8e-11],                     stepPK: [pK(4.8e-11), pK(4.3e-7)],  nEq: 2 }
+};
+
+/* 多質子酸陰離子平均帶電量：Σ i·α_i（i = 失去的質子數） */
+function chargeAvg(ka, h) {
+  const n = ka.length;
+  if (!n) return 0;
+  let prod = 1, num = 0, den = Math.pow(h, n);
+  for (let i = 1; i <= n; i++) {
+    prod *= ka[i - 1];
+    const t = prod * Math.pow(h, n - i);
+    den += t;
+    num += i * t;
+  }
+  return num / den;
+}
+
+/* 加入 Vt mL 滴定液後燒瓶的 pH：解電荷平衡 Σ(陽離子) = Σ(陰離子) */
+function pHat(spec, ca0, Vt) {
+  const Vtot = V0 + Vt;
+  const Ca = ca0 * V0 / Vtot;       // 稀釋後被滴定物總濃度
+  const T = CB * Vt / Vtot;         // 滴定液離子濃度（Na⁺ 或 Cl⁻）
+  const f = ph => {
+    const h = Math.pow(10, -ph), oh = KW / h;
+    let pos = h, neg = oh;
+    switch (spec.kind) {
+      case 'acid':  pos += T;                        neg += spec.strong ? Ca : Ca * chargeAvg(spec.ka, h); break;
+      case 'sbase': pos += Ca;                       neg += T; break;
+      case 'nh3':   pos += Ca * h / (h + spec.ka[0]); neg += T; break;
+      case 'carb':  pos += 2 * Ca;                   neg += T + Ca * chargeAvg(spec.ka, h); break;
+    }
+    return pos - neg;
+  };
+  let lo = -1, hi = 15;
+  for (let i = 0; i < 60; i++) {
+    const mid = (lo + hi) / 2;
+    if (f(mid) > 0) lo = mid; else hi = mid;
+  }
+  return (lo + hi) / 2;
+}
+
+/* 第 k 個當量點體積 (mL) */
+const veq = (ca0, k) => k * ca0 * V0 / CB;
+/* ===== END ENGINE ===== */
+
+
+</script>
+<script>
+(function(){
+'use strict';
+const $ = id => document.getElementById(id);
+const clamp = (x,a,b) => Math.max(a, Math.min(b, x));
+const TEACHER = new URLSearchParams(location.search).get('teacher') === '1';
+const rgb = c => 'rgb('+c[0]+','+c[1]+','+c[2]+')';
+const WATER = [225,240,250];
+const DROP = 0.05;
+const IND = {
+  pp:{name:'酚酞',   lo:8.2, hi:10.0, a:[232,244,250], b:[224,24,128]},
+  mo:{name:'甲基橙', lo:3.1, hi:4.4,  a:[229,57,53],   b:[255,196,0]},
+  mr:{name:'甲基紅', lo:4.4, hi:6.2,  a:[216,27,58],   b:[255,224,51]}
+};
+function indColor(key, ph){
+  const I = IND[key]; if(!I) return WATER;
+  const t = clamp((ph-I.lo)/(I.hi-I.lo),0,1);
+  return I.a.map((v,i)=>Math.round(v+(I.b[i]-v)*t));
+}
+let store = null;
+try{ store = window.localStorage; }catch(e){}
+const sget = k => { try{ return store ? store.getItem(k) : null; }catch(e){ return null; } };
+const sset = (k,v) => { try{ if(store) store.setItem(k,v); }catch(e){} };
+
+/* ---------- 放大讀數圖（凹液面） ---------- */
+function loupeSVG(r, W, H, span){
+  const px = H/span, cy = H/2, yOf = v => cy + (v-r)*px;
+  const tL = W*0.36, tR = W*0.74, cx = (tL+tR)/2;
+  const lLong = W*0.15, lMid = W*0.105, lShort = W*0.07, fs = W*0.085;
+  const yL = cy;
+  let s = '<rect x="0" y="0" width="'+W+'" height="'+H+'" fill="#fff"/>';
+  s += '<path d="M'+tL+' '+(yL-8)+' Q'+cx+' '+(yL+8)+' '+tR+' '+(yL-8)+' L'+tR+' '+H+' L'+tL+' '+H+' Z" fill="#cfe6ff"/>';
+  s += '<path d="M'+tL+' '+(yL-8)+' Q'+cx+' '+(yL+8)+' '+tR+' '+(yL-8)+'" fill="none" stroke="#1e3a8a" stroke-width="2.4"/>';
+  s += '<line x1="'+tL+'" y1="0" x2="'+tL+'" y2="'+H+'" stroke="#1f2937" stroke-width="2.5"/>';
+  s += '<line x1="'+tR+'" y1="0" x2="'+tR+'" y2="'+H+'" stroke="#1f2937" stroke-width="2.5"/>';
+  const i0 = Math.ceil((r-span/2)*10), i1 = Math.floor((r+span/2)*10);
+  for(let i=i0;i<=i1;i++){
+    if(i<0 || i>500) continue;
+    const y = yOf(i/10), whole = i%10===0, half = i%5===0;
+    const len = whole ? lLong : half ? lMid : lShort;
+    s += '<line x1="'+(tL-len)+'" y1="'+y+'" x2="'+tL+'" y2="'+y+'" stroke="#1f2937" stroke-width="'+(whole?2.4:1.4)+'"/>';
+    if(whole) s += '<text x="'+(tL-lLong-6)+'" y="'+(y+fs*0.35)+'" text-anchor="end" font-size="'+fs+'" font-weight="800" fill="#14213d">'+(i/10)+'</text>';
+  }
+  s += '<text x="'+(W-6)+'" y="'+(H-6)+'" text-anchor="end" font-size="'+(fs*0.8)+'" fill="#4b5b75">mL</text>';
+  return s;
+}
+
+/* ---------- 儀器說明 ---------- */
+const LAB_PARTS = {
+  burette:  {name:'滴定管（50 mL）', use:'精確量出滴下的溶液體積。0 刻度在上方，數字往下變大；最小刻度 0.1 mL，要估讀到 0.01 mL。', tip:'使用前先用蒸餾水洗，再用要裝的溶液「潤洗」2～3 次；尖端不能有氣泡。'},
+  stopcock: {name:'活塞', use:'控制溶液流出的快慢。', tip:'一般用左手控制活塞、右手搖晃錐形瓶；接近終點時改成一滴一滴慢慢滴。'},
+  stand:    {name:'鐵架（含底座）', use:'支撐並固定滴定管，讓它保持垂直。', tip:'滴定管要夾穩、保持垂直，讀數才準。'},
+  clamp:    {name:'滴定管夾', use:'夾住滴定管，固定在鐵架上。', tip:'夾在滴定管上段，不要夾太緊，以免夾破玻璃。'},
+  flask:    {name:'錐形瓶', use:'盛裝待測溶液，滴定時反應就在這裡進行。瓶口小、瓶身斜，搖晃時溶液不容易濺出。', tip:'瓶內有蒸餾水沒關係（溶質的量不變），所以不必烘乾，也不必潤洗。'},
+  tile:     {name:'白紙（或白瓷板）', use:'墊在錐形瓶下面，讓顏色變化更容易看清楚。', tip:'終點是靠顏色判斷，所以背景要白。'},
+  pipette:  {name:'吸量管（20.00 mL）', use:'精確取 20.00 mL 的待測溶液，放入錐形瓶。', tip:'使用前要用待測液潤洗；放液後讓液體自然流下，管尖殘留的一點液體通常不要吹出。'},
+  bulb:     {name:'安全吸球', use:'套在吸量管上端，用來吸液、放液。', tip:'不可以用嘴巴吸！'},
+  hclBeaker:{name:'待測 HCl 溶液', use:'濃度未知的鹽酸，要用已知濃度的 NaOH 來滴定。', tip:'先倒一小部分到乾淨燒杯再取，剩下的不要倒回原試劑瓶。'},
+  naoh:     {name:'NaOH 標準液（0.100 M）', use:'濃度已知的氫氧化鈉，裝進滴定管，用來滴定待測的 HCl。', tip:'NaOH 會吸收空氣中的 CO₂，要蓋緊瓶蓋；有腐蝕性，避免碰到皮膚。'},
+  indicator:{name:'酚酞指示劑', use:'幫助判斷終點：酸性溶液中是無色，pH 約 8.2～10.0 之間由無色變成粉紅色。', tip:'只加 2～3 滴就夠，加太多會影響結果。'},
+  funnel:   {name:'漏斗', use:'把 NaOH 倒進滴定管時使用，避免灑出來。', tip:'裝好液體後要把漏斗拿走，不然漏斗上殘留的液滴會滴進滴定管，影響讀數。'},
+  wash:     {name:'洗瓶（蒸餾水）', use:'用蒸餾水沖洗錐形瓶內壁，把附著的溶液沖下去。', tip:'沖洗用的蒸餾水不會改變溶質的量，不影響滴定結果。'},
+  waste:    {name:'廢液燒杯', use:'收集潤洗液、沖洗液和用完的溶液。', tip:'廢液不要倒回原試劑瓶，依老師指示處理。'}
+};
+
+/* ---------- 狀態 ---------- */
+const EMPTY_R = 62;
+const LTIP = 486;
+const lyOf = r => 110 + 6.2*r;
+const ease = u => { u = clamp(u,0,1); return u*u*(3-2*u); };
+const lerp = (a,b,u) => a + (b-a)*u;
+const L = {
+  ca0: Math.round((0.08 + Math.random()*0.04)*10000)/10000,
+  filled:false, base:0, released:0, landed:0, pending:0, holding:false, rate:1, dropAcc:0,
+  hcl:false, fillFrac:0, ind:0, ph:0, flash:0, swirlUntil:0, openUntil:0, streaming:false, rinseK:1,
+  anim:null, disp:EMPTY_R, wasteH:0, wasteCol:[225,240,250], drops:[], msgT:0, lkey:'',
+  trials:[{i:null,f:null},{i:null,f:null},{i:null,f:null}],
+  guide: sget('titM_guide') !== '0',
+  msg:'', msgKind:'warn', trace:[], old:[], dirty:true
+};
+L.trace = [{v:0, ph:pHat(SPECS.hcl, L.ca0, 0)}];
+const VEQ = () => veq(L.ca0, 1);
+
+function ppRGB(ph){
+  const I = IND.pp, t = clamp((ph-I.lo)/(12-I.lo),0,1);
+  return I.a.map((v,i)=>Math.round(v+(I.b[i]-v)*t));
+}
+const lFlaskFh = () => 36*L.fillFrac + (L.fillFrac>0 ? 0.28*L.landed : 0);
+const lFlaskLevelY = () => 622 - lFlaskFh();
+const flaskRGB = () => (L.ind>0 && (L.hcl || L.fillFrac>0)) ? ppRGB(L.ph) : WATER;
+const labSwirling = now => now < L.swirlUntil || ($('aAuto').checked && L.holding);
+
+function lmsg(t, kind){
+  L.msg = t || ''; L.msgKind = kind || 'warn';
+  clearTimeout(L.msgT);
+  if(t) L.msgT = setTimeout(()=>{ L.msg = ''; renderGuide(); }, 4500);
+  renderGuide();
+}
+$('gText').addEventListener('click', ()=>{ if(L.msg){ clearTimeout(L.msgT); L.msg=''; renderGuide(); } });
+function toastPart(key){
+  const p = LAB_PARTS[key]; if(!p) return;
+  lmsg(p.name+'：'+p.use.split('。')[0]+'。', 'info');
+}
+
+/* 刻度（只畫一次） */
+(function buildLabTicks(){
+  let s = '';
+  for(let v=0; v<=50; v++){
+    const y = lyOf(v), len = v%10===0 ? 22 : v%5===0 ? 16 : 9;
+    s += '<line x1="247" y1="'+y+'" x2="'+(247+len)+'" y2="'+y+'" stroke="#1f2937" stroke-width="'+(v%5===0?2:1.2)+'"/>';
+    if(v%5===0) s += '<text x="'+(247+len+5)+'" y="'+(y+5)+'" font-size="'+(v%10===0?17:13)+'" font-weight="'+(v%10===0?800:600)+'" fill="#14213d">'+v+'</text>';
+  }
+  $('lTicks').innerHTML = s;
+})();
+
+/* ---------- 點儀器看說明 ---------- */
+let sheetT = 0;
+function openSheet(key, anchorEl){
+  const p = LAB_PARTS[key]; if(!p) return;
+  const sh = $('sheet');
+  let lower = true;
+  if(anchorEl){
+    const gr = anchorEl.getBoundingClientRect(), sr = $('scene').getBoundingClientRect();
+    lower = (gr.top + gr.height/2) > (sr.top + sr.height/2);
+  }
+  sh.style.top = lower ? '8px' : 'auto'; sh.style.bottom = lower ? 'auto' : '8px';
+  $('shName').textContent = p.name; $('shUse').textContent = p.use;
+  $('shTip').textContent = p.tip; $('shTip').hidden = !p.tip;
+  $('sheet').hidden = false;
+  document.querySelectorAll('#labSvg .part').forEach(g=>g.classList.toggle('sel', g.dataset.part===key));
+  clearTimeout(sheetT); sheetT = setTimeout(closeSheet, 12000);
+}
+function closeSheet(){
+  $('sheet').hidden = true;
+  document.querySelectorAll('#labSvg .part.sel').forEach(g=>g.classList.remove('sel'));
+}
+$('sheet').addEventListener('click', closeSheet);
+$('labSvg').addEventListener('click', e=>{
+  const g = e.target.closest ? e.target.closest('.part') : null;
+  if(g) openSheet(g.dataset.part, g); else if(!$('sheet').hidden) closeSheet();
+});
+
+/* 認識儀器：整張實驗桌（靜態複製一份，左右滑動） */
+function openPano(){
+  let s = $('labSvg').outerHTML;
+  s = s.replace(/ id="([^"]+)"/g, ' id="$1_c"').replace(/url\(#([^)]+)\)/g, 'url(#$1_c)')
+       .replace(/viewBox="[^"]*"/, 'viewBox="0 0 900 700"').replace('id="labSvg_c"', 'id="panoSvg"')
+       .replace(/ class="part sel"/g, ' class="part"');
+  $('panoScroll').innerHTML = s;
+  $('pano').hidden = false;
+  $('pnName').textContent = '點一下任何儀器'; $('pnUse').textContent = '看看它叫什麼、做什麼用。'; $('pnTip').hidden = true;
+  $('panoScroll').scrollLeft = 0;
+}
+$('panoBtn').addEventListener('click', openPano);
+$('panoX').addEventListener('click', ()=>{ $('pano').hidden = true; $('panoScroll').innerHTML = ''; });
+$('panoScroll').addEventListener('click', e=>{
+  const g = e.target.closest ? e.target.closest('.part') : null; if(!g) return;
+  const p = LAB_PARTS[g.dataset.part]; if(!p) return;
+  $('pnName').textContent = p.name; $('pnUse').textContent = p.use; $('pnTip').textContent = p.tip; $('pnTip').hidden = !p.tip;
+  document.querySelectorAll('#panoSvg .part').forEach(x=>x.classList.toggle('sel', x===g));
+});
+
+/* ---------- 動作 ---------- */
+function labBusy(){
+  if(L.anim){ lmsg('等一下，動作還沒做完。'); return true; }
+  if(L.holding || L.pending>1e-9 || L.drops.length){ lmsg('先暫停滴定，等液滴落下後再操作。'); return true; }
+  return false;
+}
+$('aFill').addEventListener('click', ()=>{
+  if(labBusy()) return;
+  const t = curTrial();
+  if(t>=0 && L.trials[t].i!=null && L.trials[t].f==null){
+    L.trials[t].i = null; recRender();
+  }
+  L.anim = {type:'fill', t0:performance.now(), from:L.disp, to:Math.round((0.2 + Math.random()*1.0)*100)/100};
+  toastPart('funnel');
+});
+$('aPip').addEventListener('click', ()=>{
+  if(labBusy()) return;
+  if(L.hcl){ lmsg('錐形瓶裡已經有待測液了。要重做請先「倒掉沖洗」。'); return; }
+  L.anim = {type:'pip', t0:performance.now()};
+  toastPart('pipette');
+});
+$('aInd').addEventListener('click', ()=>{
+  if(labBusy()) return;
+  if(!L.hcl){ lmsg('先「取待測液」放進錐形瓶，再加指示劑。'); return; }
+  if(L.ind>=6){ lmsg('指示劑已經加得夠多了，再加會影響結果。'); return; }
+  L.anim = {type:'ind', t0:performance.now(), spawned:0};
+  toastPart('indicator');
+});
+$('aSwirl').addEventListener('click', ()=>{
+  if(L.anim){ lmsg('等一下，動作還沒做完。'); return; }
+  if(!L.hcl){ lmsg('錐形瓶裡還沒有溶液。'); return; }
+  L.swirlUntil = performance.now() + 1500;
+});
+$('aRinse').addEventListener('click', ()=>{
+  if(labBusy()) return;
+  if(!L.hcl && L.ind===0){ lmsg('錐形瓶已經是乾淨的了。'); return; }
+  L.anim = {type:'rinse', t0:performance.now(), col:flaskRGB().slice(), w0:L.wasteH, tx:0, ty:0, ta:0};
+  toastPart('waste');
+});
+$('lRate').addEventListener('input', e=>{ L.rate = parseFloat(e.target.value); });
+
+function labStart(){
+  if(L.holding) return;
+  if(L.anim){ lmsg('等一下，動作還沒做完。'); return; }
+  if(!L.filled){ lmsg('滴定管是空的，先按「裝 NaOH」。'); return; }
+  if(!L.hcl){ lmsg('錐形瓶裡還沒有待測液，先按「取待測液」。'); return; }
+  if(L.released >= 50 - L.base - 1e-9){ lmsg('已到滴定管 50 mL 刻度，請重新裝液。'); return; }
+  if(L.ind===0 && L.landed<1e-9) lmsg('提醒：還沒加指示劑，到終點時看不到顏色變化。');
+  L.holding = true; labHoldUI();
+}
+function labStop(){ if(!L.holding) return; L.holding = false; labHoldUI(); }
+function labHoldUI(){
+  const b = $('lHoldBtn'); b.textContent = L.holding ? '⏸ 暫停' : '▶ 開始滴定'; b.classList.toggle('run', L.holding);
+  const c = $('cvHold'); c.textContent = L.holding ? '⏸ 暫停' : '▶ 繼續滴定'; c.classList.toggle('run', L.holding);
+}
+const toggleHold = () => { if(L.holding) labStop(); else labStart(); };
+$('lHoldBtn').addEventListener('click', toggleHold);
+$('cvHold').addEventListener('click', toggleHold);
+
+function labAdd(v){
+  if(L.anim){ lmsg('等一下，動作還沒做完。'); return; }
+  if(!L.filled){ lmsg('滴定管是空的，先按「裝 NaOH」。'); return; }
+  if(!L.hcl){ lmsg('錐形瓶裡還沒有待測液，先按「取待測液」。'); return; }
+  const mr = 50 - L.base;
+  if(L.released + L.pending >= mr - 1e-9){ lmsg('已到滴定管 50 mL 刻度，請重新裝液。'); return; }
+  if(L.ind===0 && L.landed<1e-9) lmsg('提醒：還沒加指示劑，到終點時看不到顏色變化。');
+  if(v <= DROP + 1e-9){
+    L.released += v; L.drops.push({x:230, y:LTIP, vol:v, kind:'naoh'}); L.openUntil = performance.now() + 160;
+  } else {
+    L.pending += Math.min(v, mr - L.released - L.pending);
+  }
+}
+document.querySelectorAll('.lStep').forEach(b=>b.addEventListener('click', ()=>labAdd(parseFloat(b.dataset.v))));
+$('cvDrop').addEventListener('click', ()=>labAdd(DROP));
+
+/* 一滴 NaOH 落到溶液：更新 pH、局部粉紅、曲線軌跡 */
+function labLanded(dv){
+  let rem = dv;
+  while(rem > 1e-12){ const s = Math.min(0.02, rem); rem -= s; L.landed += s; }
+  L.ph = pHat(SPECS.hcl, L.ca0, L.landed);
+  const f = clamp((L.ph-2.8)/3.5, 0, 1);
+  if(f > L.flash) L.flash = f;
+  const lt = L.trace[L.trace.length-1];
+  if(!lt || L.landed - lt.v >= 0.02){ L.trace.push({v:L.landed, ph:L.ph}); L.dirty = true; }
+}
+
+/* ---------- 動畫（吸量管 / 滴管 / 漏斗 / 倒廢液） ---------- */
+const PP = {rest:{x:405,y:632,a:0}, lift:{x:405,y:500,a:0}, hov:{x:232,y:500,a:50}, pour:{x:232,y:553,a:50}};
+const DP = {home:{x:595,y:630,a:0}, lift:{x:595,y:505,a:0}, hov:{x:226,y:531,a:-30}};
+const lp = (p,q,u) => { u = ease(u); return {x:lerp(p.x,q.x,u), y:lerp(p.y,q.y,u), a:lerp(p.a,q.a,u)}; };
+
+function labAnimStep(now){
+  const a = L.anim, t = (now - a.t0)/1000;
+  if(a.type==='pip'){
+    let pose = PP.rest, f = 1, ff = 0;
+    if(t < 0.8){ f = ease(t/0.8); }
+    else if(t < 1.3) pose = lp(PP.rest, PP.lift, (t-0.8)/0.5);
+    else if(t < 2.1) pose = lp(PP.lift, PP.hov, (t-1.3)/0.8);
+    else if(t < 2.6) pose = lp(PP.hov, PP.pour, (t-2.1)/0.5);
+    else if(t < 3.8){ pose = PP.pour; const u = ease((t-2.6)/1.2); f = 1-u; ff = u; }
+    else if(t < 4.1){ pose = PP.pour; f = 0; ff = 1; }
+    else if(t < 4.6){ pose = lp(PP.pour, PP.hov, (t-4.1)/0.5); f = 0; ff = 1; }
+    else if(t < 5.4){ pose = lp(PP.hov, PP.lift, (t-4.6)/0.8); f = 0; ff = 1; }
+    else if(t < 5.9){ pose = lp(PP.lift, PP.rest, (t-5.4)/0.5); f = 0; ff = 1; }
+    else {
+      L.hcl = true; L.fillFrac = 1; L.landed = 0; L.ph = pHat(SPECS.hcl, L.ca0, 0); L.anim = null;
+      if(L.trace.length>1){ L.old.push(L.trace); if(L.old.length>3) L.old.shift(); }
+      L.trace = [{v:0, ph:L.ph}]; L.dirty = true;
+      return;
+    }
+    a.pose = pose; a.f = f; a.stream = (t>=2.6 && t<3.85);
+    L.fillFrac = ff;
+  }
+  else if(a.type==='ind'){
+    let pose = DP.home;
+    if(t < 0.5) pose = lp(DP.home, DP.lift, t/0.5);
+    else if(t < 1.4) pose = lp(DP.lift, DP.hov, (t-0.5)/0.9);
+    else if(t < 2.9) pose = DP.hov;
+    else if(t < 3.8) pose = lp(DP.hov, DP.lift, (t-2.9)/0.9);
+    else if(t < 4.3) pose = lp(DP.lift, DP.home, (t-3.8)/0.5);
+    else { L.anim = null; return; }
+    if(a.spawned < 1 && t >= 1.8){ a.spawned = 1; L.drops.push({x:226, y:531, vol:0, kind:'ind'}); }
+    if(a.spawned < 2 && t >= 2.4){ a.spawned = 2; L.drops.push({x:226, y:531, vol:0, kind:'ind'}); }
+    a.pose = pose;
+  }
+  else if(a.type==='fill'){
+    let fx = 230, fy = 90;
+    if(t < 0.9){ const u = ease(t/0.9); fx = lerp(680,230,u); fy = lerp(630,90,u); }
+    else if(t >= 3.1){ const u = ease((t-3.1)/0.9); fx = lerp(230,680,u); fy = lerp(90,630,u); }
+    if(t >= 0.9 && t < 2.7) L.disp = lerp(a.from, a.to, ease((t-0.9)/1.8));
+    else if(t >= 2.7) L.disp = a.to;
+    a.fx = fx; a.fy = fy; a.glow = (t>=0.9 && t<2.7);
+    if(t >= 4.0){ L.filled = true; L.base = a.to; L.released = 0; L.pending = 0; L.disp = a.to; L.anim = null; }
+  }
+  else if(a.type==='rinse'){
+    let tx = 0, ty = 0, ta = 0, k = 1;
+    if(t < 0.9){ const u = ease(t/0.9); tx = lerp(0,-172,u); ty = lerp(0,8,u); ta = lerp(0,-100,u); }
+    else if(t < 2.6){
+      tx = -172; ty = 8; ta = -100;
+      if(t < 2.3){ const u = ease((t-0.9)/1.4); k = 1-u; L.wasteH = Math.min(52, a.w0 + 11*u); }
+      else { k = 0; L.wasteH = Math.min(52, a.w0 + 11); }
+    }
+    else if(t < 3.5){ const u = ease((t-2.6)/0.9); tx = lerp(-172,0,u); ty = lerp(8,0,u); ta = lerp(-100,0,u); k = 0; L.wasteH = Math.min(52, a.w0 + 11); }
+    else { L.hcl = false; L.ind = 0; L.landed = 0; L.fillFrac = 0; L.flash = 0; L.rinseK = 1; L.ph = 0; L.anim = null; return; }
+    a.tx = tx; a.ty = ty; a.ta = ta; L.rinseK = k;
+    a.stream = (t >= 1.0 && t < 2.35);
+    if(t >= 0.9) L.wasteCol = a.col;
+  }
+}
+
+/* ---------- 每個畫面更新 ---------- */
+function labStep(dt, now){
+  L.streaming = false;
+  if(L.anim) labAnimStep(now);
+  const mr = 50 - L.base;
+  if(L.filled && L.hcl && !L.anim){
+    let flow = 0;
+    if(L.holding) flow = L.rate; else if(L.pending > 1e-9) flow = 1.5;
+    if(flow > 0 && L.released < mr - 1e-9){
+      if(L.holding && L.rate <= 0.5){
+        L.dropAcc += L.rate*dt;
+        while(L.dropAcc >= DROP && L.released < mr - 1e-9){
+          L.dropAcc -= DROP; L.released += DROP; L.drops.push({x:230, y:LTIP, vol:DROP, kind:'naoh'});
+        }
+        L.openUntil = now + 120;
+      } else {
+        let dv = Math.min(flow*dt, mr - L.released);
+        if(!L.holding){ dv = Math.min(dv, L.pending); L.pending -= dv; }
+        L.released += dv; labLanded(dv); L.streaming = true; L.openUntil = now + 120;
+      }
+    }
+    if(L.holding && L.released >= mr - 1e-9){ labStop(); lmsg('已到滴定管 50 mL 刻度，請重新裝液。'); }
+  } else if(L.holding && !L.anim){ labStop(); }
+  const ly = lFlaskLevelY();
+  for(let i=L.drops.length-1; i>=0; i--){
+    const d = L.drops[i]; d.y += 520*dt;
+    if(d.y >= ly){
+      if(d.kind==='naoh') labLanded(d.vol); else if(d.kind==='ind') L.ind++;
+      L.drops.splice(i,1);
+    }
+  }
+  L.flash *= Math.exp(-(labSwirling(now) ? 5 : 0.6)*dt); if(L.flash < 0.01) L.flash = 0;
+  if(!(L.anim && L.anim.type==='fill')) L.disp = L.filled ? L.base + L.released : EMPTY_R;
+}
+
+function labRender(now){
+  const a = L.anim, r = L.disp, yL = lyOf(r);
+  $('lBLiquid').setAttribute('y', yL);
+  $('lBMen').setAttribute('d', r <= 50 ? 'M215 '+(yL-3)+' Q230 '+(yL+3)+' 245 '+(yL-3) : '');
+  const open = L.holding || L.pending > 1e-9 || now < L.openUntil;
+  $('lHandle').setAttribute('transform', 'rotate('+(open?-90:0)+' 230 448)');
+  const ly = lFlaskLevelY();
+  $('lStream').setAttribute('height', L.streaming ? Math.max(0, ly - LTIP) : 0);
+  let dh = '';
+  for(const d of L.drops){
+    dh += d.kind==='naoh'
+      ? '<ellipse cx="'+d.x+'" cy="'+d.y.toFixed(1)+'" rx="3.4" ry="4.8" fill="#8fc3ff" stroke="#3b82f6" stroke-width=".8"/>'
+      : '<ellipse cx="'+d.x+'" cy="'+d.y.toFixed(1)+'" rx="3.2" ry="4.4" fill="#eef2f7" stroke="#94a3b8" stroke-width="1"/>';
+  }
+  $('lDrops').innerHTML = dh;
+  const fh = lFlaskFh()*L.rinseK, fy = 622 - fh, col = flaskRGB();
+  const fl = $('lFLiquid');
+  fl.setAttribute('y', fy); fl.setAttribute('fill', rgb(col)); fl.setAttribute('opacity', fh > 0.3 ? 1 : 0);
+  const fs = $('lFlash');
+  fs.setAttribute('cy', fy + 7);
+  fs.setAttribute('opacity', (L.ind>0 && fh>0.3) ? (clamp(L.flash,0,1)*0.95).toFixed(3) : 0);
+  let ftf = '';
+  if(a && a.type==='rinse') ftf = 'translate('+a.tx.toFixed(1)+' '+a.ty.toFixed(1)+') rotate('+a.ta.toFixed(1)+' 230 540)';
+  else if(labSwirling(now)){ const tt = now/1000; ftf = 'translate('+(7*Math.sin(tt*17)).toFixed(2)+' 0) rotate('+(2.2*Math.sin(tt*17+1.3)).toFixed(2)+' 230 622)'; }
+  $('lFlaskG').setAttribute('transform', ftf);
+  let pp = PP.rest, pf = 0;
+  if(a && a.type==='pip'){ pp = a.pose || PP.rest; pf = a.f==null ? 0 : a.f; }
+  $('lPipG').setAttribute('transform', 'translate('+pp.x.toFixed(1)+' '+pp.y.toFixed(1)+') rotate('+pp.a.toFixed(1)+') scale(0.88)');
+  const pl = $('lPipLiq'); pl.setAttribute('y', (-262*pf).toFixed(1)); pl.setAttribute('height', (262*pf).toFixed(1));
+  const ps = $('lPStream');
+  ps.setAttribute('height', (a && a.type==='pip' && a.stream) ? Math.max(0, ly - 553) : 0);
+  const dp = (a && a.type==='ind' && a.pose) ? a.pose : DP.home;
+  $('lDropperG').setAttribute('transform', 'translate('+dp.x.toFixed(1)+' '+dp.y.toFixed(1)+') rotate('+dp.a.toFixed(1)+')');
+  const fx = (a && a.type==='fill' && a.fx!=null) ? a.fx : 680, fyy = (a && a.type==='fill' && a.fy!=null) ? a.fy : 630;
+  $('lFunnelG').setAttribute('transform', 'translate('+fx.toFixed(1)+' '+fyy.toFixed(1)+')');
+  $('lNaohG').classList.toggle('pour', !!(a && a.type==='fill' && a.glow));
+  const wl = $('lWasteLiq'); wl.setAttribute('y', 640 - L.wasteH); wl.setAttribute('height', L.wasteH); wl.setAttribute('fill', rgb(L.wasteCol));
+  const ws = $('lWStream');
+  if(a && a.type==='rinse' && a.stream){ ws.setAttribute('y', 552); ws.setAttribute('height', Math.max(0, 640 - L.wasteH - 552)); ws.setAttribute('fill', rgb(a.col)); }
+  else ws.setAttribute('height', 0);
+  /* 放大讀數 */
+  const key = (L.filled || (a && a.type==='fill')) && r <= 50 ? String(Math.round(r*1000)) : 'e';
+  if(key !== L.lkey){
+    L.lkey = key;
+    $('lLoupe').innerHTML = key==='e'
+      ? '<rect width="150" height="150" fill="#fff"/><text x="75" y="68" text-anchor="middle" font-size="16" font-weight="800" fill="#4b5b75">滴定管</text><text x="75" y="92" text-anchor="middle" font-size="16" font-weight="800" fill="#4b5b75">還是空的</text>'
+      : loupeSVG(r, 150, 150, 2);
+    if(TEACHER){ const tr = $('lTeacherRead'); tr.hidden = key==='e'; tr.textContent = '教師：讀數 '+r.toFixed(2)+' mL'; }
+  }
+}
+
+/* ---------- 實驗記錄 ---------- */
+const curTrial = () => { for(let t=0;t<3;t++) if(L.trials[t].f==null) return t; return -1; };
+const doneTrials = () => L.trials.filter(x=>x.f!=null).length;
+const trialVol = t => L.trials[t].f - L.trials[t].i;
+
+function recRender(){
+  const t = curTrial();
+  const kk = t<0 ? null : (L.trials[t].i==null ? 'i' : 'f');
+  $('rdBtn').textContent = kk==='i' ? '記初讀' : kk==='f' ? '記終讀' : '完成';
+  $('rdBtn').disabled = (kk==null);
+  $('rdIn').placeholder = kk==='f' ? '終點讀數' : '初始讀數';
+  let h = '';
+  for(let x=0;x<3;x++){
+    const tr = L.trials[x];
+    if(tr.f!=null) h += '<div class="rt ok"><span>第'+(x+1)+'次</span><b>'+trialVol(x).toFixed(2)+' mL</b></div>';
+    else if(tr.i!=null) h += '<div class="rt cur"><span>第'+(x+1)+'次</span><span>初讀 '+tr.i.toFixed(2)+'</span></div>';
+    else h += '<div class="rt"><span>第'+(x+1)+'次</span><span>—</span></div>';
+  }
+  $('recList').innerHTML = h;
+  const vols = []; for(let x=0;x<3;x++) if(L.trials[x].f!=null) vols.push(trialVol(x));
+  const s = $('recSum');
+  if(!vols.length) s.innerHTML = '';
+  else {
+    const avg = vols.reduce((p,q)=>p+q,0)/vols.length, spread = Math.max(...vols) - Math.min(...vols);
+    s.innerHTML = '平均 <b>'+avg.toFixed(2)+' mL</b>'
+      + (spread > 0.2 ? ' <span class="bad">各次差超過 0.2 mL，建議重做</span>' : '')
+      + '<br>HCl 濃度 = 0.100 × '+avg.toFixed(2)+' ÷ 20.00 = <b>'+(0.100*avg/20).toFixed(3)+' M</b>';
+  }
+  if(TEACHER){
+    $('teacherPill').hidden = false;
+    $('teacherPill').textContent = '教師：HCl '+L.ca0.toFixed(4)+' M，當量點 '+VEQ().toFixed(2)+' mL';
+  }
+  L.dirty = true;
+}
+function recordNow(){
+  const t = curTrial();
+  if(t<0){ lmsg('3 次都記好了。要重做請按「清除」。', 'info'); return; }
+  const k = L.trials[t].i==null ? 'i' : 'f';
+  if(L.anim){ lmsg('等一下，動作還沒做完。'); return; }
+  if(L.holding || L.pending>1e-9 || L.drops.length){ lmsg('請先暫停滴定，再讀數。'); return; }
+  if(!L.filled){ lmsg('滴定管是空的，沒有讀數可以記。'); return; }
+  const v = parseFloat($('rdIn').value);
+  if(isNaN(v)){ lmsg('請先在欄位輸入讀數，讀到 0.01 mL。'); return; }
+  if(k==='i' && L.landed > 1e-9){ lmsg('初讀要在開始滴定前記錄。請先「倒掉沖洗」，重新取液再做。'); return; }
+  if(k==='f' && L.landed < 1e-9){ lmsg('還沒有滴入任何 NaOH，不能記終讀。'); return; }
+  const d = v - L.disp;
+  if(Math.abs(d) > 0.031){
+    lmsg('和滴定管現在的液面還有差：你讀的比實際'+(d>0?'大':'小')+'一些。看看放大圖，凹液面最低處對到哪個刻度？');
+    return;
+  }
+  if(k==='f' && v <= L.trials[t].i){ lmsg('終讀要比初讀大（數字往下變大）。'); return; }
+  L.trials[t][k] = v;
+  $('rdIn').value = '';
+  $('rdIn').blur();
+  recRender();
+  if(k==='f') lmsg('記好了，用量 '+trialVol(t).toFixed(2)+' mL。', 'info');
+  else lmsg('初讀 '+v.toFixed(2)+' mL 記好了。', 'info');
+}
+$('rdBtn').addEventListener('click', recordNow);
+$('rdIn').addEventListener('keydown', e=>{ if(e.key==='Enter'){ e.preventDefault(); recordNow(); } });
+$('recClear').addEventListener('click', ()=>{
+  L.trials = [{i:null,f:null},{i:null,f:null},{i:null,f:null}];
+  recRender(); lmsg('記錄已清除。', 'info');
+});
+
+/* ---------- 步驟引導 ---------- */
+const STEP_TXT = {
+  1:'按「裝 NaOH」，用漏斗把標準液倒進滴定管',
+  2:'按「取待測液」，用吸量管取 20.00 mL HCl 放進錐形瓶',
+  3:'按「加酚酞」，滴 2 滴指示劑到錐形瓶',
+  4:'看放大圖：凹液面最低處在哪個刻度？讀到 0.01，輸入後按「記初讀」',
+  5:'按「開始滴定」。粉紅色一出現就改用「+1 滴」，搖勻後 30 秒不退色＝終點',
+  6:'暫停了。看放大圖讀終點刻度，輸入後按「記終讀」'
+};
+function reachedEnd(){ return L.landed>1e-9 && L.ph>=8.2; }
+function guideInfo(){
+  const t = curTrial();
+  if(t<0) return {k:'D', n:3, s:'✓', text:'3 次都記好了 🎉 到「曲線」頁，看看你的滴定過程', tgt:'tabCurve'};
+  const tr = L.trials[t], n = t+1;
+  if(!L.filled) return {k:1, n, s:'1/6', text:STEP_TXT[1], tgt:'aFill'};
+  if(tr.i==null){
+    if(L.landed>1e-9) return {k:'R', n, s:'沖洗', text: doneTrials()>0 ? '上一次記好了 ✔ 再做一次：按「倒掉沖洗」(共 3 次取平均)' : '初讀要在滴定「前」記錄。按「倒掉沖洗」，再重新開始', tgt:'aRinse'};
+    if(!L.hcl){
+      if(50 - L.disp < VEQ() + 3) return {k:'F', n, s:'補液', text:'滴定管剩下的液量不夠了，按「裝 NaOH」重新裝液', tgt:'aFill'};
+      return {k:2, n, s:'2/6', text:STEP_TXT[2], tgt:'aPip'};
+    }
+    if(L.ind<2) return {k:3, n, s:'3/6', text:STEP_TXT[3], tgt:'aInd'};
+    return {k:4, n, s:'4/6', text:STEP_TXT[4], tgt:'rdBtn'};
+  }
+  if(!L.hcl) return {k:2, n, s:'2/6', text:STEP_TXT[2], tgt:'aPip'};
+  if(L.ind<2) return {k:3, n, s:'3/6', text:STEP_TXT[3], tgt:'aInd'};
+  if(reachedEnd()){
+    if(L.holding) return {k:5, n, s:'5/6', text:'到終點了！按「暫停」，不要再滴', tgt:'lHoldBtn'};
+    return {k:6, n, s:'6/6', text:STEP_TXT[6], tgt:'rdBtn'};
+  }
+  if(L.flash > 0.05 || L.landed > 5 && L.ph > 3.2) return {k:5, n, s:'5/6', text:'快到了！改用「+1 滴」，每滴一下就搖勻，看粉紅會不會退色', tgt:'lStep'};
+  return {k:5, n, s:'5/6', text:STEP_TXT[5], tgt:'lHoldBtn'};
+}
+let gKey = '';
+function renderGuide(){
+  const gi = guideInfo();
+  const txt = L.msg ? L.msg : (L.guide ? gi.text : '自由操作：想做哪一步就按下面的按鈕');
+  const cls = L.msg ? L.msgKind : '';
+  const badge = L.guide ? gi.n+'|'+gi.s : '自由|·';
+  const nudge = (L.guide && !L.anim) ? gi.tgt : '';
+  const key = [txt, cls, badge, nudge, L.guide].join('¦');
+  if(key === gKey) return;
+  gKey = key;
+  $('gText').textContent = txt; $('gText').className = cls;
+  const gb = $('gBadge');
+  if(L.guide){
+    $('gTrial').textContent = gi.k==='D' ? '完成' : '第 '+gi.n+' 次'; $('gStep').textContent = gi.s;
+    gb.className = gi.k==='D' ? 'done' : '';
+  } else { $('gTrial').textContent = '自由'; $('gStep').textContent = '操作'; gb.className = 'free'; }
+  $('cvMsg').textContent = L.msg || '';
+  document.querySelectorAll('.nudge').forEach(e=>e.classList.remove('nudge'));
+  if(nudge){
+    if(nudge==='lStep') document.querySelectorAll('.lStep[data-v="0.05"]').forEach(e=>e.classList.add('nudge'));
+    else if(nudge==='tabCurve') document.querySelector('#tabs button[data-pg="curve"]').classList.add('nudge');
+    else $(nudge).classList.add('nudge');
+  }
+}
+function setGuide(on){
+  L.guide = on; sset('titM_guide', on ? '1' : '0');
+  $('guideBtn').classList.toggle('on', on); $('guideBtn').setAttribute('aria-pressed', on ? 'true' : 'false');
+  gKey = ''; renderGuide(); L.dirty = true;
+}
+$('guideBtn').addEventListener('click', ()=>setGuide(!L.guide));
+
+/* ---------- 頁面切換 ---------- */
+let page = 'lab';
+function setPage(p){
+  page = p;
+  $('pgLab').hidden = p!=='lab'; $('pgCurve').hidden = p!=='curve';
+  document.querySelectorAll('#tabs button').forEach(b=>b.classList.toggle('on', b.dataset.pg===p));
+  document.body.classList.toggle('onlab', p==='lab');
+  if(p==='curve'){ L.dirty = true; requestAnimationFrame(()=>{ drawCurve(); }); }
+  else { L.lkey = ''; }
+  gKey = ''; renderGuide();
+}
+document.querySelectorAll('#tabs button').forEach(b=>b.addEventListener('click', ()=>setPage(b.dataset.pg)));
+$('rotGo').addEventListener('click', ()=>setPage('curve'));
+
+/* ================= 曲線頁 ================= */
+const CV = {ind:'pp', cursor:null};
+const revealTheory = () => !L.guide || TEACHER || doneTrials()>=1;
+function volAtPh(target){
+  let lo = 0, hi = 50;
+  if(pHat(SPECS.hcl, L.ca0, hi) < target) return hi;
+  for(let i=0;i<40;i++){ const m = (lo+hi)/2; if(pHat(SPECS.hcl, L.ca0, m) < target) lo = m; else hi = m; }
+  return (lo+hi)/2;
+}
+function halo(ctx, text, x, y, color, align, size){
+  ctx.font = '800 '+(size||13)+'px sans-serif'; ctx.textAlign = align; ctx.textBaseline = 'middle';
+  ctx.lineWidth = 4; ctx.strokeStyle = '#fff'; ctx.lineJoin = 'round'; ctx.strokeText(text, x, y);
+  ctx.fillStyle = color; ctx.fillText(text, x, y);
+}
+function maxLanded(){
+  let m = L.landed;
+  for(const t of L.old) m = Math.max(m, t[t.length-1].v);
+  return m;
+}
+let cvGeom = null;
+function drawCurve(){
+  const cv = $('cv'), dpr = window.devicePixelRatio||1;
+  const W = cv.clientWidth, H = cv.clientHeight;
+  if(!W || !H) return;
+  if(cv.width!==Math.round(W*dpr) || cv.height!==Math.round(H*dpr)){ cv.width = Math.round(W*dpr); cv.height = Math.round(H*dpr); }
+  const ctx = cv.getContext('2d');
+  ctx.setTransform(dpr,0,0,dpr,0,0); ctx.clearRect(0,0,W,H);
+  const ML=36, MR=10, MT=10, MB=34, pw=W-ML-MR, ph=H-MT-MB;
+  const xmax = maxLanded() > 36 ? 50 : 40;
+  const X = v => ML + v/xmax*pw, Y = p => MT + (1-p/14)*ph;
+  cvGeom = {ML, MR, MT, MB, pw, ph, xmax, W, H};
+  ctx.fillStyle = '#fff'; ctx.fillRect(0,0,W,H);
+  const rev = revealTheory();
+  const I = IND[CV.ind];
+  if(I){
+    const g = ctx.createLinearGradient(0, Y(I.hi), 0, Y(I.lo));
+    g.addColorStop(0, 'rgba('+I.b.join(',')+',.5)'); g.addColorStop(1, 'rgba('+I.a.join(',')+',.5)');
+    ctx.fillStyle = g; ctx.fillRect(ML, Y(I.hi), pw, Y(I.lo)-Y(I.hi));
+    ctx.strokeStyle = 'rgba(20,33,61,.4)'; ctx.lineWidth = 1; ctx.setLineDash([4,4]);
+    [I.lo,I.hi].forEach(p=>{ ctx.beginPath(); ctx.moveTo(ML,Y(p)); ctx.lineTo(ML+pw,Y(p)); ctx.stroke(); });
+    ctx.setLineDash([]);
+    halo(ctx, I.name+' pH '+I.lo.toFixed(1)+'–'+I.hi.toFixed(1), ML+6, (Y(I.lo)+Y(I.hi))/2, '#14213d', 'left', 12);
+  }
+  ctx.lineWidth = 1; ctx.font = '600 12px sans-serif'; ctx.fillStyle = '#4b5b75';
+  ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
+  for(let p=0;p<=14;p+=2){ ctx.strokeStyle = '#e3e9f3'; ctx.beginPath(); ctx.moveTo(ML,Y(p)); ctx.lineTo(ML+pw,Y(p)); ctx.stroke(); ctx.fillText(String(p), ML-6, Y(p)); }
+  ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+  for(let v=0;v<=xmax;v+=5){ ctx.strokeStyle = '#eef2f8'; ctx.beginPath(); ctx.moveTo(X(v),MT); ctx.lineTo(X(v),MT+ph); ctx.stroke(); if(v%10===0) ctx.fillText(String(v), X(v), MT+ph+4); }
+  ctx.strokeStyle = '#14213d'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(ML,MT); ctx.lineTo(ML,MT+ph); ctx.lineTo(ML+pw,MT+ph); ctx.stroke();
+  ctx.fillStyle = '#14213d'; ctx.font = '800 13px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'bottom';
+  ctx.fillText('滴入 NaOH 的體積 (mL)', ML+pw/2, H-2);
+  ctx.save(); ctx.translate(11, MT+ph/2); ctx.rotate(-Math.PI/2); ctx.textBaseline = 'top'; ctx.fillText('pH', 0, -3); ctx.restore();
+
+  /* 理論曲線＋當量點（引導模式下，完成一次記錄後才顯示） */
+  if(rev){
+    ctx.strokeStyle = 'rgba(100,116,139,.85)'; ctx.lineWidth = 2.5; ctx.setLineDash([6,4]); ctx.beginPath();
+    let st = false;
+    for(let v=0; v<=xmax; v+=0.1){ const p = pHat(SPECS.hcl, L.ca0, v); if(!st){ ctx.moveTo(X(v),Y(p)); st = true; } else ctx.lineTo(X(v),Y(p)); }
+    ctx.stroke(); ctx.setLineDash([]);
+    const ve = VEQ(), pe = pHat(SPECS.hcl, L.ca0, ve);
+    ctx.strokeStyle = '#0f7a3a'; ctx.lineWidth = 2; ctx.setLineDash([6,4]);
+    ctx.beginPath(); ctx.moveTo(X(ve),MT); ctx.lineTo(X(ve),MT+ph); ctx.stroke(); ctx.setLineDash([]);
+    ctx.fillStyle = '#0f7a3a'; ctx.beginPath(); ctx.arc(X(ve),Y(pe),6,0,7); ctx.fill();
+    const right = X(ve) < ML+pw*0.55;
+    halo(ctx, '當量點 '+ve.toFixed(2)+' mL、pH '+pe.toFixed(1), right ? X(ve)+10 : X(ve)-10, Y(pe)+(right?20:-20), '#0f7a3a', right?'left':'right', 12.5);
+  }
+  /* 前幾次的軌跡 */
+  ctx.lineJoin = 'round';
+  L.old.forEach(tr=>{
+    ctx.strokeStyle = 'rgba(31,79,216,.35)'; ctx.lineWidth = 2; ctx.beginPath();
+    tr.forEach((pt,i)=>{ const x = X(pt.v), y = Y(pt.ph); if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y); });
+    ctx.stroke();
+  });
+  /* 這一次的軌跡 */
+  ctx.strokeStyle = '#1f4fd8'; ctx.lineWidth = 3.5; ctx.beginPath();
+  L.trace.forEach((pt,i)=>{ const x = X(pt.v), y = Y(pt.ph); if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y); });
+  ctx.stroke();
+  /* 你記錄的用量 */
+  for(let t=0;t<3;t++){
+    if(L.trials[t].f==null) continue;
+    const x = X(trialVol(t));
+    ctx.strokeStyle = '#d9480f'; ctx.lineWidth = 2.5;
+    ctx.beginPath(); ctx.moveTo(x, MT+ph); ctx.lineTo(x, MT+ph-16); ctx.stroke();
+    halo(ctx, String(t+1), x, MT+ph-24, '#d9480f', 'center', 13);
+  }
+  const cur = L.trace[L.trace.length-1];
+  ctx.fillStyle = '#e11d48'; ctx.beginPath(); ctx.arc(X(cur.v), Y(cur.ph), 6, 0, 7); ctx.fill();
+  ctx.strokeStyle = '#fff'; ctx.lineWidth = 2; ctx.stroke();
+  /* 手指指到的位置 */
+  if(CV.cursor!=null){
+    const v = CV.cursor, p = pHat(SPECS.hcl, L.ca0, v);
+    ctx.strokeStyle = 'rgba(20,33,61,.7)'; ctx.lineWidth = 1.5; ctx.setLineDash([3,3]);
+    ctx.beginPath(); ctx.moveTo(X(v),MT); ctx.lineTo(X(v),MT+ph); ctx.moveTo(ML,Y(p)); ctx.lineTo(ML+pw,Y(p)); ctx.stroke(); ctx.setLineDash([]);
+    ctx.fillStyle = '#fff'; ctx.strokeStyle = '#14213d'; ctx.lineWidth = 2.5;
+    ctx.beginPath(); ctx.arc(X(v),Y(p),6,0,7); ctx.fill(); ctx.stroke();
+  }
+  updateCvText();
+}
+function updateCvText(){
+  const rd = $('cvReadT'), sw = $('cvSw');
+  if(CV.cursor==null){
+    rd.textContent = '在曲線上滑動手指，看每個體積的 pH';
+    sw.style.background = rgb(WATER);
+  } else {
+    const p = pHat(SPECS.hcl, L.ca0, CV.cursor);
+    rd.textContent = CV.cursor.toFixed(2)+' mL　pH '+p.toFixed(2);
+    sw.style.background = rgb(indColor(CV.ind, p));
+  }
+  /* 說明文字 */
+  const n = $('cvNote'), I = IND[CV.ind];
+  let h = '';
+  if(!revealTheory()){
+    h = '<span class="lock">🔒 藍線是你剛剛滴出來的曲線。完成並記下一次終讀後，會出現理論曲線和當量點讓你對照。</span>';
+  } else {
+    const ve = VEQ();
+    h = '理論當量點 <b>'+ve.toFixed(2)+' mL</b>';
+    if(doneTrials()>0){
+      const vols = []; for(let t=0;t<3;t++) if(L.trials[t].f!=null) vols.push(trialVol(t));
+      const avg = vols.reduce((a,b)=>a+b,0)/vols.length;
+      h += '；你測到平均 <b>'+avg.toFixed(2)+' mL</b>（差 '+(avg-ve>=0?'+':'')+(avg-ve).toFixed(2)+'）';
+    }
+    h += '。<br>';
+    if(I){
+      const vm = volAtPh((I.lo+I.hi)/2), d = vm - ve;
+      h += I.name+' 約在 <b>'+vm.toFixed(2)+' mL</b> 變色，和當量點差 '+(d>=0?'+':'')+d.toFixed(2)+' mL（'+(Math.abs(d)/ve*100).toFixed(2)+'%）。強酸強鹼的 pH 突躍很陡，這三種都適用。';
+    } else h += '選一個指示劑，看它的變色範圍落在曲線的哪裡。';
+  }
+  if(n.dataset.h !== h){ n.dataset.h = h; n.innerHTML = h; }
+}
+function cvPointer(e){
+  if(!cvGeom) return;
+  const r = $('cv').getBoundingClientRect();
+  const x = e.clientX - r.left;
+  let v = (x - cvGeom.ML)/cvGeom.pw*cvGeom.xmax;
+  v = clamp(v, 0, cvGeom.xmax);
+  if(!revealTheory()) v = Math.min(v, Math.max(maxLanded(), 0));
+  CV.cursor = Math.round(v*100)/100;
+  L.dirty = true;
+}
+let cvDown = false;
+$('cv').addEventListener('pointerdown', e=>{ cvDown = true; try{ $('cv').setPointerCapture(e.pointerId); }catch(_){} cvPointer(e); });
+$('cv').addEventListener('pointermove', e=>{ if(cvDown) cvPointer(e); });
+$('cv').addEventListener('pointerup', ()=>{ cvDown = false; });
+$('cv').addEventListener('pointercancel', ()=>{ cvDown = false; });
+$('cvChips').addEventListener('click', e=>{
+  const b = e.target.closest('button'); if(!b) return;
+  CV.ind = b.dataset.i;
+  document.querySelectorAll('#cvChips button').forEach(x=>x.classList.toggle('on', x===b));
+  L.dirty = true;
+});
+window.addEventListener('resize', ()=>{ L.dirty = true; });
+if(window.ResizeObserver) new ResizeObserver(()=>{ L.dirty = true; }).observe($('cvWrap'));
+
+/* ---------- 啟動 ---------- */
+if(TEACHER) $('teacherTag').hidden = false;
+L.rate = parseFloat($('lRate').value);
+$('guideBtn').classList.toggle('on', L.guide); $('guideBtn').setAttribute('aria-pressed', L.guide ? 'true' : 'false');
+buildInit();
+function buildInit(){ labHoldUI(); recRender(); renderGuide(); }
+let last = performance.now(), gTick = 0;
+function frame(now){
+  const dt = Math.min(0.05, (now-last)/1000); last = now;
+  labStep(dt, now);
+  if(page==='lab') labRender(now);
+  if(now - gTick > 120){ gTick = now; renderGuide(); }
+  if(page==='curve' && L.dirty){ L.dirty = false; drawCurve(); }
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+window.__titr = {L, setPage, guideInfo, pHat, veq, setGuide, CV};
+})();
+</script>
+</body>
+</html>
